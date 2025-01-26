@@ -2,7 +2,7 @@ import psycopg2
 from contextlib import contextmanager
 from psycopg2.extras import RealDictCursor
 
-from config import settings
+from app.core.config import settings
 
 import logging
 logger = logging.getLogger(__name__)

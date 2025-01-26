@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from core.database import get_db_cursor
-from app.crud import users, user_types,payments, reports
+from app.core.database import get_db_cursor
+from app.api.endpoints import users, user_types,payments, reports
 
 api_router = APIRouter()
 

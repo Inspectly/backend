@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from user_types import User_Types
+from app.schema.user_types import User_Types
 
 class Users(BaseModel):
     user_type: User_Types

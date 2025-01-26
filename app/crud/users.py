@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
-from schema.users import Users
-from core.database import get_db_cursor
+from app.schema.users import Users
+from app.core.database import get_db_cursor
 from app.crud.user_types import get_one_user_type
 
 def get_one(id: int):

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
-from schema.payments import Payments
-from core.database import get_db_cursor
+from app.schema.payments import Payments
+from app.core.database import get_db_cursor
 
 def get_one(id: int):
     query = """
