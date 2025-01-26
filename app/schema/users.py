@@ -7,10 +7,10 @@ class Users(BaseModel):
     user_type: User_Types
     name: str
     email: str
-    phone: str
-    address: str
+    phone: Optional[str]
+    address: Optional[str]
     user_code: int
-    city: str
-    state: str
-    country: str
-    postal_code: str
+    city: Optional[str]
+    state: Optional[str]
+    country: Optional[str]
+    postal_code: Optional[str]
