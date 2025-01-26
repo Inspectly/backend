@@ -17,7 +17,7 @@ def get_status():
 def get_db_status():
     try:
         get_db_cursor()
-        return {'message': 'Database is running'} 
+        return {'message': 'Database is running'}
     except Exception as e:
         return {'message': 'Database is not running', 'error': str(e)}
 
