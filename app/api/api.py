@@ -19,7 +19,7 @@ def get_db_status():
         get_db_cursor()
         return {'message': 'Database is running'}
     except Exception as e:
-        return {'message': 'Database is not running', 'error': str(e)}
+        return {'message': 'Database is not running', 'error': str(e)} 
 
 api_router.include_router(users.router, prefix = '/users', tags = ['users'])
 api_router.include_router(user_types.router, prefix = '/user_types', tags = ['user_types'])
