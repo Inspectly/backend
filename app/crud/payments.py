@@ -44,7 +44,7 @@ def create(payment: Payments):
                     (user_id, payment_amount)
                 VALUES 
                     ({}, {})
-                RETURNING id
+                RETURNING id, created_at
             """.format(payment.user_id, payment.payment_amount)
     with get_db_cursor() as cursor:
         cursor.execute(query)

@@ -43,7 +43,7 @@ def create(report: Reports):
                     (user_id, aws_link, name, city, state, country, postal_code)
                 VALUES 
                     ({}, '{}', '{}', '{}', '{}', '{}', '{}')
-                RETURNING id
+                RETURNING id, name, created_at
             """.format(
                 report.user_id, 
                 report.aws_link, 
@@ -69,7 +69,7 @@ def update(id: int, report: Reports):
                     country = '{}', 
                     postal_code = '{}' 
                 WHERE id = {}
-                RETURNING id
+                RETURNING id, name, updated_at
             """.format(
                 report.aws_link, 
                 report.name, 

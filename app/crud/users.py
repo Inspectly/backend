@@ -39,7 +39,7 @@ def create(user: Users):
                     (user_type, name, email, phone, address, user_code, city, state, country, postal_code)
                 VALUES 
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
-                RETURNING id
+                RETURNING id, name, created_at
             """.format(
                 user.user_type, 
                 user.name, 
@@ -77,7 +77,7 @@ def update(id: int, user: Users):
                     country = '{}',
                     postal_code = '{}'
                 WHERE id = {}
-                RETURNING id
+                RETURNING id, name, updated_at
             """.format(
                 user.user_type,
                 user.name, 

@@ -46,7 +46,7 @@ def create(user_login: User_Logins):
                     (user_id, email_login, email, phone_login, phone, gmail_login, gmail)
                 VALUES 
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}')
-                RETURNING id
+                RETURNING id, created_at
             """.format(
                 user_login.user_id, 
                 user_login.email_login, 
@@ -72,6 +72,7 @@ def update(id: int, user_login: User_Logins):
                     gmail_login = '{}', 
                     gmail = '{}'
                 WHERE id = {}
+                RETURNING id, updated_at
             """.format(
                 user_login.email_login, 
                 user_login.email, 

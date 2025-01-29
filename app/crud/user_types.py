@@ -49,7 +49,7 @@ def create(user_type: User_Types):
                     (user_type)
                 VALUES ('{}')
                 RETURNING id, user_type, created_at
-            """.format(user_type)
+            """.format(user_type.user_type.value)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_type = cursor.fetchone()   
