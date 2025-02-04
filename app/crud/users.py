@@ -29,10 +29,10 @@ def get_all():
         return [dict(user) for user in users]
 
 def create(user: Users):
-    user_type = get_one_user_type(user.user_type)
-    if (user_type != user.user_type):
+    user_type = get_one_user_type(user.user_type.user_type.value)
+    if (user_type['user_type'] != user.user_type.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    if(len(user.user_code) != 5):
+    if(len(str(user.user_code)) != 5):
         raise HTTPException(status_code = 400, detail = 'Invalid user code')
     query = """
                 INSERT INTO users 
@@ -41,7 +41,7 @@ def create(user: Users):
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, name, created_at
             """.format(
-                user.user_type, 
+                user.user_type.user_type.value, 
                 user.name, 
                 user.email, 
                 user.phone, 

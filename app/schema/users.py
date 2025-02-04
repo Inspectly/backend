@@ -9,7 +9,7 @@ class Users(BaseModel):
     email: str
     phone: Optional[str]
     address: Optional[str]
-    user_code: int
+    user_code: str
     city: Optional[str]
     state: Optional[str]
     country: Optional[str]
