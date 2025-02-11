@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 
 from app.schema.types import Login_Method, User_Types, Vendor_Types
@@ -34,6 +34,10 @@ class Realtors(BaseModel):
     rating: Optional[int] = Field(default = -1)
     review: Optional[str]
 
+    @validator('rating')
+    def set_default_rating(cls, v):
+        return v if v is not None else -1
+
 class Vendors(BaseModel):
     vendor_user_id: int
     vendor_type: Vendor_Types
@@ -48,6 +52,10 @@ class Vendors(BaseModel):
     postal_code: str
     rating: Optional[int] = Field(default = -1)
     review: Optional[str]
+
+    @validator('rating')
+    def set_default_rating(cls, v):
+        return v if v is not None else -1
 
 class User_Logins(BaseModel):
     user_id: int
