@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 from app.schema.types import Progress_Steps
 
 class Listings(BaseModel):
-    user_id: str
+    user_id: int
     address: str
     city: str
     state: str
@@ -14,14 +14,14 @@ class Listings(BaseModel):
     image_url: Optional[str]
 
 class Reports(BaseModel):
-    user_id: str
-    listing_id: str
+    user_id: int
+    listing_id: int
     aws_link: str
     name: str
     
 class Issues(BaseModel):
-    report_id: str
-    vendor_id: str
+    report_id: int
+    vendor_id: int
     type: str
     description: Optional[str]
     summary: Optional[str]
@@ -31,18 +31,18 @@ class Issues(BaseModel):
     cost: Optional[float]
 
 class Attachments(BaseModel):
-    issue_id: str
-    user_id: str
+    issue_id: int
+    user_id: int
     name: str
     attachment_type: str
     url: str
 
 class Comments(BaseModel):
-    issue_id: str
-    user_id: str
+    issue_id: int
+    user_id: int
     comment: str
 
 class Notes(BaseModel):
-    report_id: str
-    user_id: str
+    report_id: int
+    user_id: int
     note: str

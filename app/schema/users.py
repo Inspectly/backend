@@ -8,7 +8,7 @@ class Users(BaseModel):
     user_type: User_Types
 
 class Clients(BaseModel):
-    user_id: str
+    user_id: int
     first_name: str
     last_name: str
     email: str
@@ -20,8 +20,8 @@ class Clients(BaseModel):
     postal_code: Optional[str]
 
 class Realtors(BaseModel):
-    realtor_user_id: str
-    realtor_firm_id: str
+    realtor_user_id: int
+    realtor_firm_id: int
     first_name: str
     last_name: str
     email: str
@@ -35,7 +35,7 @@ class Realtors(BaseModel):
     review: Optional[str]
 
 class Vendors(BaseModel):
-    vendor_user_id: str
+    vendor_user_id: int
     vendor_type: Vendor_Types
     code: str
     name: str
@@ -50,7 +50,7 @@ class Vendors(BaseModel):
     review: Optional[str]
 
 class User_Logins(BaseModel):
-    user_id: str
+    user_id: int
     email_login: bool
     email: Optional[str]
     phone_login: bool
@@ -59,6 +59,6 @@ class User_Logins(BaseModel):
     gmail: Optional[str]
 
 class User_Sessions(BaseModel):
-    user_id: str
+    user_id: int
     login_method: Login_Method
     authentication_code: str
