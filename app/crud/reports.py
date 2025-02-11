@@ -37,21 +37,29 @@ def get_user_reports(user_id: int):
         reports = cursor.fetchall()
         return [dict(report) for report in reports]
     
+def get_listing_reports(listing_id: int):
+    query = """
+                SELECT * 
+                FROM reports 
+                WHERE listing_id = {}
+            """.format(listing_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        reports = cursor.fetchall()
+        return [dict(report) for report in reports]
+    
 def create(report: Reports):
     query = """
                 INSERT INTO reports 
-                    (user_id, aws_link, name, city, state, country, postal_code)
+                    (user_id, listing_id, aws_link, name)
                 VALUES 
-                    ({}, '{}', '{}', '{}', '{}', '{}', '{}')
-                RETURNING id, name, created_at
+                    ({}, {}, '{}', '{}')
+                RETURNING id, user_id, listing_id, created_at
             """.format(
                 report.user_id, 
+                report.listing_id, 
                 report.aws_link, 
-                report.name, 
-                report.city, 
-                report.state, 
-                report.country, 
-                report.postal_code
+                report.name
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
@@ -63,20 +71,12 @@ def update(id: int, report: Reports):
                 UPDATE reports 
                 SET 
                     aws_link = '{}', 
-                    name = '{}', 
-                    city = '{}', 
-                    state = '{}', 
-                    country = '{}', 
-                    postal_code = '{}' 
+                    name = '{}' 
                 WHERE id = {}
-                RETURNING id, name, updated_at
+                RETURNING id, user_id, listing_id, updated_at
             """.format(
                 report.aws_link, 
                 report.name, 
-                report.city, 
-                report.state, 
-                report.country, 
-                report.postal_code, 
                 id
             )
     with get_db_cursor() as cursor:
