@@ -23,5 +23,5 @@ def create(user_session: User_Sessions):
     return user_sessions.create(user_session)
 
 @router.put('/{id}')
-def update(id: int, logout_time: datetime):
+def update(id: int, logout_time: str):
     return user_sessions.update(id, logout_time)

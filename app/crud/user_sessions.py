@@ -61,7 +61,7 @@ def create(user_session: User_Sessions):
         user_session_id = cursor.fetchone()
         return dict(user_session_id)
     
-def update(id: int, logout_time: datetime):
+def update(id: int, logout_time: str):
     query = """
                 UPDATE user_sessions 
                 SET 
