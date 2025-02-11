@@ -67,10 +67,12 @@ def update(id: int, logout_time: datetime):
                 SET 
                     logout_time = '{}'
                 WHERE id = {}
+                RETURNING id
             """.format(
                 logout_time, 
                 id
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        return {'message': f'User session {id} updated successfully'}
+        user_session_id = cursor.fetchone()
+        return dict(user_session_id)
