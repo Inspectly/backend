@@ -4,10 +4,9 @@ from typing import Optional, List, Dict, Any
 
 class User_Type(str, Enum):
     ADMIN = 'admin'
-    INDIVIDUAL = 'individual'
-    BROKER = 'broker'
+    CLIENT = 'client'
     REALTOR = 'realtor'
-    CONTRACTOR = 'contractor'
+    VENDOR = 'vendor'
 
 class User_Types(BaseModel):
     user_type: User_Type
