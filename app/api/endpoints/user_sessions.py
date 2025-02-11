@@ -2,7 +2,7 @@ import datetime
 from fastapi import APIRouter, HTTPException
 
 from app.crud import user_sessions
-from app.schema.user_sessions import User_Sessions
+from app.schema.users import User_Sessions
 
 router = APIRouter()
 

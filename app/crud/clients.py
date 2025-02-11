@@ -12,6 +12,8 @@ def get_one(id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         client = cursor.fetchone()
+        if not client:
+            raise HTTPException(status_code = 404, detail = 'Client not found')
         return dict(client)
 
 def get_all():

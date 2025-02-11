@@ -2,7 +2,7 @@ import datetime
 from fastapi import HTTPException
 
 from app.core.database import get_db_cursor
-from app.schema.user_sessions import User_Sessions
+from app.schema.users import User_Sessions
 
 def get_one(id: int):
     query = """

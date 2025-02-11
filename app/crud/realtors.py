@@ -12,6 +12,8 @@ def get_one(id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         realtor = cursor.fetchone()
+        if not realtor:
+            raise HTTPException(status_code = 404, detail = 'Realtor not found')
         return dict(realtor)
 
 def get_all():

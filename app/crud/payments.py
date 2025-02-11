@@ -43,7 +43,7 @@ def create(payment: Payments):
                 INSERT INTO payments 
                     (user_id, payment_amount, expiry_date, stripe_payment_id, stripe_user_id)
                 VALUES 
-                    ({}, {}, {}, {}, {})
+                    ({}, {}, '{}', '{}', '{}')
                 RETURNING id, created_at
             """.format(payment.user_id, payment.payment_amount, payment.expiry_date, payment.stripe_payment_id, payment.stripe_user_id)
     with get_db_cursor() as cursor:

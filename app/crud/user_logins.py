@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
 from app.core.database import get_db_cursor
-from app.schema.user_logins import User_Logins
+from app.schema.users import User_Logins
 
 def get_one(id: int):
     query = """

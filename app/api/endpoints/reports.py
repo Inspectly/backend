@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.crud import reports
-from app.schema.reports import Reports
+from app.schema.properties import Reports
 
 router = APIRouter()
 
@@ -16,6 +16,10 @@ def get_one(id: int):
 @router.get('/user/{user_id}')
 def get_user_reports(user_id: int):
     return reports.get_user_reports(user_id)
+
+@router.get('/listing/{listing_id}')
+def get_listing_reports(listing_id: int):
+    return reports.get_listing_reports(listing_id)
 
 @router.post('/')
 def create(report: Reports):

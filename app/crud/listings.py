@@ -12,6 +12,8 @@ def get_one(id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         listing = cursor.fetchone()
+        if not listing:
+            raise HTTPException(status_code = 404, detail = 'Listing not found')
         return dict(listing)
     
 def get_all():

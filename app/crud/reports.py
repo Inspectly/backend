@@ -1,6 +1,7 @@
 from fastapi import HTTPException
+
 from app.core.database import get_db_cursor
-from app.schema.reports import Reports
+from app.schema.properties import Reports
 
 def get_one(id: int):
     query = """
