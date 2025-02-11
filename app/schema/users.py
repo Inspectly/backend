@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
 from app.schema.types import Login_Method, User_Types, Vendor_Types
@@ -31,7 +31,7 @@ class Realtors(BaseModel):
     state: str
     country: str
     postal_code: str
-    rating: Optional[int]
+    rating: Optional[int] = Field(default = -1)
     review: Optional[str]
 
 class Vendors(BaseModel):
@@ -46,7 +46,7 @@ class Vendors(BaseModel):
     state: str
     country: str
     postal_code: str
-    rating: Optional[int]
+    rating: Optional[int] = Field(default = -1)
     review: Optional[str]
 
 class User_Logins(BaseModel):

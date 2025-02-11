@@ -31,7 +31,7 @@ def create(realtor: Realtors):
                 INSERT INTO realtors 
                     (realtor_user_id, realtor_firm_id, first_name, last_name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, realtor_user_id, first_name, created_at
             """.format(
                 realtor.realtor_user_id,
@@ -68,7 +68,7 @@ def update(id: int, realtor: Realtors):
                     state = '{}', 
                     country = '{}', 
                     postal_code = '{}', 
-                    rating = '{}', 
+                    rating = {}, 
                     review = '{}' 
                 WHERE id = {}
                 RETURNING id, realtor_user_id, first_name, updated_at

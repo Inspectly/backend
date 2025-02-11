@@ -29,7 +29,7 @@ def create(vendor: Vendors):
                 INSERT INTO vendors 
                     (vendor_user_id, vendor_type, code, name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, vendor_user_id, first_name, created_at
             """.format(
                 vendor.vendor_user_id,
@@ -66,7 +66,7 @@ def update(id: int, vendor: Vendors):
                     state = '{}', 
                     country = '{}', 
                     postal_code = '{}', 
-                    rating = '{}', 
+                    rating = {}, 
                     review = '{}'
                 WHERE id = {}
                 RETURNING id, vendor_user_id, first_name, updated_at
