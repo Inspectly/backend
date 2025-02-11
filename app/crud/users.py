@@ -32,69 +32,38 @@ def create(user: Users):
     user_type = get_one_user_type(user.user_type.user_type.value)
     if (user_type['user_type'] != user.user_type.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    if(len(str(user.user_code)) != 5):
-        raise HTTPException(status_code = 400, detail = 'Invalid user code')
     query = """
                 INSERT INTO users 
-                    (user_type, name, email, phone, address, user_code, city, state, country, postal_code)
+                    (user_type)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
-                RETURNING id, name, created_at
+                    ('{}')
+                RETURNING id, created_at
             """.format(
-                user.user_type.user_type.value, 
-                user.name, 
-                user.email, 
-                user.phone, 
-                user.address, 
-                user.user_code, 
-                user.city, 
-                user.state, 
-                user.country, 
-                user.postal_code
+                user.user_type.user_type.value
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        user_id = cursor.fetchone()
-        return dict(user_id)
+        user = cursor.fetchone()
+        return dict(user)
     
 def update(id: int, user: Users):
     user_type = get_one_user_type(user.user_type)
     if (user_type != user.user_type):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    if(len(user.user_code) != 5):
-        raise HTTPException(status_code = 400, detail = 'Invalid user code')
     query = """
                 UPDATE users 
                 SET 
-                    user_type = '{}',
-                    name = '{}',
-                    email = '{}',
-                    phone = '{}',
-                    address = '{}',
-                    user_code = '{}',
-                    city = '{}',
-                    state = '{}',
-                    country = '{}',
-                    postal_code = '{}'
+                    user_type = '{}'
                 WHERE id = {}
-                RETURNING id, name, updated_at
+                RETURNING id, user_type, updated_at
             """.format(
                 user.user_type,
-                user.name, 
-                user.email, 
-                user.phone, 
-                user.address, 
-                user.user_code, 
-                user.city, 
-                user.state, 
-                user.country, 
-                user.postal_code, 
                 id
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        user_id = cursor.fetchone()
-        return dict(user_id)
+        user = cursor.fetchone()
+        return dict(user)
     
 def delete(id: int):
     query = """
