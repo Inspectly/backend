@@ -2,6 +2,7 @@ from fastapi import HTTPException
 
 from app.schema.users import Vendors
 from app.core.database import get_db_cursor
+from app.crud.vendor_types import get_one_vendor_type
 
 def get_one(id: int):
     query = '''
@@ -25,15 +26,18 @@ def get_all():
         return [dict(vendor) for vendor in vendors]
 
 def create(vendor: Vendors):
+    vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
+    if (vendor_type['vendor_type'] != vendor.vendor_type.vendor_type.value):
+        raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
     query = '''
                 INSERT INTO vendors 
                     (vendor_user_id, vendor_type, code, name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
-                RETURNING id, vendor_user_id, first_name, created_at
+                RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
-                vendor.vendor_type,
+                vendor.vendor_type.vendor_type.value,
                 vendor.code,
                 vendor.name,
                 vendor.email,
