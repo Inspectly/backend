@@ -5,11 +5,11 @@ from app.core.database import get_db_cursor
 from app.crud.user_types import get_one_user_type
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM users 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user = cursor.fetchone()
@@ -18,11 +18,11 @@ def get_one(id: int):
         return dict(user)
 
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM users
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         users = cursor.fetchall()
@@ -32,13 +32,13 @@ def create(user: Users):
     user_type = get_one_user_type(user.user_type.user_type.value)
     if (user_type['user_type'] != user.user_type.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    query = """
+    query = '''
                 INSERT INTO users 
                     (user_type)
                 VALUES 
                     ('{}')
                 RETURNING id, created_at
-            """.format(
+            '''.format(
                 user.user_type.user_type.value
             )
     with get_db_cursor() as cursor:
@@ -50,13 +50,13 @@ def update(id: int, user: Users):
     user_type = get_one_user_type(user.user_type)
     if (user_type != user.user_type):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    query = """
+    query = '''
                 UPDATE users 
                 SET 
                     user_type = '{}'
                 WHERE id = {}
                 RETURNING id, user_type, updated_at
-            """.format(
+            '''.format(
                 user.user_type,
                 id
             )
@@ -66,10 +66,10 @@ def update(id: int, user: Users):
         return dict(user)
     
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM users 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'User {id} deleted successfully'}

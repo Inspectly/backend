@@ -4,11 +4,11 @@ from app.schema.users import Realtors
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM realtors 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         realtor = cursor.fetchone()
@@ -17,23 +17,23 @@ def get_one(id: int):
         return dict(realtor)
 
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM realtors 
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         realtors = cursor.fetchall()
         return [dict(realtor) for realtor in realtors]
 
 def create(realtor: Realtors):
-    query = """
+    query = '''
                 INSERT INTO realtors 
                     (realtor_user_id, realtor_firm_id, first_name, last_name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, realtor_user_id, first_name, created_at
-            """.format(
+            '''.format(
                 realtor.realtor_user_id,
                 realtor.realtor_firm_id,
                 realtor.first_name,
@@ -54,7 +54,7 @@ def create(realtor: Realtors):
         return dict(realtor)
 
 def update(id: int, realtor: Realtors):
-    query = """
+    query = '''
                 UPDATE realtors 
                 SET 
                     realtor_user_id = '{}', 
@@ -72,7 +72,7 @@ def update(id: int, realtor: Realtors):
                     review = '{}' 
                 WHERE id = {}
                 RETURNING id, realtor_user_id, first_name, updated_at
-            """.format(
+            '''.format(
                 realtor.realtor_user_id,
                 realtor.realtor_firm_id,
                 realtor.first_name,
@@ -94,10 +94,10 @@ def update(id: int, realtor: Realtors):
         return dict(realtor)
 
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM realtors 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Realtor {id} deleted successfully'}

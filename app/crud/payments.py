@@ -4,11 +4,11 @@ from app.schema.payments import Payments
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM payments 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         payment = cursor.fetchone()
@@ -17,22 +17,22 @@ def get_one(id: int):
         return dict(payment)
     
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM payments
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         payments = cursor.fetchall()
         return [dict(payment) for payment in payments]
 
 def get_user_payments(user_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM payments 
                 WHERE user_id = {}
-            """.format(user_id)
+            '''.format(user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         payments = cursor.fetchall()
@@ -52,10 +52,10 @@ def create(payment: Payments):
         return dict(payment_id)
     
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM payments 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Payment {id} deleted successfully'}

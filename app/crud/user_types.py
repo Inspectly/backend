@@ -4,12 +4,12 @@ from app.core.database import get_db_cursor
 from app.schema.types import User_Types, User_Type
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM user_types 
                 WHERE id = {}
                 LIMIT 1
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_type = cursor.fetchone()
@@ -18,12 +18,12 @@ def get_one(id: int):
     return dict(user_type)
 
 def get_one_user_type(user_type: User_Type):
-    query = """
+    query = '''
                 SELECT user_type
                 FROM user_types 
                 WHERE user_type = '{}'
                 LIMIT 1
-            """.format(user_type)
+            '''.format(user_type)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_type = cursor.fetchone()
@@ -32,10 +32,10 @@ def get_one_user_type(user_type: User_Type):
     return dict(user_type)
 
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM user_types
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_types = cursor.fetchall()
@@ -44,24 +44,24 @@ def get_all():
 def create(user_type: User_Types):
     if not isinstance(user_type.user_type, User_Type):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    query = """
+    query = '''
                 INSERT INTO user_types 
                     (user_type)
                 VALUES ('{}')
                 RETURNING id, user_type, created_at
-            """.format(user_type.user_type.value)
+            '''.format(user_type.user_type.value)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_type = cursor.fetchone()   
         return dict(user_type)
 
 def update(id: int, user_type: User_Types):
-    query = """
+    query = '''
                 UPDATE user_types 
                 SET user_type = '{}'
                 WHERE id = {}
                 RETURNING id, user_type, updated_at
-            """.format(user_type, id)
+            '''.format(user_type, id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_type = cursor.fetchone()
@@ -71,10 +71,10 @@ def delete(id: int):
     user_type = get_one(id)
     if (not user_type):
         raise HTTPException(status_code = 404, detail = 'User type not found')
-    query = """
+    query = '''
                 DELETE FROM user_types 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'User type {user_type["user_type"]} deleted successfully'}

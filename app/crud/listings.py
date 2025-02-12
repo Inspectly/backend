@@ -4,11 +4,11 @@ from app.schema.properties import Listings
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM listings 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         listing = cursor.fetchone()
@@ -17,35 +17,35 @@ def get_one(id: int):
         return dict(listing)
     
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM listings
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         listings = cursor.fetchall()
         return [dict(listing) for listing in listings]
     
 def get_user_listings(user_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM listings 
                 WHERE user_id = {}
-            """.format(user_id)
+            '''.format(user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         listings = cursor.fetchall()
         return [dict(listing) for listing in listings]
 
 def create(listing: Listings):
-    query = """
+    query = '''
                 INSERT INTO listings 
                     (user_id, address, city, state, country, postal_code, image_url)
                 VALUES 
                     ({}, '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, user_id, created_at
-            """.format(
+            '''.format(
                 listing.user_id,
                 listing.address,
                 listing.city,
@@ -60,13 +60,13 @@ def create(listing: Listings):
         return dict(listing)
     
 def update(id: int, listing: Listings):
-    query = """
+    query = '''
                 UPDATE listings 
                 SET 
                     address = '{}', city = '{}', state = '{}', country = '{}', postal_code = '{}', image_url = '{}'
                 WHERE id = {}
                 RETURNING id, user_id, updated_at
-            """.format(
+            '''.format(
                 listing.address,
                 listing.city,
                 listing.state,
@@ -81,10 +81,10 @@ def update(id: int, listing: Listings):
         return dict(listing)
     
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM listings 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Listing {id} deleted successfully'}

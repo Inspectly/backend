@@ -4,11 +4,11 @@ from app.core.database import get_db_cursor
 from app.schema.payments import User_Stripe_Information
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM stripe_user_information 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_stripe_information = cursor.fetchone()
@@ -17,22 +17,22 @@ def get_one(id: int):
         return dict(user_stripe_information)
     
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM stripe_user_information
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_stripe_information = cursor.fetchall()
         return [dict(user_stripe_information) for user_stripe_information in user_stripe_information]
     
 def get_user_stripe_information(user_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM stripe_user_information 
                 WHERE user_id = {}
-            """.format(user_id)
+            '''.format(user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_stripe_information = cursor.fetchone()
@@ -41,11 +41,11 @@ def get_user_stripe_information(user_id: int):
         return dict(user_stripe_information)
     
 def get_user_stripe_information_by_stripe_user_id(stripe_user_id: str):
-    query = """
+    query = '''
                 SELECT * 
                 FROM stripe_user_information 
                 WHERE stripe_user_id = {}
-            """.format(stripe_user_id)
+            '''.format(stripe_user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         user_stripe_information = cursor.fetchone()
@@ -86,10 +86,10 @@ def update(id: int, user_stripe_information: User_Stripe_Information):
         return {'message': 'User Stripe Information updated successfully'}
 
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM stripe_user_information 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': 'User Stripe Information deleted successfully'}

@@ -4,11 +4,11 @@ from app.schema.users import Clients
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM clients 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         client = cursor.fetchone()
@@ -17,23 +17,23 @@ def get_one(id: int):
         return dict(client)
 
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM clients 
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         clients = cursor.fetchall()
         return [dict(client) for client in clients]
     
 def create(client: Clients):
-    query = """
+    query = '''
                 INSERT INTO clients 
                     (user_id, first_name, last_name, email, phone, address, city, state, country, postal_code)
                 VALUES 
                     ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, user_id, first_name, created_at
-            """.format(
+            '''.format(
                 client.user_id,
                 client.first_name,
                 client.last_name,
@@ -51,7 +51,7 @@ def create(client: Clients):
         return dict(client)
 
 def update(id: int, client: Clients):
-    query = """
+    query = '''
                 UPDATE clients 
                 SET 
                     user_id = '{}', 
@@ -66,7 +66,7 @@ def update(id: int, client: Clients):
                     postal_code = '{}'
                 WHERE id = {}
                 RETURNING id, user_id, first_name, updated_at
-            """.format(
+            '''.format(
                 client.user_id, 
                 client.first_name, 
                 client.last_name, 
@@ -85,10 +85,10 @@ def update(id: int, client: Clients):
         return dict(client)
     
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM clients 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Client {id} deleted successfully'}

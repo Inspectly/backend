@@ -4,11 +4,11 @@ from app.schema.properties import Issues
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM issues 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issue = cursor.fetchone()
@@ -17,46 +17,46 @@ def get_one(id: int):
         return dict(issue)
     
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM issues 
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     
 def get_report_issues(report_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM issues 
                 WHERE report_id = {}
-            """.format(report_id)
+            '''.format(report_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
 
 def get_vendor_issues(vendor_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM issues 
                 WHERE vendor_id = {}
-            """.format(vendor_id)
+            '''.format(vendor_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
 
 def create(issue: Issues):
-    query = """
+    query = '''
                 INSERT INTO issues 
                     (report_id, vendor_id, type, description, summary, severity, progress, cost, active)
                 VALUES 
                     ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, report_id, vendor_id, created_at
-            """.format(
+            '''.format(
                 issue.report_id,
                 issue.vendor_id,
                 issue.type,
@@ -73,7 +73,7 @@ def create(issue: Issues):
         return dict(issue)
     
 def update(id: int, issue: Issues):
-    query = """
+    query = '''
                 UPDATE issues 
                 SET 
                     vendor_id = {},
@@ -86,7 +86,7 @@ def update(id: int, issue: Issues):
                     active = '{}'
                 WHERE id = {}
                 RETURNING id, vendor_id, updated_at
-            """.format(
+            '''.format(
                 issue.vendor_id,
                 issue.type,
                 issue.description,
@@ -103,10 +103,10 @@ def update(id: int, issue: Issues):
         return dict(issue)
 
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM issues 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Issue {id} deleted successfully'}

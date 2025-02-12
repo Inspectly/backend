@@ -4,11 +4,11 @@ from app.schema.properties import Notes
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM notes 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         note = cursor.fetchone()
@@ -17,66 +17,66 @@ def get_one(id: int):
         return dict(note)
 
 def get_all():
-    query = """
+    query = '''
                 SELECT * 
                 FROM notes 
                 ORDER BY id DESC
-            """
+            '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         notes = cursor.fetchall()
         return [dict(note) for note in notes]
 
 def get_report_notes(report_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM notes 
                 WHERE report_id = {}
-            """.format(report_id)
+            '''.format(report_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         notes = cursor.fetchall()
         return [dict(note) for note in notes]
 
 def get_user_notes(user_id: int):
-    query = """
+    query = '''
                 SELECT * 
                 FROM notes 
                 WHERE user_id = {}
-            """.format(user_id)
+            '''.format(user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         notes = cursor.fetchall()
         return [dict(note) for note in notes]
 
 def create(note: Notes):
-    query = """
+    query = '''
                 INSERT INTO notes (report_id, user_id, note)
                 VALUES ({}, {}, '{}')
                 RETURNING id, report_id, user_id, note, created_at
-            """.format(note.report_id, note.user_id, note.note)
+            '''.format(note.report_id, note.user_id, note.note)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         note = cursor.fetchone()
         return dict(note)
 
 def update(id: int, note: Notes):
-    query = """
+    query = '''
                 UPDATE notes 
                 SET note = '{}'
                 WHERE id = {}
                 RETURNING id, report_id, user_id, note, updated_at
-            """.format(note.note, id)
+            '''.format(note.note, id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         note = cursor.fetchone()
         return dict(note)
 
 def delete(id: int):
-    query = """
+    query = '''
                 DELETE FROM notes 
                 WHERE id = {}
-            """.format(id)
+            '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Note {id} deleted successfully'}
