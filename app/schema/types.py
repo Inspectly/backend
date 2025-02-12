@@ -35,7 +35,7 @@ class Login_Method(str, Enum):
     PHONE = 'phone'
     GMAIL = 'gmail'
 
-class Progress_Steps(str, Enum):
+class Status(str, Enum):
     OPEN = 'open'
     REVIEW = 'review'
     IN_PROGRESS = 'in_progress'

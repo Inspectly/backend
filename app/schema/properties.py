@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from app.schema.types import Progress_Steps
+from app.schema.types import Status
 
 class Listings(BaseModel):
     user_id: int
@@ -26,7 +26,7 @@ class Issues(BaseModel):
     description: Optional[str]
     summary: Optional[str]
     severity: Optional[str]
-    progress: Progress_Steps
+    status: Status
     active: bool
     cost: Optional[float]
 

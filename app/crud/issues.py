@@ -52,7 +52,7 @@ def get_vendor_issues(vendor_id: int):
 def create(issue: Issues):
     query = '''
                 INSERT INTO issues 
-                    (report_id, vendor_id, type, description, summary, severity, progress, cost, active)
+                    (report_id, vendor_id, type, description, summary, severity, status, cost, active)
                 VALUES 
                     ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, report_id, vendor_id, created_at
@@ -63,7 +63,7 @@ def create(issue: Issues):
                 issue.description,
                 issue.summary,
                 issue.severity,
-                issue.progress,
+                issue.status,
                 issue.cost,
                 issue.active
             )
@@ -81,7 +81,7 @@ def update(id: int, issue: Issues):
                     description = '{}', 
                     summary = '{}', 
                     severity = '{}', 
-                    progress = '{}', 
+                    status = '{}', 
                     cost = '{}', 
                     active = '{}'
                 WHERE id = {}
@@ -92,7 +92,7 @@ def update(id: int, issue: Issues):
                 issue.description,
                 issue.summary,
                 issue.severity,
-                issue.progress,
+                issue.status,
                 issue.cost,
                 issue.active,
                 id
