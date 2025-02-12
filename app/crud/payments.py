@@ -39,13 +39,13 @@ def get_user_payments(user_id: int):
         return [dict(payment) for payment in payments]
 
 def create(payment: Payments):
-    query = """
+    query = '''
                 INSERT INTO payments 
                     (user_id, payment_amount, expiry_date, stripe_payment_id, stripe_user_id)
                 VALUES 
                     ({}, {}, '{}', '{}', '{}')
                 RETURNING id, created_at
-            """.format(payment.user_id, payment.payment_amount, payment.expiry_date, payment.stripe_payment_id, payment.stripe_user_id)
+            '''.format(payment.user_id, payment.payment_amount, payment.expiry_date, payment.stripe_payment_id, payment.stripe_user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         payment_id = cursor.fetchone()
