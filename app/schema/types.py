@@ -39,4 +39,4 @@ class Status(str, Enum):
     OPEN = 'open'
     REVIEW = 'review'
     IN_PROGRESS = 'in_progress'
-    COMPLETED = 'completed'
+    COMPLETED = 'completed' 
