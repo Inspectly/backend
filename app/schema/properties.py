@@ -34,7 +34,7 @@ class Attachments(BaseModel):
     issue_id: int
     user_id: int
     name: str
-    attachment_type: str
+    type: str
     url: str
 
 class Comments(BaseModel):

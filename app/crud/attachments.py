@@ -60,7 +60,7 @@ def create(attachment: Attachments):
                 attachment.issue_id,
                 attachment.user_id,
                 attachment.name,
-                attachment.attachment_type,
+                attachment.type,
                 attachment.url
             )
     with get_db_cursor() as cursor:
