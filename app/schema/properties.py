@@ -46,3 +46,4 @@ class Notes(BaseModel):
     report_id: int
     user_id: int
     note: str
+ 
