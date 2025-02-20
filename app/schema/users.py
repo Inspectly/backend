@@ -6,6 +6,7 @@ from app.schema.types import Login_Method, User_Types, Vendor_Types
 
 class Users(BaseModel):
     user_type: User_Types
+    firebase_id: str
 
 class Clients(BaseModel):
     user_id: int

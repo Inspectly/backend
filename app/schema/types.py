@@ -40,3 +40,13 @@ class Status(str, Enum):
     REVIEW = 'review'
     IN_PROGRESS = 'in_progress'
     COMPLETED = 'completed'
+
+class Bid_Status(str, Enum):
+    RECEIVED = 'received'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+
+class Assessment_Status(str, Enum):
+    RECEIVED = 'received'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'

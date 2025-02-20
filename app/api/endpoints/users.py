@@ -13,6 +13,10 @@ def get_all():
 def get_one(id: int):
     return users.get_one(id)
 
+@router.get('/{firebase_id}')
+def get_one_by_firebase_id(firebase_id: str):
+    return users.get_one_by_firebase_id(firebase_id)
+
 @router.post('/')
 def create(user: Users):
     return users.create(user)

@@ -27,6 +27,19 @@ def get_all():
         cursor.execute(query)
         users = cursor.fetchall()
         return [dict(user) for user in users]
+    
+def get_one_by_firebase_id(firebase_id: str):
+    query = '''
+                SELECT * 
+                FROM users 
+                WHERE firebase_id = '{}'
+            '''.format(firebase_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        user = cursor.fetchone()
+        if not user:
+            raise HTTPException(status_code = 404, detail = 'User not found')
+        return dict(user)
 
 def create(user: Users):
     user_type = get_one_user_type(user.user_type.user_type.value)
