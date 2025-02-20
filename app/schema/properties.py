@@ -29,6 +29,7 @@ class Issues(BaseModel):
     status: Status
     active: bool
     cost: Optional[float]
+    image_url: Optional[str]
 
 class Attachments(BaseModel):
     issue_id: int
@@ -46,4 +47,3 @@ class Notes(BaseModel):
     report_id: int
     user_id: int
     note: str
- 

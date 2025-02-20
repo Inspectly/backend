@@ -52,9 +52,9 @@ def get_vendor_issues(vendor_id: int):
 def create(issue: Issues):
     query = '''
                 INSERT INTO issues 
-                    (report_id, vendor_id, type, description, summary, severity, status, cost, active)
+                    (report_id, vendor_id, type, description, summary, severity, status, cost, active, image_url)
                 VALUES 
-                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, report_id, vendor_id, created_at
             '''.format(
                 issue.report_id,
@@ -65,7 +65,8 @@ def create(issue: Issues):
                 issue.severity,
                 issue.status,
                 issue.cost,
-                issue.active
+                issue.active,
+                issue.image_url
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
@@ -83,7 +84,8 @@ def update(id: int, issue: Issues):
                     severity = '{}', 
                     status = '{}', 
                     cost = '{}', 
-                    active = '{}'
+                    active = '{}',
+                    image_url = '{}'
                 WHERE id = {}
                 RETURNING id, vendor_id, updated_at
             '''.format(
@@ -95,6 +97,7 @@ def update(id: int, issue: Issues):
                 issue.status,
                 issue.cost,
                 issue.active,
+                issue.image_url,
                 id
             )
     with get_db_cursor() as cursor:
