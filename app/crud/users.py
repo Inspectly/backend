@@ -47,12 +47,13 @@ def create(user: Users):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
     query = '''
                 INSERT INTO users 
-                    (user_type)
+                    (user_type, firebase_id)
                 VALUES 
-                    ('{}')
+                    ('{}', '{}')
                 RETURNING id, created_at
             '''.format(
-                user.user_type.user_type.value
+                user.user_type.user_type.value,
+                user.firebase_id
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
