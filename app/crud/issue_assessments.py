@@ -54,7 +54,7 @@ def create(issue_assessment: Issue_Assessments):
                 INSERT INTO issue_assessments 
                     (issue_id, vendor_id, date, status, comment_vendor, comment_client)
                 VALUES 
-                    ({}, {}, {}, {}, {}, {})
+                    ({}, {}, '{}', '{}', '{}', '{}')
                 RETURNING id, created_at, updated_at
             '''.format(
                 issue_assessment.issue_id,
@@ -75,10 +75,10 @@ def update(id: int, issue_assessment: Issue_Assessments):
                 SET 
                     issue_id = {}, 
                     vendor_id = {}, 
-                    date = {}, 
-                    status = {}, 
-                    comment_vendor = {}, 
-                    comment_client = {}
+                    date = '{}', 
+                    status = '{}', 
+                    comment_vendor = '{}', 
+                    comment_client = '{}'
                 WHERE id = {}
                 RETURNING id, updated_at
             '''.format(
