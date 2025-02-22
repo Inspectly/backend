@@ -54,7 +54,7 @@ def create(issue_bid: Issue_Bids):
                 INSERT INTO issue_bids 
                     (issue_id, vendor_id, price, status, comment_vendor, comment_client)
                 VALUES 
-                    ({}, {}, {}, {}, {}, {})
+                    ({}, {}, {}, '{}', '{}', '{}')
                 RETURNING id, issue_id, vendor_id, created_at
             '''.format(
                 issue_bid.issue_id,
@@ -76,9 +76,9 @@ def update(id: int, issue_bid: Issue_Bids):
                     issue_id = {}, 
                     vendor_id = {}, 
                     price = {}, 
-                    status = {}, 
-                    comment_vendor = {}, 
-                    comment_client = {}, 
+                    status = '{}', 
+                    comment_vendor = '{}', 
+                    comment_client = '{}'
                 WHERE id = {}
                 RETURNING id, updated_at
             '''.format(
