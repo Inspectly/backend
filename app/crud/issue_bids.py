@@ -52,18 +52,17 @@ def get_all_by_vendor_id(vendor_id: int, issue_id: int):
 def create(issue_bid: Issue_Bids):
     query = '''
                 INSERT INTO issue_bids 
-                    (issue_id, vendor_id, price, status, comment_vendor, comment_client, active)
+                    (issue_id, vendor_id, price, status, comment_vendor, comment_client)
                 VALUES 
-                    ({}, {}, {}, {}, {}, {}, {})
-                RETURNING id, created_at, updated_at
+                    ({}, {}, {}, {}, {}, {})
+                RETURNING id, issue_id, vendor_id, created_at
             '''.format(
                 issue_bid.issue_id,
                 issue_bid.vendor_id,
                 issue_bid.price,
                 issue_bid.status,
                 issue_bid.comment_vendor,
-                issue_bid.comment_client,
-                issue_bid.active
+                issue_bid.comment_client
             )
     with get_db_cursor() as cursor:
         cursor.execute(query)
@@ -80,7 +79,6 @@ def update(id: int, issue_bid: Issue_Bids):
                     status = {}, 
                     comment_vendor = {}, 
                     comment_client = {}, 
-                    active = {}
                 WHERE id = {}
                 RETURNING id, updated_at
             '''.format(
@@ -90,7 +88,6 @@ def update(id: int, issue_bid: Issue_Bids):
                 issue_bid.status,
                 issue_bid.comment_vendor,
                 issue_bid.comment_client,
-                issue_bid.active,
                 id
             )
     with get_db_cursor() as cursor:

@@ -38,7 +38,6 @@ class Issue_Bids(BaseModel):
     status: Bid_Status
     comment_vendor: Optional[str]
     comment_client: Optional[str]
-    active: bool
 
 class Issue_Assessments(BaseModel):
     issue_id: int
