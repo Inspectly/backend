@@ -692,11 +692,12 @@ def populate_issue_assessments():
             try:
                 vendor = random.choice(vendors_available) 
                 assessment_date = str(fake.date_time_between(start_date="-1y", end_date="now"))
-
+                status = random.choice(['received','accepted','rejected']) 
                 issue_assessment_data = {
                     "issue_id": issue['id'],
                     "vendor_id": vendor['id'],
                     "date": assessment_date,
+                    "status": status, 
                     "comment_vendor": fake.text(),
                     "comment_client": fake.text(),
                 }
