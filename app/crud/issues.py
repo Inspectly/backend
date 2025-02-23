@@ -68,10 +68,13 @@ def create(issue: Issues):
                 issue.active,
                 issue.image_url
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue = cursor.fetchone()
-        return dict(issue)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue = cursor.fetchone()
+            return dict(issue)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, issue: Issues):
     query = '''
@@ -100,16 +103,22 @@ def update(id: int, issue: Issues):
                 issue.image_url,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue = cursor.fetchone()
-        return dict(issue)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue = cursor.fetchone()
+            return dict(issue)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM issues 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Issue {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Issue {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

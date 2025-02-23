@@ -46,16 +46,22 @@ def create(payment: Payments):
                     ({}, {}, '{}', '{}', '{}')
                 RETURNING id, created_at
             '''.format(payment.user_id, payment.payment_amount, payment.expiry_date, payment.stripe_payment_id, payment.stripe_user_id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        payment_id = cursor.fetchone()
-        return dict(payment_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            payment_id = cursor.fetchone()
+            return dict(payment_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def delete(id: int):
     query = '''
                 DELETE FROM payments 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Payment {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Payment {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

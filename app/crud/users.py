@@ -55,10 +55,13 @@ def create(user: Users):
                 user.user_type.user_type.value,
                 user.firebase_id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user = cursor.fetchone()
-        return dict(user)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user = cursor.fetchone()
+            return dict(user)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, user: Users):
     user_type = get_one_user_type(user.user_type)
@@ -74,16 +77,22 @@ def update(id: int, user: Users):
                 user.user_type,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user = cursor.fetchone()
-        return dict(user)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user = cursor.fetchone()
+            return dict(user)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def delete(id: int):
     query = '''
                 DELETE FROM users 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'User {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'User {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

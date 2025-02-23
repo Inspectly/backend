@@ -54,10 +54,13 @@ def create(listing: Listings):
                 listing.postal_code,
                 listing.image_url
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        listing = cursor.fetchone()
-        return dict(listing)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            listing = cursor.fetchone()
+            return dict(listing)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, listing: Listings):
     query = '''
@@ -75,16 +78,22 @@ def update(id: int, listing: Listings):
                 listing.image_url,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        listing = cursor.fetchone()
-        return dict(listing)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            listing = cursor.fetchone()
+            return dict(listing)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def delete(id: int):
     query = '''
                 DELETE FROM listings 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Listing {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Listing {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

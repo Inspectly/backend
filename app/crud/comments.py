@@ -59,10 +59,13 @@ def create(comment: Comments):
                 comment.user_id,
                 comment.comment
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        comment = cursor.fetchone()
-        return dict(comment)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            comment = cursor.fetchone()
+            return dict(comment)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, comment: Comments):
     query = '''
@@ -71,16 +74,22 @@ def update(id: int, comment: Comments):
                 WHERE id = {}
                 RETURNING id, issue_id, user_id, updated_at
             '''.format(comment.comment, id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        comment = cursor.fetchone()
-        return dict(comment)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            comment = cursor.fetchone()
+            return dict(comment)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def delete(id: int):
     query = '''
                 DELETE FROM comments 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Comment {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Comment {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

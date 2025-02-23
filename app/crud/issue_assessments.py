@@ -64,10 +64,13 @@ def create(issue_assessment: Issue_Assessments):
                 issue_assessment.comment_vendor,
                 issue_assessment.comment_client
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue_assessment_id = cursor.fetchone()
-        return dict(issue_assessment_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue_assessment_id = cursor.fetchone()
+            return dict(issue_assessment_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, issue_assessment: Issue_Assessments):
     query = '''
@@ -90,16 +93,22 @@ def update(id: int, issue_assessment: Issue_Assessments):
                 issue_assessment.comment_client,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue_assessment_id = cursor.fetchone()
-        return dict(issue_assessment_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue_assessment_id = cursor.fetchone()
+            return dict(issue_assessment_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM issue_assessments 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Issue assessment {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Issue assessment {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

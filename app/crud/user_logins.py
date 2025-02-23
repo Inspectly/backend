@@ -56,10 +56,13 @@ def create(user_login: User_Logins):
                 user_login.gmail_login, 
                 user_login.gmail
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_login_id = cursor.fetchone()
-        return dict(user_login_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_login_id = cursor.fetchone()
+            return dict(user_login_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, user_login: User_Logins):
     query = '''
@@ -82,16 +85,22 @@ def update(id: int, user_login: User_Logins):
                 user_login.gmail, 
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_login_id = cursor.fetchone()
-        return dict(user_login_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_login_id = cursor.fetchone()
+            return dict(user_login_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM user_logins 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'User login {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'User login {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

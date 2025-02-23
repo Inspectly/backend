@@ -63,11 +63,14 @@ def create(user_stripe_information: User_Stripe_Information):
                 user_stripe_information.user_id,
                 user_stripe_information.stripe_user_id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_stripe_information_id = cursor.fetchone()
-        return dict(user_stripe_information_id)
-    
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_stripe_information_id = cursor.fetchone()
+            return dict(user_stripe_information_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
+
 def update(id: int, user_stripe_information: User_Stripe_Information):
     query = '''
                 UPDATE stripe_user_information 
@@ -81,15 +84,21 @@ def update(id: int, user_stripe_information: User_Stripe_Information):
                 user_stripe_information.stripe_user_id, 
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': 'User Stripe Information updated successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': 'User Stripe Information updated successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM stripe_user_information 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': 'User Stripe Information deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': 'User Stripe Information deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

@@ -46,10 +46,13 @@ def create(realtor_firm: Realtor_Firms):
                 realtor_firm.rating,
                 realtor_firm.review
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        realtor_firm = cursor.fetchone()
-        return dict(realtor_firm)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            realtor_firm = cursor.fetchone()
+            return dict(realtor_firm)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, realtor_firm: Realtor_Firms):
     query = '''
@@ -82,16 +85,22 @@ def update(id: int, realtor_firm: Realtor_Firms):
                 realtor_firm.review,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        realtor_firm = cursor.fetchone()
-        return dict(realtor_firm)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            realtor_firm = cursor.fetchone()
+            return dict(realtor_firm)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM realtor_firms 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Realtor firm {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Realtor firm {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

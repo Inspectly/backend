@@ -55,10 +55,13 @@ def create(note: Notes):
                 VALUES ({}, {}, '{}')
                 RETURNING id, report_id, user_id, note, created_at
             '''.format(note.report_id, note.user_id, note.note)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        note = cursor.fetchone()
-        return dict(note)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            note = cursor.fetchone()
+            return dict(note)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, note: Notes):
     query = '''
@@ -67,16 +70,22 @@ def update(id: int, note: Notes):
                 WHERE id = {}
                 RETURNING id, report_id, user_id, note, updated_at
             '''.format(note.note, id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        note = cursor.fetchone()
-        return dict(note)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            note = cursor.fetchone()
+            return dict(note)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM notes 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Note {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Note {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

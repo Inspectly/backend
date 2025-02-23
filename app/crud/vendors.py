@@ -14,6 +14,8 @@ def get_one(id: int):
         cursor.execute(query)
         vendor = cursor.fetchone()
         return dict(vendor)
+    if not vendor:
+        raise HTTPException(status_code = 404, detail = 'Vendor not found')
 
 def get_all():
     query = '''
@@ -35,7 +37,7 @@ def create(vendor: Vendors):
                 INSERT INTO vendors 
                     (vendor_user_id, vendor_type, code, name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
+                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
@@ -52,10 +54,13 @@ def create(vendor: Vendors):
                 vendor.rating,
                 vendor.review
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        vendor = cursor.fetchone()
-        return dict(vendor)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            vendor = cursor.fetchone()
+            return dict(vendor)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, vendor: Vendors):
     vendor_types = vendor.vendor_type.split(',')
@@ -97,10 +102,13 @@ def update(id: int, vendor: Vendors):
                 vendor.review,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        vendor = cursor.fetchone()
-        return dict(vendor)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            vendor = cursor.fetchone()
+            return dict(vendor)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''

@@ -2,6 +2,7 @@ import datetime
 from fastapi import HTTPException
 
 from app.core.database import get_db_cursor
+from app.schema.types import Login_Method
 from app.schema.users import User_Sessions
 
 def get_one(id: int):
@@ -45,21 +46,26 @@ def get_all():
         return [dict(user_session) for user_session in user_sessions]
     
 def create(user_session: User_Sessions):
+    if not isinstance(user_session.login_method, Login_Method):
+        raise HTTPException(status_code = 400, detail = 'Invalid login method')
     query = '''
                 INSERT INTO user_sessions 
                     (user_id, login_method, authentication_code)
                 VALUES 
-                    ('{}', '{}', '{}')
+                    ({}, '{}', '{}')
                 RETURNING id, authentication_code
             '''.format(
                 user_session.user_id, 
                 user_session.login_method, 
                 user_session.authentication_code
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_session_id = cursor.fetchone()
-        return dict(user_session_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_session_id = cursor.fetchone()
+            return dict(user_session_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, logout_time: str):
     query = '''
@@ -72,7 +78,10 @@ def update(id: int, logout_time: str):
                 logout_time, 
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_session_id = cursor.fetchone()
-        return dict(user_session_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_session_id = cursor.fetchone()
+            return dict(user_session_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

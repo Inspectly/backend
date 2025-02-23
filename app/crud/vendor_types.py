@@ -50,10 +50,13 @@ def create(vendor_type: Vendor_Types):
                 VALUES ('{}')
                 RETURNING id, vendor_type, created_at
             '''.format(vendor_type.vendor_type.value)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        vendor_type = cursor.fetchone()   
-        return dict(vendor_type)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            vendor_type = cursor.fetchone()   
+            return dict(vendor_type)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, vendor_type: Vendor_Types):
     query = '''
@@ -62,10 +65,13 @@ def update(id: int, vendor_type: Vendor_Types):
                 WHERE id = {}
                 RETURNING id, vendor_type, updated_at
             '''.format(vendor_type, id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        vendor_type = cursor.fetchone()
-        return dict(vendor_type)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            vendor_type = cursor.fetchone()
+            return dict(vendor_type)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     vendor_type = get_one(id)
@@ -75,6 +81,9 @@ def delete(id: int):
                 DELETE FROM vendor_types 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Vendor type {vendor_type["vendor_type"]} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Vendor type {vendor_type["vendor_type"]} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

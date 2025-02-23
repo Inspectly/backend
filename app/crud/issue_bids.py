@@ -64,10 +64,13 @@ def create(issue_bid: Issue_Bids):
                 issue_bid.comment_vendor,
                 issue_bid.comment_client
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue_bid_id = cursor.fetchone()
-        return dict(issue_bid_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue_bid_id = cursor.fetchone()
+            return dict(issue_bid_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, issue_bid: Issue_Bids):
     query = '''
@@ -90,16 +93,22 @@ def update(id: int, issue_bid: Issue_Bids):
                 issue_bid.comment_client,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        issue_bid_id = cursor.fetchone()
-        return dict(issue_bid_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            issue_bid_id = cursor.fetchone()
+            return dict(issue_bid_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM issue_bids 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Issue bid {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Issue bid {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

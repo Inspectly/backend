@@ -50,10 +50,13 @@ def create(user_type: User_Types):
                 VALUES ('{}')
                 RETURNING id, user_type, created_at
             '''.format(user_type.user_type.value)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_type = cursor.fetchone()   
-        return dict(user_type)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_type = cursor.fetchone()   
+            return dict(user_type)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, user_type: User_Types):
     query = '''
@@ -62,10 +65,13 @@ def update(id: int, user_type: User_Types):
                 WHERE id = {}
                 RETURNING id, user_type, updated_at
             '''.format(user_type, id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        user_type = cursor.fetchone()
-        return dict(user_type)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user_type = cursor.fetchone()
+            return dict(user_type)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     user_type = get_one(id)
@@ -75,6 +81,9 @@ def delete(id: int):
                 DELETE FROM user_types 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'User type {user_type["user_type"]} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'User type {user_type["user_type"]} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

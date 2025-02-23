@@ -62,10 +62,13 @@ def create(report: Reports):
                 report.aws_link, 
                 report.name
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        report_id = cursor.fetchone()
-        return dict(report_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            report_id = cursor.fetchone()
+            return dict(report_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, report: Reports):
     query = '''
@@ -80,16 +83,22 @@ def update(id: int, report: Reports):
                 report.name, 
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        report_id = cursor.fetchone()
-        return dict(report_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            report_id = cursor.fetchone()
+            return dict(report_id)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
     
 def delete(id: int):
     query = '''
                 DELETE FROM reports 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Report {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Report {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

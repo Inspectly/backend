@@ -31,7 +31,7 @@ def create(realtor: Realtors):
                 INSERT INTO realtors 
                     (realtor_user_id, realtor_firm_id, first_name, last_name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
+                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, realtor_user_id, first_name, created_at
             '''.format(
                 realtor.realtor_user_id,
@@ -48,17 +48,20 @@ def create(realtor: Realtors):
                 realtor.rating,
                 realtor.review
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        realtor = cursor.fetchone()
-        return dict(realtor)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            realtor = cursor.fetchone()
+            return dict(realtor)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, realtor: Realtors):
     query = '''
                 UPDATE realtors 
                 SET 
-                    realtor_user_id = '{}', 
-                    realtor_firm_id = '{}', 
+                    realtor_user_id = {}, 
+                    realtor_firm_id = {}, 
                     first_name = '{}', 
                     last_name = '{}', 
                     email = '{}', 
@@ -88,16 +91,22 @@ def update(id: int, realtor: Realtors):
                 realtor.review,
                 id
             )
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        realtor = cursor.fetchone()
-        return dict(realtor)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            realtor = cursor.fetchone()
+            return dict(realtor)
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
                 DELETE FROM realtors 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Realtor {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Realtor {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))
