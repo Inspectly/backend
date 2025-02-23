@@ -30,7 +30,7 @@ class Vendor_Type(str, Enum):
 class Vendor_Types(BaseModel):
     vendor_type: Vendor_Type
 
-class Login_Method(str, Enum):
+class Login(str, Enum):
     EMAIL = 'email'
     PHONE = 'phone'
     GMAIL = 'gmail'

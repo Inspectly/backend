@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 
-from app.schema.types import Login_Method, User_Types
+from app.schema.types import Login, User_Types
 
 class Users(BaseModel):
     user_type: User_Types
@@ -69,5 +69,5 @@ class User_Logins(BaseModel):
 
 class User_Sessions(BaseModel):
     user_id: int
-    login_method: Login_Method
+    login: Login
     authentication_code: str

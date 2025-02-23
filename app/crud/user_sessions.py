@@ -1,9 +1,9 @@
 import datetime
 from fastapi import HTTPException
 
-from app.core.database import get_db_cursor
-from app.schema.types import Login_Method
+from app.schema.types import Login
 from app.schema.users import User_Sessions
+from app.core.database import get_db_cursor
 
 def get_one(id: int):
     query = '''
@@ -46,17 +46,17 @@ def get_all():
         return [dict(user_session) for user_session in user_sessions]
     
 def create(user_session: User_Sessions):
-    if not isinstance(user_session.login_method, Login_Method):
+    if not isinstance(user_session.login, Login):
         raise HTTPException(status_code = 400, detail = 'Invalid login method')
     query = '''
                 INSERT INTO user_sessions 
-                    (user_id, login_method, authentication_code)
+                    (user_id, login, authentication_code)
                 VALUES 
                     ({}, '{}', '{}')
                 RETURNING id, authentication_code
             '''.format(
                 user_session.user_id, 
-                user_session.login_method, 
+                user_session.login, 
                 user_session.authentication_code
             )
     try:
