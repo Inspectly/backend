@@ -26,9 +26,11 @@ def get_all():
         return [dict(vendor) for vendor in vendors]
 
 def create(vendor: Vendors):
-    vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
-    if (vendor_type['vendor_type'] != vendor.vendor_type.vendor_type.value):
-        raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
+    vendor_types = vendor.vendor_type.split(',')
+    for vendor_type in vendor_types:
+        vendor_type = get_one_vendor_type(vendor_type)
+        if (vendor_type['vendor_type'] != vendor_type):
+            raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
     query = '''
                 INSERT INTO vendors 
                     (vendor_user_id, vendor_type, code, name, email, phone, address, city, state, country, postal_code, rating, review)
@@ -37,7 +39,7 @@ def create(vendor: Vendors):
                 RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
-                vendor.vendor_type.vendor_type.value,
+                vendor.vendor_type,
                 vendor.code,
                 vendor.name,
                 vendor.email,
@@ -56,10 +58,15 @@ def create(vendor: Vendors):
         return dict(vendor)
     
 def update(id: int, vendor: Vendors):
+    vendor_types = vendor.vendor_type.split(',')
+    for vendor_type in vendor_types:
+        vendor_type = get_one_vendor_type(vendor_type)
+        if (vendor_type['vendor_type'] != vendor_type):
+            raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
     query = '''
                 UPDATE vendors 
                 SET 
-                    vendor_user_id = '{}', 
+                    vendor_user_id = {}, 
                     vendor_type = '{}', 
                     code = '{}', 
                     name = '{}', 
