@@ -28,6 +28,8 @@ def get_all():
         return [dict(vendor) for vendor in vendors]
 
 def create(vendor: Vendors):
+    if (len(vendor.code) != 5):
+        raise HTTPException(status_code = 400, detail = 'Invalid Vendor Code')
     valid_vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
     if not valid_vendor_type:
         raise HTTPException(status_code = 400, detail = f'Invalid main vendor type {vendor.vendor_type.vendor_type.value} does not exist')
@@ -68,6 +70,8 @@ def create(vendor: Vendors):
         raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, vendor: Vendors):
+    if (len(vendor.code) != 5):
+        raise HTTPException(status_code = 400, detail = 'Invalid Vendor Code')
     valid_vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
     if not valid_vendor_type:
         raise HTTPException(status_code = 400, detail = f'Invalid main vendor type {vendor.vendor_type.vendor_type.value} does not exist')
