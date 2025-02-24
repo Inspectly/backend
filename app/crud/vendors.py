@@ -13,9 +13,9 @@ def get_one(id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         vendor = cursor.fetchone()
-        return dict(vendor)
     if not vendor:
         raise HTTPException(status_code = 404, detail = 'Vendor not found')
+    return dict(vendor)
 
 def get_all():
     query = '''
@@ -28,20 +28,25 @@ def get_all():
         return [dict(vendor) for vendor in vendors]
 
 def create(vendor: Vendors):
-    vendor_types = vendor.vendor_type.split(',')
+    valid_vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
+    if not valid_vendor_type:
+        raise HTTPException(status_code = 400, detail = f'Invalid main vendor type {vendor.vendor_type.vendor_type.value} does not exist')
+    vendor_types = vendor.vendor_types.split(',')
     for vendor_type in vendor_types:
-        vendor_type = get_one_vendor_type(vendor_type)
-        if (vendor_type['vendor_type'] != vendor_type):
-            raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
+        vendor_type = vendor_type.strip().lower()
+        additional_vendor_type = get_one_vendor_type(vendor_type)
+        if (additional_vendor_type['vendor_type'] != vendor_type):
+            raise HTTPException(status_code = 400, detail = f'Invalid additional vendor type {vendor_type} does not exist')
     query = '''
                 INSERT INTO vendors 
-                    (vendor_user_id, vendor_type, code, name, email, phone, address, city, state, country, postal_code, rating, review)
+                    (vendor_user_id, vendor_type, vendor_types, code, name, email, phone, address, city, state, country, postal_code, rating, review)
                 VALUES 
-                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
+                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
                 RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
-                vendor.vendor_type,
+                vendor.vendor_type.vendor_type.value,
+                vendor.vendor_types,
                 vendor.code,
                 vendor.name,
                 vendor.email,
@@ -63,16 +68,21 @@ def create(vendor: Vendors):
         raise HTTPException(status_code = 400, detail = str(e))
     
 def update(id: int, vendor: Vendors):
-    vendor_types = vendor.vendor_type.split(',')
+    valid_vendor_type = get_one_vendor_type(vendor.vendor_type.vendor_type.value)
+    if not valid_vendor_type:
+        raise HTTPException(status_code = 400, detail = f'Invalid main vendor type {vendor.vendor_type.vendor_type.value} does not exist')
+    vendor_types = vendor.vendor_types.split(',')
     for vendor_type in vendor_types:
-        vendor_type = get_one_vendor_type(vendor_type)
-        if (vendor_type['vendor_type'] != vendor_type):
-            raise HTTPException(status_code = 400, detail = 'Invalid vendor type')
+        vendor_type = vendor_type.strip().lower()
+        additional_vendor_type = get_one_vendor_type(vendor_type)
+        if (additional_vendor_type['vendor_type'] != vendor_type):
+            raise HTTPException(status_code = 400, detail = f'Invalid additional vendor type {vendor_type} does not exist')
     query = '''
                 UPDATE vendors 
                 SET 
                     vendor_user_id = {}, 
                     vendor_type = '{}', 
+                    vendor_types = '{}', 
                     code = '{}', 
                     name = '{}', 
                     email = '{}', 
@@ -85,10 +95,11 @@ def update(id: int, vendor: Vendors):
                     rating = {}, 
                     review = '{}'
                 WHERE id = {}
-                RETURNING id, vendor_user_id, first_name, updated_at
+                RETURNING id, vendor_user_id, code, name, updated_at
             '''.format(
                 vendor.vendor_user_id,
-                vendor.vendor_type,
+                vendor.vendor_type.vendor_type.value,
+                vendor.vendor_types,
                 vendor.code,
                 vendor.name,
                 vendor.email,
@@ -115,6 +126,9 @@ def delete(id: int):
                 DELETE FROM vendors 
                 WHERE id = {}
             '''.format(id)
-    with get_db_cursor() as cursor:
-        cursor.execute(query)
-        return {'message': f'Vendor {id} deleted successfully'}
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            return {'message': f'Vendor {id} deleted successfully'}
+    except Exception as e:
+        raise HTTPException(status_code = 400, detail = str(e))

@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 
-from app.schema.types import Login, User_Types
+from app.schema.types import Login, User_Types, Vendor_Types
 
 class Users(BaseModel):
     user_type: User_Types
@@ -41,7 +41,8 @@ class Realtors(BaseModel):
 
 class Vendors(BaseModel):
     vendor_user_id: int
-    vendor_type: str
+    vendor_type: Vendor_Types
+    vendor_types: str
     code: str
     name: str
     email: str
