@@ -13,6 +13,10 @@ def get_all():
 def get_one(id: int):
     return vendors.get_one(id)
 
+@router.get('/vendor_user_id/{vendor_user_id}')
+def get_one_vendor_user_id(vendor_user_id: int):
+    return vendors.get_one_vendor_user_id(vendor_user_id)
+
 @router.post('/')
 def create(vendor: Vendors):
     return vendors.create(vendor)

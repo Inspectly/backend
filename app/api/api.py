@@ -6,7 +6,7 @@ from app.api.endpoints import (
     users, user_logins, user_sessions, clients, realtors, vendors,
     realtor_firms,
     listings, reports, issues, issue_bids, issue_assessments, attachments, comments, notes,
-    payments
+    payments, stripe_user_information, stripe_payments
 )
 
 api_router = APIRouter()
@@ -49,3 +49,6 @@ api_router.include_router(comments.router, prefix = '/comments', tags = ['commen
 api_router.include_router(notes.router, prefix = '/notes', tags = ['notes'])
 
 api_router.include_router(payments.router, prefix = '/payments', tags = ['payments'])
+
+api_router.include_router(stripe_user_information.router, prefix = '/stripe_user_information', tags = ['stripe_user_information'])
+api_router.include_router(stripe_payments.router, prefix = '/stripe_payments', tags = ['stripe_payments'])

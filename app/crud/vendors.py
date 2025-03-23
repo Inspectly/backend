@@ -17,6 +17,19 @@ def get_one(id: int):
         raise HTTPException(status_code = 404, detail = 'Vendor not found')
     return dict(vendor)
 
+def get_one_vendor_user_id(vendor_user_id: int):
+    query = '''
+                SELECT * 
+                FROM vendors 
+                WHERE vendor_user_id = {}
+            '''.format(vendor_user_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        vendor = cursor.fetchone()
+    if not vendor:
+        raise HTTPException(status_code = 404, detail = 'Vendor not found')
+    return dict(vendor)
+
 def get_all():
     query = '''
                 SELECT * 
