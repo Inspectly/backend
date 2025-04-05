@@ -21,6 +21,10 @@ def get_report_issues(report_id: int):
 def get_vendor_issues(vendor_id: int):
     return issues.get_vendor_issues(vendor_id)
 
+@router.get('/address/{id}')
+def get_issue_address(id: int):
+    return issues.get_issue_address(id)
+
 @router.post('/')
 def create(issue: Issues):
     return issues.create(issue)

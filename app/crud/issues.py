@@ -48,7 +48,31 @@ def get_vendor_issues(vendor_id: int):
         cursor.execute(query)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
-
+    
+def get_issue_address(id: int):
+    query = '''
+                SELECT 
+                    l.address,
+                    l.city,
+                    l.state,
+                    l.country,
+                    l.postal_code
+                FROM 
+                    issues i
+                JOIN 
+                    reports r ON i.report_id = r.id
+                JOIN 
+                    listings l ON r.listing_id = l.id
+                WHERE 
+                    i.id = {}
+            '''.format(id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        address = cursor.fetchone()
+        if not address:
+            raise HTTPException(status_code = 404, detail = 'Address not found')
+        return dict(address)
+    
 def create(issue: Issues):
     query = '''
                 INSERT INTO issues 
