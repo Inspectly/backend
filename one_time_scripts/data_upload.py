@@ -22,13 +22,13 @@ from app.crud.realtor_firms import get_all as get_all_realtor_firms
 from app.crud.attachments import create as create_attachment
 from app.crud.comments import create as create_comment
 from app.crud.notes import create as create_note
-from app.crud.issue_offers import create as create_issue_bid
+from app.crud.issue_offers import create as create_issue_offer
 from app.crud.issue_assessments import create as create_issue_assessment
 from app.crud.vendor_reviews import create as create_vendor_review
 from app.crud.realtor_reviews import create as create_realtor_review
 from app.crud.realtors import get_all as get_all_realtors
 
-from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Bids, Listings, Notes, Reports, Issues
+from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Offers, Listings, Notes, Reports, Issues
 from app.schema.types import Status, User_Types, User_Type, Vendor_Types, Vendor_Type
 from app.schema.users import Users, Clients, Realtors, Vendors
 from app.schema.realtor_firms import Realtor_Firms
@@ -549,7 +549,6 @@ def populate_issues(issues_per_report: int = 3):
                     "severity": fake.random_element(elements=("low", "medium", "high")),
                     "status": random.choice(list(Status)), 
                     "active": random.choice([True, False]),
-                    "cost": round(random.uniform(0, 1000), 2), 
                     "image_url": fake.image_url(), 
                 }
 
@@ -645,7 +644,7 @@ def populate_notes(notes_per_report: int = 2):
             except Exception as e:
                 print(f"Error inserting note: {str(e)}")
 
-def populate_issue_bids():
+def populate_issue_offers():
     """Populate the issue_bids table, 1-3 bids per issue. Randomly chooses a vendor id from existing vendors"""
 
     issues = get_all_issues()
@@ -667,7 +666,7 @@ def populate_issue_bids():
                 status = random.choice(['received','accepted','rejected']) 
                 issue_bid_data = {
                     "issue_id": issue['id'],
-                    "vendor_id": vendor['id'],
+                    "vendor_id": vendor['vendor_user_id'],
                     "price": round(random.uniform(100, 5000), 2),  
                     "status": status, 
                     "comment_vendor": fake.text(),
@@ -676,8 +675,8 @@ def populate_issue_bids():
                 }
 
                 print(issue_bid_data)
-                issue_bid_create = Issue_Bids(**issue_bid_data)
-                created_issue_bid = create_issue_bid(issue_bid_create)
+                issue_bid_create = Issue_Offers(**issue_bid_data)
+                created_issue_bid = create_issue_offer(issue_bid_create)
                 print(f"Inserted issue bid: {created_issue_bid}")
 
             except Exception as e:
@@ -796,24 +795,24 @@ def populate_realtor_reviews():
 
 def run():
     """ Run all population methods in order or selectively by commenting out the ones you don't want to populate"""
-    populate_user_types()
-    populate_vendor_types()
-    populate_realtor_firms()
-    populate_users( )
+    # populate_user_types()
+    # populate_vendor_types()
+    # populate_realtor_firms()
+    # populate_users( )
     get_user_data()
-    populate_clients()
-    populate_realtors()
-    populate_vendors()
-    populate_vendor_reviews()
-    populate_realtor_reviews()
-    populate_real_admins()
-    populate_listings()
-    populate_reports()
+    # populate_clients()
+    # populate_realtors()
+    # populate_vendors()
+    # populate_vendor_reviews()
+    # populate_realtor_reviews()
+    # populate_real_admins()
+    # populate_listings()
+    # populate_reports()
     populate_issues()
     populate_attachments()
     populate_comments()
-    populate_notes()
-    populate_issue_bids()
+    # populate_notes()
+    populate_issue_offers()
     populate_issue_assessments()
 
 if __name__ == "__main__":
