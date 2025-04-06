@@ -24,11 +24,15 @@ from app.crud.comments import create as create_comment
 from app.crud.notes import create as create_note
 from app.crud.issue_bids import create as create_issue_bid
 from app.crud.issue_assessments import create as create_issue_assessment
+from app.crud.vendor_reviews import create as create_vendor_review
+from app.crud.realtor_reviews import create as create_realtor_review
+from app.crud.realtors import get_all as get_all_realtors
 
 from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Bids, Listings, Notes, Reports, Issues
 from app.schema.types import Status, User_Types, User_Type, Vendor_Types, Vendor_Type
 from app.schema.users import Users, Clients, Realtors, Vendors
 from app.schema.realtor_firms import Realtor_Firms
+from app.schema.reviews import Realtor_Reviews, Vendor_Reviews
 
 
 
@@ -285,7 +289,7 @@ def populate_real_admins():
 
         realtor_create = Realtors(**realtor_data)
         created_realtor = create_realtor(realtor_create)
-        print(f"Inserted realtor: {created_realtor}")
+        print(f"Inserted real user: {created_realtor}")
     except Exception as e:
         print(f"Error inserting realtor : {str(e)}")
 
@@ -310,7 +314,7 @@ def populate_real_admins():
 
         realtor_create = Realtors(**realtor_data)
         created_realtor = create_realtor(realtor_create)
-        print(f"Inserted realtor: {created_realtor}")
+        print(f"Inserted real user: {created_realtor}")
     except Exception as e:
         print(f"Error inserting realtor : {str(e)}")
     
@@ -335,7 +339,7 @@ def populate_real_admins():
 
         realtor_create = Realtors(**realtor_data)
         created_realtor = create_realtor(realtor_create)
-        print(f"Inserted realtor: {created_realtor}")
+        print(f"Inserted real user: {created_realtor}")
     except Exception as e:
         print(f"Error inserting realtor : {str(e)}")
     
@@ -385,7 +389,7 @@ def populate_real_admins():
 
         realtor_create = Realtors(**realtor_data)
         created_realtor = create_realtor(realtor_create)
-        print(f"Inserted realtor: {created_realtor}")
+        print(f"Inserted real user: {created_realtor}")
     except Exception as e:
         print(f"Error inserting realtor : {str(e)}")
 
@@ -401,10 +405,14 @@ def populate_vendors():
     for vendor_type in vendor_types:
         for vendor_user in vendor_users_available:
             try:
+                additional_types = random.sample([t.value for t in vendor_types if t != vendor_type], 
+                                                k=random.randint(0, min(4, len(vendor_types)-1)))
+                additional_types_str = ','.join(additional_types)
                 vendor_type_instance = Vendor_Types(vendor_type=vendor_type)
                 vendor_data = {
                     "vendor_user_id": vendor_user['id'],
                     "vendor_type": vendor_type_instance,
+                    "vendor_types": additional_types_str,
                     "code": fake.lexify('?????'),
                     "name": fake.company(),
                     "email": fake.email(),
@@ -432,10 +440,13 @@ def populate_vendors():
         try:
             vendor_type_enum = random.choice(list(Vendor_Type))
             vendor_type_instance = Vendor_Types(vendor_type=vendor_type_enum)
-
+            additional_types = random.sample([t.value for t in vendor_types if t != vendor_type], 
+                                            k=random.randint(0, min(3, len(vendor_types)-1)))
+            additional_types_str = ','.join(additional_types)
             vendor_data = {
                 "vendor_user_id": vendor_user['id'],
                 "vendor_type": vendor_type_instance,
+                "vendor_types": additional_types_str,
                 "code": fake.lexify('?????'),
                 "name": fake.company(),
                 "email": fake.email(),
@@ -709,6 +720,80 @@ def populate_issue_assessments():
             except Exception as e:
                 print(f"Error inserting issue assessment: {str(e)}")
 
+def populate_vendor_reviews():
+    """Populate the vendor_reviews table with random amounts of review data for each vendor we have."""
+    
+    # Assuming you already have a list of users and vendors from previous population
+    users_available = list(users_made)
+    vendors_available = get_all_vendors()
+    
+    print("Creating vendor reviews...")
+    
+    # Create 1-3 reviews for each vendor
+    for vendor in vendors_available:
+        # Determine how many reviews to create for this vendor
+        num_reviews = random.randint(1, 8)
+        
+        # Select random users to write reviews
+        reviewers = random.sample(users_available, num_reviews)
+        
+        for user in reviewers:
+            try:
+                # Generate review data
+                review_data = {
+                    "user_id": user['id'],
+                    "vendor_user_id": vendor['vendor_user_id'],
+                    "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
+                    "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
+                }
+                
+                # Create the review object
+                vendor_review = Vendor_Reviews(**review_data)
+                
+                # Call your API function to create the review
+                created_review = create_vendor_review(vendor_review)
+                print(f"Inserted vendor review: {created_review}")
+                
+            except Exception as e:
+                print(f"Error inserting vendor review: {str(e)}")
+
+def populate_realtor_reviews():
+    """Populate the realtor_reviews table with fake review data."""
+    users_available = list(users_made)
+    realtors_available = get_all_realtors()
+    
+    print("Creating realtor reviews...")
+    
+    # Create 1-4 reviews for each realtor
+    for realtor in realtors_available:
+        # Determine how many reviews to create for this realtor
+
+        num_reviews = random.randint(1, 8)
+        
+        # Select random users to write reviews
+        reviewers = random.sample(users_available, num_reviews)
+        
+        for user in reviewers:
+            try:
+                # Generate review data
+                review_data = {
+                    "user_id": user['id'],
+                    "realtor_user_id": realtor['realtor_user_id'],
+                    "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
+                    "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
+                }
+                
+                # Create the review object
+                realtor_review = Realtor_Reviews(**review_data)
+                
+                # Call your API function to create the review
+                created_review = create_realtor_review(realtor_review)
+                print(f"Inserted realtor review: {created_review}")
+                
+            except Exception as e:
+                print(f"Error inserting realtor review: {str(e)}")
+
+
 def run():
     """ Run all population methods in order or selectively by commenting out the ones you don't want to populate"""
     populate_user_types()
@@ -719,6 +804,8 @@ def run():
     populate_clients()
     populate_realtors()
     populate_vendors()
+    populate_vendor_reviews()
+    populate_realtor_reviews()
     populate_real_admins()
     populate_listings()
     populate_reports()
