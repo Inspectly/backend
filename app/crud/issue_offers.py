@@ -1,80 +1,80 @@
 from fastapi import HTTPException
 
-from app.schema.properties import Issue_Bids
+from app.schema.properties import Issue_Offers
 from app.core.database import get_db_cursor
 
 def get_one(id: int):
     query = '''
                 SELECT * 
-                FROM issue_bids 
+                FROM issue_offers 
                 WHERE id = {}
             '''.format(id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        issue_bid = cursor.fetchone()
-        if not issue_bid:
-            raise HTTPException(status_code = 404, detail = 'Issue bid not found')
-        return dict(issue_bid)
+        issue_offer = cursor.fetchone()
+        if not issue_offer:
+            raise HTTPException(status_code = 404, detail = 'Issue offer not found')
+        return dict(issue_offer)
     
 def get_all():
     query = '''
                 SELECT * 
-                FROM issue_bids 
+                FROM issue_offers 
                 ORDER BY id DESC
             '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        issue_bids = cursor.fetchall()
-        return [dict(issue_bid) for issue_bid in issue_bids]
+        issue_offers = cursor.fetchall()
+        return [dict(issue_offer) for issue_offer in issue_offers]
     
 def get_all_by_issue_id(issue_id: int):
     query = '''
                 SELECT * 
-                FROM issue_bids 
+                FROM issue_offers 
                 WHERE issue_id = {}
             '''.format(issue_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        issue_bids = cursor.fetchall()
-        return [dict(issue_bid) for issue_bid in issue_bids]
+        issue_offers = cursor.fetchall()
+        return [dict(issue_offer) for issue_offer in issue_offers]
     
 def get_all_by_vendor_id(vendor_id: int, issue_id: int):
     query = '''
                 SELECT * 
-                FROM issue_bids 
+                FROM issue_offers 
                 WHERE vendor_id = {} AND issue_id = {}
             '''.format(vendor_id, issue_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        issue_bids = cursor.fetchall()
-        return [dict(issue_bid) for issue_bid in issue_bids]
+        issue_offers = cursor.fetchall()
+        return [dict(issue_offer) for issue_offer in issue_offers]
     
-def create(issue_bid: Issue_Bids):
+def create(issue_offer: Issue_Offers):
     query = '''
-                INSERT INTO issue_bids 
+                INSERT INTO issue_offers 
                     (issue_id, vendor_id, price, status, comment_vendor, comment_client)
                 VALUES 
                     ({}, {}, {}, '{}', '{}', '{}')
                 RETURNING id, issue_id, vendor_id, created_at
             '''.format(
-                issue_bid.issue_id,
-                issue_bid.vendor_id,
-                issue_bid.price,
-                issue_bid.status,
-                issue_bid.comment_vendor,
-                issue_bid.comment_client
+                issue_offer.issue_id,
+                issue_offer.vendor_id,
+                issue_offer.price,
+                issue_offer.status,
+                issue_offer.comment_vendor,
+                issue_offer.comment_client
             )
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            issue_bid_id = cursor.fetchone()
-            return dict(issue_bid_id)
+            issue_offer_id = cursor.fetchone()
+            return dict(issue_offer_id)
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
-def update(id: int, issue_bid: Issue_Bids):
+def update(id: int, issue_offer: Issue_Offers):
     query = '''
-                UPDATE issue_bids 
+                UPDATE issue_offers 
                 SET 
                     issue_id = {}, 
                     vendor_id = {}, 
@@ -85,30 +85,30 @@ def update(id: int, issue_bid: Issue_Bids):
                 WHERE id = {}
                 RETURNING id, updated_at
             '''.format(
-                issue_bid.issue_id,
-                issue_bid.vendor_id,
-                issue_bid.price,
-                issue_bid.status,
-                issue_bid.comment_vendor,
-                issue_bid.comment_client,
+                issue_offer.issue_id,
+                issue_offer.vendor_id,
+                issue_offer.price,
+                issue_offer.status,
+                issue_offer.comment_vendor,
+                issue_offer.comment_client,
                 id
             )
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            issue_bid_id = cursor.fetchone()
-            return dict(issue_bid_id)
+            issue_offer_id = cursor.fetchone()
+            return dict(issue_offer_id)
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int):
     query = '''
-                DELETE FROM issue_bids 
+                DELETE FROM issue_offers 
                 WHERE id = {}
             '''.format(id)
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            return {'message': f'Issue bid {id} deleted successfully'}
+            return {'message': f'Issue offer {id} deleted successfully'}
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))

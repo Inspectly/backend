@@ -28,10 +28,9 @@ class Issues(BaseModel):
     severity: Optional[str]
     status: Status
     active: bool
-    cost: Optional[float]
     image_url: Optional[str]
 
-class Issue_Bids(BaseModel):
+class Issue_Offers(BaseModel):
     issue_id: int
     vendor_id: int
     price: float

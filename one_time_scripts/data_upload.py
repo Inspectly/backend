@@ -22,7 +22,7 @@ from app.crud.realtor_firms import get_all as get_all_realtor_firms
 from app.crud.attachments import create as create_attachment
 from app.crud.comments import create as create_comment
 from app.crud.notes import create as create_note
-from app.crud.issue_bids import create as create_issue_bid
+from app.crud.issue_offers import create as create_issue_bid
 from app.crud.issue_assessments import create as create_issue_assessment
 
 from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Bids, Listings, Notes, Reports, Issues
