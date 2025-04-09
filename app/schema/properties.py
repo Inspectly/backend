@@ -22,13 +22,13 @@ class Reports(BaseModel):
 class Issues(BaseModel):
     report_id: int
     type: str
-    vendor_id: Optional[int]
-    description: Optional[str]
-    summary: Optional[str]
-    severity: Optional[str]
+    vendor_id: Optional[int] = None
+    description: Optional[str] = None
+    summary: Optional[str] = None
+    severity: Optional[str] = None
     status: Status
     active: bool
-    image_url: Optional[str]
+    image_url: Optional[str] = None
 
 class Issue_Offers(BaseModel):
     issue_id: int
