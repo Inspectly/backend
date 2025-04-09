@@ -2,10 +2,10 @@ from fastapi import APIRouter
 
 from app.core.database import get_db_cursor
 from app.api.endpoints import (
-    user_types, vendor_types, 
+    issue_offers, user_types, vendor_types, 
     users, user_logins, user_sessions, clients, realtors, vendors,
     realtor_firms,
-    listings, reports, issues, issue_bids, issue_assessments, attachments, comments, notes,
+    listings, reports, issues, issue_assessments, attachments, comments, notes,
     payments, stripe_user_information, stripe_payments,
     realtor_reviews, vendor_reviews
 )
@@ -45,7 +45,7 @@ api_router.include_router(realtor_firms.router, prefix = '/realtor_firms', tags 
 api_router.include_router(listings.router, prefix = '/listings', tags = ['listings'])
 api_router.include_router(reports.router, prefix = '/reports', tags = ['reports'])
 api_router.include_router(issues.router, prefix = '/issues', tags = ['issues'])
-api_router.include_router(issue_bids.router, prefix = '/issue_bids', tags = ['issue_bids'])
+api_router.include_router(issue_offers.router, prefix = '/issue_offers', tags = ['issue_offers'])
 api_router.include_router(issue_assessments.router, prefix = '/issue_assessments', tags = ['issue_assessments'])
 api_router.include_router(attachments.router, prefix = '/attachments', tags = ['attachments'])
 api_router.include_router(comments.router, prefix = '/comments', tags = ['comments'])
