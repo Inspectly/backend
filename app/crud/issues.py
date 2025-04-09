@@ -78,17 +78,15 @@ def create(issue: Issues):
                 INSERT INTO issues 
                     (report_id, vendor_id, type, description, summary, severity, status, cost, active, image_url)
                 VALUES 
-                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, report_id, vendor_id, created_at
             '''.format(
                 issue.report_id,
-                issue.vendor_id,
                 issue.type,
                 issue.description,
                 issue.summary,
                 issue.severity,
                 issue.status,
-                issue.cost,
                 issue.active,
                 issue.image_url
             )
@@ -110,7 +108,6 @@ def update(id: int, issue: Issues):
                     summary = '{}', 
                     severity = '{}', 
                     status = '{}', 
-                    cost = '{}', 
                     active = '{}',
                     image_url = '{}'
                 WHERE id = {}
@@ -122,7 +119,6 @@ def update(id: int, issue: Issues):
                 issue.summary,
                 issue.severity,
                 issue.status,
-                issue.cost,
                 issue.active,
                 issue.image_url,
                 id
