@@ -76,7 +76,7 @@ def get_issue_address(id: int):
 def create(issue: Issues):
     query = '''
                 INSERT INTO issues 
-                    (report_id, vendor_id, type, description, summary, severity, status, cost, active, image_url)
+                    (report_id, vendor_id, type, description, summary, severity, status, active, image_url)
                 VALUES 
                     ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, report_id, vendor_id, created_at
