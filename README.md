@@ -9,5 +9,3 @@ link to [vercel](https://inspectlyai-backend.vercel.app/api/v0/)</br>
 
 TODO
 1. Add tests
-2. Add one time script to preload with dummy data
-
