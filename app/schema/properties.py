@@ -21,7 +21,7 @@ class Reports(BaseModel):
     
 class Issues(BaseModel):
     report_id: int
-    vendor_id: int
+    vendor_id: Optional[int]
     type: str
     description: Optional[str]
     summary: Optional[str]
