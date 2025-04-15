@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.core.security import get_api_key
 from app.core.database import get_db_cursor
 from app.api.endpoints import (
     issue_offers, user_types, vendor_types, 
@@ -10,7 +11,10 @@ from app.api.endpoints import (
     realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews
 )
 
-api_router = APIRouter()
+def require_api_key(api_key: str = Depends(get_api_key)):
+    return True
+
+api_router = APIRouter(dependencies = [Depends(require_api_key)])
 
 @api_router.get('/')
 def get_all():
