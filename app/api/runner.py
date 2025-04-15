@@ -7,7 +7,7 @@ from app.api.endpoints import (
     realtor_firms,
     listings, reports, issues, issue_assessments, attachments, comments, notes,
     payments, stripe_user_information, stripe_payments,
-    realtor_reviews, vendor_reviews, issue_assessment_comments
+    realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews
 )
 
 api_router = APIRouter()
