@@ -14,7 +14,7 @@ from app.api.endpoints import (
 def require_api_key(api_key: str = Depends(get_api_key)):
     return True
 
-api_router = APIRouter(dependencies = [Depends(require_api_key)])
+api_router = APIRouter()
 
 @api_router.get('/')
 def get_all():
