@@ -12,7 +12,7 @@ class Realtor_Firms(BaseModel):
     country: str
     postal_code: str
     rating: Optional[int] = Field(default = -1)
-    review: Optional[str]
+    review: Optional[str] = None
 
     @validator('rating')
     def set_default_rating(cls, v):

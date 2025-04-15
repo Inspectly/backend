@@ -13,12 +13,12 @@ class Clients(BaseModel):
     first_name: str
     last_name: str
     email: str
-    phone: Optional[str]
-    address: Optional[str]
-    city: Optional[str]
-    state: Optional[str]
-    country: Optional[str]
-    postal_code: Optional[str]
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
 
 class Realtors(BaseModel):
     realtor_user_id: int
@@ -33,7 +33,7 @@ class Realtors(BaseModel):
     country: str
     postal_code: str
     rating: Optional[int] = Field(default = -1)
-    review: Optional[str]
+    review: Optional[str] = None
 
     @validator('rating')
     def set_default_rating(cls, v):
@@ -53,7 +53,7 @@ class Vendors(BaseModel):
     country: str
     postal_code: str
     rating: Optional[int] = Field(default = -1)
-    review: Optional[str]
+    review: Optional[str] = None
 
     @validator('rating')
     def set_default_rating(cls, v):
@@ -61,14 +61,16 @@ class Vendors(BaseModel):
 
 class User_Logins(BaseModel):
     user_id: int
-    email_login: bool
-    email: Optional[str]
-    phone_login: bool
-    phone: Optional[str]
-    gmail_login: bool
-    gmail: Optional[str]
+    email_login: bool = Field(default = False)
+    email: Optional[str] = None
+    phone_login: bool = Field(default = False)
+    phone: Optional[str] = None
+    gmail_login: bool = Field(default = False)
+    gmail: Optional[str] = None
 
 class User_Sessions(BaseModel):
     user_id: int
     login: Login
+    login_time: str
+    logout_time: Optional[str] = None
     authentication_code: str

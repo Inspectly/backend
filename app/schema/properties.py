@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from app.schema.types import Assessment_Status, Bid_Status, Status
+from app.schema.types import Assessment_Status, Bid_Status, Status, User_Type
 
 class Listings(BaseModel):
     user_id: int
@@ -11,12 +11,12 @@ class Listings(BaseModel):
     state: str
     country: str
     postal_code: str
-    image_url: Optional[str]
+    image_url: Optional[str] = None
 
 class Reports(BaseModel):
     user_id: int
     listing_id: int
-    aws_link: str
+    aws_link: Optional[str] = None
     name: str
     
 class Issues(BaseModel):
@@ -32,19 +32,26 @@ class Issues(BaseModel):
 
 class Issue_Offers(BaseModel):
     issue_id: int
-    vendor_id: Optional[int]
+    vendor_id: Optional[int] = None
     price: float
     status: Bid_Status
-    comment_vendor: Optional[str]
-    comment_client: Optional[str]
+    comment_vendor: Optional[str] = None
+    comment_client: Optional[str] = None
 
 class Issue_Assessments(BaseModel):
     issue_id: int
-    vendor_id: int
-    date: str
+    user_id: int
+    interaction_id = str
+    user_type: User_Type
+    start_time: str
+    end_time: str
     status: Assessment_Status
-    comment_vendor: Optional[str]
-    comment_client: Optional[str]
+    min_assessment_time: Optional[int] = None
+
+class Issue_Assessment_Comments(BaseModel):
+    issue_assessment_id: int
+    user_id: int
+    comment: str
 
 class Attachments(BaseModel):
     issue_id: int
