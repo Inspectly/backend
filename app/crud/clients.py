@@ -1,7 +1,10 @@
 from fastapi import HTTPException
 
 from app.schema.users import Clients
+from app.schema.types import User_Type
 from app.core.database import get_db_cursor
+
+from app.utils.helpers import get_user_type_from_id
 
 def get_one(id: int):
     query = '''
@@ -27,11 +30,14 @@ def get_all():
         return [dict(client) for client in clients]
     
 def create(client: Clients):
+    user_type = get_user_type_from_id(client.user_id)
+    if (user_type != User_Type.CLIENT):
+        raise HTTPException(status_code = 400, detail = 'User is not a client')
     query = '''
                 INSERT INTO clients 
                     (user_id, first_name, last_name, email, phone, address, city, state, country, postal_code)
                 VALUES 
-                    ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, user_id, first_name, created_at
             '''.format(
                 client.user_id,
@@ -53,8 +59,7 @@ def create(client: Clients):
 def update(id: int, client: Clients):
     query = '''
                 UPDATE clients 
-                SET 
-                    user_id = '{}', 
+                SET  
                     first_name = '{}', 
                     last_name = '{}', 
                     email = '{}', 
@@ -64,10 +69,10 @@ def update(id: int, client: Clients):
                     state = '{}', 
                     country = '{}', 
                     postal_code = '{}'
-                WHERE id = {}
+                WHERE id = {} 
+                AND user_id = {}
                 RETURNING id, user_id, first_name, updated_at
             '''.format(
-                client.user_id, 
                 client.first_name, 
                 client.last_name, 
                 client.email, 
@@ -77,18 +82,20 @@ def update(id: int, client: Clients):
                 client.state, 
                 client.country, 
                 client.postal_code, 
-                id
+                id,
+                client.user_id
             ) 
     with get_db_cursor() as cursor:
         cursor.execute(query)
         client = cursor.fetchone()
         return dict(client)
     
-def delete(id: int):
+def delete(id: int, user_id: int):
     query = '''
                 DELETE FROM clients 
                 WHERE id = {}
-            '''.format(id)
+                AND user_id = {}
+            '''.format(id, user_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return {'message': f'Client {id} deleted successfully'}

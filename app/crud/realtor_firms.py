@@ -93,11 +93,12 @@ def update(id: int, realtor_firm: Realtor_Firms):
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
-def delete(id: int):
+def delete(id: int, code: str):
     query = '''
                 DELETE FROM realtor_firms 
                 WHERE id = {}
-            '''.format(id)
+                AND code = '{}'
+            '''.format(id, code)
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)

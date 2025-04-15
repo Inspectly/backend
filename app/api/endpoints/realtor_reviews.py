@@ -17,7 +17,7 @@ def get_one(id: int):
 def get_all_by_user_id(user_id: int):
     return realtor_reviews.get_all_by_user_id(user_id)
 
-@router.get('/vendor_user_id/{vendor_user_id}')
+@router.get('/realtor_user_id/{realtor_user_id}')
 def get_all_by_realtor_user_id(realtor_user_id: int):
     return realtor_reviews.get_all_by_realtor_user_id(realtor_user_id)
 

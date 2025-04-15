@@ -1,7 +1,10 @@
 from fastapi import HTTPException
 
+from app.schema.types import User_Type
 from app.core.database import get_db_cursor
 from app.schema.reviews import Vendor_Reviews
+
+from app.utils.helpers import get_user_type_from_id
 
 def get_one(id: int):
     query = '''
@@ -50,6 +53,9 @@ def get_all_by_vendor_user_id(vendor_user_id: int):
         return [dict(vendor_review) for vendor_review in vendor_reviews]
 
 def create(vendor_review: Vendor_Reviews):
+    user_type = get_user_type_from_id(vendor_review.vendor_user_id)
+    if (user_type != User_Type.VENDOR):
+        raise HTTPException(status_code = 400, detail = 'Review is not for a vendor')
     query = '''
                 INSERT INTO vendor_reviews 
                     (user_id, vendor_user_id, rating, review)
@@ -75,10 +81,20 @@ def update(id: int, vendor_review: Vendor_Reviews):
                 UPDATE vendor_reviews 
                 SET 
                     rating = {}, 
-                    review = '{}'
+                    review = '{}',
+                    status = '{}'
                 WHERE id = {}
+                AND user_id = {}
+                AND vendor_user_id = {}
                 RETURNING id, updated_at
-            '''.format(vendor_review.rating, vendor_review.review, id)
+            '''.format(
+                    vendor_review.rating, 
+                    vendor_review.review, 
+                    vendor_review.status,
+                    id, 
+                    vendor_review.user_id, 
+                    vendor_review.vendor_user_id
+                )
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
@@ -87,11 +103,13 @@ def update(id: int, vendor_review: Vendor_Reviews):
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
-def delete(id: int):
+def delete(id: int, user_id: int, vendor_user_id: int):
     query = '''
                 DELETE FROM vendor_reviews 
                 WHERE id = {}
-            '''.format(id)
+                AND user_id = {}
+                AND vendor_user_id = {}
+            '''.format(id, user_id, vendor_user_id)
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)

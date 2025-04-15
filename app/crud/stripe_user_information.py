@@ -58,7 +58,8 @@ def create(user_stripe_information: User_Stripe_Information):
                 INSERT INTO stripe_user_information 
                     (user_id, stripe_user_id)
                 VALUES 
-                    ({}, {})
+                    ({}, '{}')
+                RETURNING id, user_id
             '''.format(
                 user_stripe_information.user_id,
                 user_stripe_information.stripe_user_id
@@ -76,7 +77,7 @@ def update(id: int, user_stripe_information: User_Stripe_Information):
                 UPDATE stripe_user_information 
                     SET 
                         user_id = {}, 
-                        stripe_user_id = {}
+                        stripe_user_id = '{}'
                 WHERE id = {}
                 RETURNING id, user_id, stripe_user_id, updated_at
             '''.format(

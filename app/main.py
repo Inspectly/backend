@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
-from app.api.api import api_router
+from app.api.runner import api_router
 from app.core.config import settings
 
 app = FastAPI(
     title = settings.PROJECT_NAME
 )
-app.include_router(api_router, prefix=settings.API_V0_STR)
+app.include_router(api_router, prefix = settings.API_V0_STR)

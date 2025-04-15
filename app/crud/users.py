@@ -16,6 +16,19 @@ def get_one(id: int):
         if not user:
             raise HTTPException(status_code = 404, detail = 'User not found')
         return dict(user)
+    
+def get_user_type(id: int):
+    query = '''
+                SELECT user_type
+                FROM users
+                WHERE id = {}
+            '''.format(id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        user_type = cursor.fetchone()
+        if not user_type:
+            raise HTTPException(status_code = 404, detail = 'User type not found')
+        return user_type['user_type']
 
 def get_all():
     query = '''

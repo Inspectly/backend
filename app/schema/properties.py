@@ -32,7 +32,7 @@ class Issues(BaseModel):
 
 class Issue_Offers(BaseModel):
     issue_id: int
-    vendor_id: Optional[int] = None
+    vendor_id: int
     price: float
     status: Bid_Status
     comment_vendor: Optional[str] = None
@@ -41,7 +41,7 @@ class Issue_Offers(BaseModel):
 class Issue_Assessments(BaseModel):
     issue_id: int
     user_id: int
-    interaction_id = str
+    interaction_id: str
     user_type: User_Type
     start_time: str
     end_time: str

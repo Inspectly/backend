@@ -50,3 +50,8 @@ class Assessment_Status(str, Enum):
     RECEIVED = 'received'
     ACCEPTED = 'accepted'
     REJECTED = 'rejected'
+
+class Review_Status(str, Enum):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
