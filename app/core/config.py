@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     API_V0_STR: str
     PROJECT_NAME: str
 
+    STRIPE_SECRET_KEY: str
+    STRIPE_PUBLIC_KEY: str
+
+    INSPECTLYAI_API_KEY: str
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'

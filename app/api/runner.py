@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.security import get_api_key
 from app.core.database import get_db_cursor
-from app.api.endpoints import (
+from app.api.v0.endpoints import (
     issue_offers, user_types, vendor_types, 
     users, user_logins, user_sessions, clients, realtors, vendors,
     realtor_firms,
