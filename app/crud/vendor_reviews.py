@@ -58,13 +58,14 @@ def create(vendor_review: Vendor_Reviews):
         raise HTTPException(status_code = 400, detail = 'Review is not for a vendor')
     query = '''
                 INSERT INTO vendor_reviews 
-                    (user_id, vendor_user_id, rating, review)
+                    (user_id, vendor_user_id, status, rating, review)
                 VALUES 
-                    ({}, {}, {}, '{}')
+                    ({}, {}, '{}', {}, '{}')
                 RETURNING id
             '''.format(
                     vendor_review.user_id, 
-                    vendor_review.vendor_user_id, 
+                    vendor_review.vendor_user_id,
+                    vendor_review.status.value, 
                     vendor_review.rating, 
                     vendor_review.review
                 )

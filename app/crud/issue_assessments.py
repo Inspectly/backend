@@ -67,8 +67,8 @@ def get_all_by_interaction_id(interaction_id: str):
     
 def create(issue_assessment: Issue_Assessments):
     interaction_id = get_uuid(issue_assessment.interaction_id)
-    user_type = get_one_user_type(issue_assessment.user_type.user_type.value)
-    if (user_type['user_type'] != issue_assessment.user_type.user_type.value):
+    user_type = get_one_user_type(issue_assessment.user_type.value)
+    if (user_type['user_type'] != issue_assessment.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
     query = '''
                 INSERT INTO issue_assessments 
@@ -80,7 +80,7 @@ def create(issue_assessment: Issue_Assessments):
                 issue_assessment.issue_id,
                 issue_assessment.user_id,
                 interaction_id,
-                issue_assessment.user_type,
+                issue_assessment.user_type.value,
                 issue_assessment.start_time,
                 issue_assessment.end_time,
                 issue_assessment.status,

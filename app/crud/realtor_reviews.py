@@ -58,13 +58,14 @@ def create(realtor_review: Realtor_Reviews):
         raise HTTPException(status_code = 400, detail = 'Review is not for a realtor')
     query = '''
                 INSERT INTO realtor_reviews 
-                    (user_id, realtor_user_id, rating, review)
+                    (user_id, realtor_user_id, status, rating, review)
                 VALUES 
-                    ({}, {}, {}, '{}')
+                    ({}, {}, '{}', {}, '{}')
                 RETURNING id
             '''.format(
                     realtor_review.user_id, 
-                    realtor_review.realtor_user_id, 
+                    realtor_review.realtor_user_id,
+                    realtor_review.status.value, 
                     realtor_review.rating, 
                     realtor_review.review
                 )

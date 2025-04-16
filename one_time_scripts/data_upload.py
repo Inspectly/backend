@@ -27,7 +27,10 @@ from app.crud.issue_assessments import create as create_issue_assessment
 from app.crud.vendor_reviews import create as create_vendor_review
 from app.crud.realtor_reviews import create as create_realtor_review
 from app.crud.realtors import get_all as get_all_realtors
-
+from app.crud.clients import get_all as get_all_clients
+from app.schema.reviews import Client_Reviews
+from app.crud.client_reviews import create as create_client_review
+from app.schema.types import Review_Status
 from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Offers, Listings, Notes, Reports, Issues
 from app.schema.types import Status, User_Types, User_Type, Vendor_Types, Vendor_Type
 from app.schema.users import Users, Clients, Realtors, Vendors
@@ -266,7 +269,7 @@ def populate_realtors():
         except Exception as e:
             print(f"Error inserting realtor : {str(e)}")
 
-def populate_real_admins():
+def  populate_real_admins():
     """Populate 5 real admins as realtors"""
         
     try:
@@ -399,7 +402,7 @@ def populate_vendors():
 
     vendor_types = list(Vendor_Type)  # Get all vendor types as a list
     vendors_created_for_type = set() # Keep track of the vendor types created
-    vendor_users_available = list(vendor_users_made) # Create a copy to be able to remove elements.
+    vendor_users_available = list(vendor_users_made) # Creating a copy to be able to remove elements.
 
     print("picking each vendor type once")
     for vendor_type in vendor_types:
@@ -686,6 +689,10 @@ def populate_issue_assessments():
     """Populate the issue_assessments table, 1-3 assessments per issue. Vendor id is chosen randomly"""
 
     issues = get_all_issues()
+    clients_available = get_all_clients()
+    if not clients_available:
+        print("No clients found. Skipping issue assessment creation.")
+        return
     if not issues:
         print("No issues found. Please create issues first.")
         return
@@ -697,24 +704,30 @@ def populate_issue_assessments():
 
     for issue in issues:
         num_assessments = random.randint(1, 3)  
-
+        interaction = 1
         for _ in range(num_assessments):
             try:
                 vendor = random.choice(vendors_available) 
-                assessment_date = str(fake.date_time_between(start_date="-1y", end_date="now"))
+                client = random.choice(clients_available)
+                interaction_id = f"{vendor['id']}_{client['id']}_{interaction}"
+                start_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
+                end_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
                 status = random.choice(['received','accepted','rejected']) 
                 issue_assessment_data = {
                     "issue_id": issue['id'],
-                    "vendor_id": vendor['id'],
-                    "date": assessment_date,
+                    "user_id": vendor['id'],
+                    "interaction_id": interaction_id, 
+                    "user_type": User_Type.VENDOR,
+                    "start_time": start_time,
+                    "end_time": end_time,
                     "status": status, 
-                    "comment_vendor": fake.text(),
-                    "comment_client": fake.text(),
+                    "min_assessment_time": random.randint(1,30)
                 }
 
                 issue_assessment_create = Issue_Assessments(**issue_assessment_data)
                 created_issue_assessment = create_issue_assessment(issue_assessment_create)
                 print(f"Inserted issue assessment: {created_issue_assessment}")
+                interaction+=1
 
             except Exception as e:
                 print(f"Error inserting issue assessment: {str(e)}")
@@ -743,6 +756,7 @@ def populate_vendor_reviews():
                     "user_id": user['id'],
                     "vendor_user_id": vendor['vendor_user_id'],
                     "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
+                    "status": Review_Status.PENDING,
                     "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
                 }
                 
@@ -778,6 +792,7 @@ def populate_realtor_reviews():
                 review_data = {
                     "user_id": user['id'],
                     "realtor_user_id": realtor['realtor_user_id'],
+                    "status": Review_Status.PENDING,
                     "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
                     "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
                 }
@@ -792,26 +807,63 @@ def populate_realtor_reviews():
             except Exception as e:
                 print(f"Error inserting realtor review: {str(e)}")
 
+def populate_client_reviews():
+    """Populate the realtor_reviews table with fake review data."""
+    users_available = list(users_made)
+    client_available = get_all_clients()
+    
+    print("Creating realtor reviews...")
+    
+    # Create 1-4 reviews for each realtor
+    for client in client_available:
+        # Determine how many reviews to create for this realtor
+
+        num_reviews = random.randint(1, 8)
+        
+        # Select random users to write reviews
+        reviewers = random.sample(users_available, num_reviews)
+        
+        for user in reviewers:
+            try:
+                # Generate review data
+                review_data = {
+                    "user_id": user['id'],
+                    "client_user_id": client['user_id'],
+                    "status": Review_Status.PENDING,
+                    "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
+                    "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
+                }
+                
+                # Create the review object
+                client_review = Client_Reviews(**review_data)
+                
+                # Call your API function to create the review
+                created_review = create_client_review(client_review)
+                print(f"Inserted client review: {created_review}")
+                
+            except Exception as e:
+                print(f"Error inserting client review: {str(e)}")
 
 def run():
     """ Run all population methods in order or selectively by commenting out the ones you don't want to populate"""
-    # populate_user_types()
-    # populate_vendor_types()
-    # populate_realtor_firms()
-    # populate_users( )
+    populate_user_types()
+    populate_vendor_types()
+    populate_realtor_firms()
+    populate_users( )
     get_user_data()
-    # populate_clients()
-    # populate_realtors()
-    # populate_vendors()
-    # populate_vendor_reviews()
-    # populate_realtor_reviews()
+    populate_clients()
+    populate_realtors()
+    populate_vendors()
+    populate_vendor_reviews()
+    populate_realtor_reviews()
+    populate_client_reviews()
     # populate_real_admins()
-    # populate_listings()
-    # populate_reports()
+    populate_listings()
+    populate_reports()
     populate_issues()
     populate_attachments()
     populate_comments()
-    # populate_notes()
+    populate_notes()
     populate_issue_offers()
     populate_issue_assessments()
 
