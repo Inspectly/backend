@@ -48,6 +48,10 @@ class Issue_Assessments(BaseModel):
     status: Assessment_Status
     min_assessment_time: Optional[int] = None
 
+class Issue_Assessments_Delete(BaseModel):
+    issue_id: int
+    interaction_id: str
+
 class Issue_Assessment_Comments(BaseModel):
     issue_assessment_id: int
     user_id: int

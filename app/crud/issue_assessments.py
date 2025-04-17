@@ -125,6 +125,7 @@ def update(id: int, issue_assessment: Issue_Assessments):
         raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int, issue_id: int, interaction_id: str):
+    interaction_id = get_uuid(interaction_id)
     query = '''
                 DELETE FROM issue_assessments 
                 WHERE id = {}
