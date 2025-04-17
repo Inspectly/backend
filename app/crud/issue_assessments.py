@@ -125,16 +125,16 @@ def update(id: int, issue_assessment: Issue_Assessments):
         raise HTTPException(status_code = 400, detail = str(e))
 
 def delete(id: int, issue_id: int, interaction_id: str):
-    interaction_id = get_uuid(interaction_id)
+    transformed_interaction_id = get_uuid(interaction_id)
     query = '''
                 DELETE FROM issue_assessments 
-                WHERE id = {}
-                AND issue_id = {}
-                AND interaction_id = '{}'
-            '''.format(id, issue_id, interaction_id)
+                WHERE id = %s
+                AND issue_id = %s
+                AND interaction_id = %s
+            '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (id, issue_id, transformed_interaction_id))
             return {'message': f'Issue assessment {id} deleted successfully'}
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
