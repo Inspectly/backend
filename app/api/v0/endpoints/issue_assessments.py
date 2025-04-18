@@ -17,9 +17,9 @@ def get_one(id: int):
 def get_all_by_issue_id(issue_id: int):
     return issue_assessments.get_all_by_issue_id(issue_id)
 
-@router.get('/vendor/{vendor_id}/issue/{issue_id}')
-def get_all_by_vendor_id(vendor_id: int, issue_id: int):
-    return issue_assessments.get_all_by_vendor_id(vendor_id, issue_id)
+@router.get('/users_interaction/{users_interaction_id}')
+def get_all_by_users_interaction_id(users_interaction_id: str):
+    return issue_assessments.get_all_by_users_interaction_id(users_interaction_id)
 
 @router.post('/')
 def create(issue_assessment: Issue_Assessments):

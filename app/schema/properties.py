@@ -42,6 +42,7 @@ class Issue_Assessments(BaseModel):
     issue_id: int
     user_id: int
     interaction_id: str
+    users_interaction_id: str
     user_type: User_Type
     start_time: str
     end_time: str

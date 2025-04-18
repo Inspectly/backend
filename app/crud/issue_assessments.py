@@ -65,6 +65,18 @@ def get_all_by_interaction_id(interaction_id: str):
         issue_assessments = cursor.fetchall()
         return [dict(issue_assessment) for issue_assessment in issue_assessments]
     
+def get_all_by_users_interaction_id(users_interaction_id: str):
+    query = '''
+                SELECT * 
+                FROM issue_assessments 
+                WHERE users_interaction_id = '{}'
+                ORDER BY id DESC
+            '''.format(users_interaction_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        issue_assessments = cursor.fetchall()
+        return [dict(issue_assessment) for issue_assessment in issue_assessments]
+
 def create(issue_assessment: Issue_Assessments):
     transformed_interaction_id = get_uuid(issue_assessment.interaction_id)
     user_type = get_one_user_type(issue_assessment.user_type.value)
@@ -72,14 +84,15 @@ def create(issue_assessment: Issue_Assessments):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
     query = '''
                 INSERT INTO issue_assessments 
-                    (issue_id, user_id, interaction_id, user_type, start_time, end_time, status, min_assessment_time)
+                    (issue_id, user_id, interaction_id, users_interaction_id, user_type, start_time, end_time, status, min_assessment_time)
                 VALUES 
-                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}')
+                    ({}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
                 RETURNING id, created_at, updated_at
             '''.format(
                 issue_assessment.issue_id,
                 issue_assessment.user_id,
                 transformed_interaction_id,
+                issue_assessment.users_interaction_id,
                 issue_assessment.user_type.value,
                 issue_assessment.start_time,
                 issue_assessment.end_time,
