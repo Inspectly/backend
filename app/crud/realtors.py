@@ -19,6 +19,19 @@ def get_one(id: int):
             raise HTTPException(status_code = 404, detail = 'Realtor not found')
         return dict(realtor)
 
+def get_one_realtor_user_id(user_id: int):
+    query = '''
+                SELECT * 
+                FROM realtors 
+                WHERE realtor_user_id = {}
+            '''.format(user_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        realtor = cursor.fetchone()
+        if not realtor:
+            raise HTTPException(status_code = 404, detail = 'Realtor not found')
+        return dict(realtor)
+
 def get_all():
     query = '''
                 SELECT * 

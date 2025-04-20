@@ -18,6 +18,19 @@ def get_one(id: int):
         if not client:
             raise HTTPException(status_code = 404, detail = 'Client not found')
         return dict(client)
+    
+def get_one_user_id(user_id: int):
+    query = '''
+                SELECT * 
+                FROM clients 
+                WHERE user_id = {}
+            '''.format(user_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        client = cursor.fetchone()
+        if not client:
+            raise HTTPException(status_code = 404, detail = 'Client not found')
+        return dict(client)
 
 def get_all():
     query = '''

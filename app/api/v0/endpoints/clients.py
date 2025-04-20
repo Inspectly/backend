@@ -13,6 +13,10 @@ def get_all():
 def get_one(id: int):
     return clients.get_one(id)
 
+@router.get('/user_id/{user_id}')
+def get_one_user_id(user_id: int):
+    return clients.get_one_user_id(user_id)
+
 @router.post('/')
 def create(client: Clients):
     return clients.create(client)
