@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 
 from app.crud import issue_offers
 from app.schema.properties import Issue_Offers
@@ -30,5 +30,5 @@ def update(id: int, issue_offer: Issue_Offers):
     return issue_offers.update(id, issue_offer)
 
 @router.delete('/{id}')
-def delete(id: int):
-    return issue_offers.delete(id)
+def delete(id: int, issue_id: int = Body(..., embed = True)):
+    return issue_offers.delete(id, issue_id)
