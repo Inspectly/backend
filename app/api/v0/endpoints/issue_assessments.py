@@ -21,6 +21,14 @@ def get_all_by_issue_id(issue_id: int):
 def get_all_by_users_interaction_id(users_interaction_id: str):
     return issue_assessments.get_all_by_users_interaction_id(users_interaction_id)
 
+@router.get('/user_id/{user_id}')
+def get_all_by_user_id(user_id: int):
+    return issue_assessments.get_all_by_user_id(user_id)
+
+@router.get('/vendor_id/{vendor_id}')
+def get_all_by_vendor_id(vendor_id: int):
+    return issue_assessments.get_all_by_vendor_id(vendor_id)
+
 @router.post('/')
 def create(issue_assessment: Issue_Assessments):
     return issue_assessments.create(issue_assessment)

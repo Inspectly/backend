@@ -76,7 +76,29 @@ def get_all_by_users_interaction_id(users_interaction_id: str):
         cursor.execute(query)
         issue_assessments = cursor.fetchall()
         return [dict(issue_assessment) for issue_assessment in issue_assessments]
-
+    
+def get_all_by_user_id(user_id: int):
+    query = '''
+                SELECT * 
+                FROM issue_assessments 
+                WHERE users_interaction_id LIKE '{}_%'
+            '''.format(user_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        issue_assessments = cursor.fetchall()
+        return [dict(issue_assessment) for issue_assessment in issue_assessments]
+    
+def get_all_by_vendor_id(vendor_id: int):
+    query = '''
+                SELECT * 
+                FROM issue_assessments 
+                WHERE users_interaction_id LIKE '%_{}'
+            '''.format(vendor_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        issue_assessments = cursor.fetchall()
+        return [dict(issue_assessment) for issue_assessment in issue_assessments]
+                
 def create(issue_assessment: Issue_Assessments):
     transformed_interaction_id = get_uuid(issue_assessment.interaction_id)
     user_type = get_one_user_type(issue_assessment.user_type.value)
