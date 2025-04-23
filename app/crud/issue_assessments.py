@@ -77,7 +77,7 @@ def get_all_by_users_interaction_id(users_interaction_id: str):
         issue_assessments = cursor.fetchall()
         return [dict(issue_assessment) for issue_assessment in issue_assessments]
     
-def get_all_by_user_id(user_id: int):
+def get_all_by_user_id_users_interaction_id(user_id: int):
     query = '''
                 SELECT * 
                 FROM issue_assessments 
@@ -88,7 +88,7 @@ def get_all_by_user_id(user_id: int):
         issue_assessments = cursor.fetchall()
         return [dict(issue_assessment) for issue_assessment in issue_assessments]
     
-def get_all_by_vendor_id(vendor_id: int):
+def get_all_by_vendor_id_users_interaction_id(vendor_id: int):
     query = '''
                 SELECT * 
                 FROM issue_assessments 
