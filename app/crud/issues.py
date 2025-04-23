@@ -48,7 +48,51 @@ def get_vendor_issues(vendor_id: int):
         cursor.execute(query)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
-    
+
+def get_all_issue_addresses():
+    query = '''
+                SELECT 
+                    i.id as issue_id,
+                    l.address,
+                    l.city,
+                    l.state,
+                    l.country,
+                    l.postal_code
+                FROM 
+                    issues i
+                JOIN 
+                    reports r ON i.report_id = r.id
+                JOIN 
+                    listings l ON r.listing_id = l.id
+            '''
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        addresses = cursor.fetchall()
+        return [dict(address) for address in addresses]
+
+def get_all_issue_addresses_issue_ids(issue_ids: list[int]):
+    query = '''
+                SELECT 
+                    i.id as issue_id,
+                    l.address,
+                    l.city,
+                    l.state,
+                    l.country,
+                    l.postal_code
+                FROM 
+                    issues i
+                JOIN 
+                    reports r ON i.report_id = r.id
+                JOIN 
+                    listings l ON r.listing_id = l.id
+                WHERE 
+                    i.id IN ({})
+            '''.format(', '.join(str(id) for id in issue_ids))
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        addresses = cursor.fetchall()
+        return [dict(address) for address in addresses]
+
 def get_issue_address(id: int):
     query = '''
                 SELECT 
