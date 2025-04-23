@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
-    API_V0_STR: str
+    API_STR: str
+    V0_STR: str
     PROJECT_NAME: str
 
     STRIPE_SECRET_KEY: str
