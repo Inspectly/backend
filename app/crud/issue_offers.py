@@ -100,7 +100,6 @@ def update(id: int, issue_offer: Issue_Offers):
                     comment_client = '{}'
                 WHERE id = {}
                 AND issue_id = {}
-                AND vendor_id = {}
                 RETURNING id, updated_at
             '''.format(
                 issue_offer.price,
@@ -108,8 +107,7 @@ def update(id: int, issue_offer: Issue_Offers):
                 issue_offer.comment_vendor,
                 issue_offer.comment_client,
                 id,
-                issue_offer.issue_id,
-                issue_offer.vendor_id
+                issue_offer.issue_id
             )
     try:
         with get_db_cursor() as cursor:

@@ -13,6 +13,10 @@ def get_all():
 def get_one(id: int):
     return realtors.get_one(id)
 
+@router.get('/realtor_user_id/{user_id}')
+def get_one_realtor_user_id(user_id: int):
+    return realtors.get_one_realtor_user_id(user_id)
+
 @router.post('/')
 def create(realtor: Realtors):
     return realtors.create(realtor)

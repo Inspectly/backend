@@ -32,7 +32,7 @@ class Issues(BaseModel):
 
 class Issue_Offers(BaseModel):
     issue_id: int
-    vendor_id: int
+    vendor_id: Optional[int] = None
     price: float
     status: Bid_Status
     comment_vendor: Optional[str] = None
@@ -42,11 +42,16 @@ class Issue_Assessments(BaseModel):
     issue_id: int
     user_id: int
     interaction_id: str
+    users_interaction_id: str
     user_type: User_Type
     start_time: str
     end_time: str
     status: Assessment_Status
     min_assessment_time: Optional[int] = None
+
+class Issue_Assessments_Delete(BaseModel):
+    issue_id: int
+    interaction_id: str
 
 class Issue_Assessment_Comments(BaseModel):
     issue_assessment_id: int

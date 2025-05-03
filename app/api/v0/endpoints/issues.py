@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 
 from app.crud import issues
 from app.schema.properties import Issues
@@ -20,6 +20,14 @@ def get_report_issues(report_id: int):
 @router.get('/vendor/{vendor_id}')
 def get_vendor_issues(vendor_id: int):
     return issues.get_vendor_issues(vendor_id)
+
+@router.get('/addresses/all')
+def get_all_issue_addresses():
+    return issues.get_all_issue_addresses()
+
+@router.get('/addresses/issue_ids')
+def get_all_issue_addresses_issue_ids(issue_ids: list[int] = Body(..., embed = True)):
+    return issues.get_all_issue_addresses_issue_ids(issue_ids)
 
 @router.get('/address/{id}')
 def get_issue_address(id: int):
