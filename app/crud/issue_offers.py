@@ -97,7 +97,8 @@ def update(id: int, issue_offer: Issue_Offers):
                     price = {}, 
                     status = '{}', 
                     comment_vendor = '{}', 
-                    comment_client = '{}'
+                    comment_client = '{}',
+                    user_last_viewed = '{}'
                 WHERE id = {}
                 AND issue_id = {}
                 RETURNING id, updated_at
@@ -106,6 +107,7 @@ def update(id: int, issue_offer: Issue_Offers):
                 issue_offer.status,
                 issue_offer.comment_vendor,
                 issue_offer.comment_client,
+                issue_offer.user_last_viewed,
                 id,
                 issue_offer.issue_id
             )

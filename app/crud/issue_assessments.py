@@ -137,7 +137,8 @@ def update(id: int, issue_assessment: Issue_Assessments):
                     start_time = '{}', 
                     end_time = '{}', 
                     status = '{}', 
-                    min_assessment_time = '{}'
+                    min_assessment_time = '{}',
+                    user_last_viewed = '{}'
                 WHERE id = {}
                 AND issue_id = {}
                 AND interaction_id = '{}'
@@ -147,6 +148,7 @@ def update(id: int, issue_assessment: Issue_Assessments):
                 issue_assessment.end_time,
                 issue_assessment.status,
                 issue_assessment.min_assessment_time,
+                issue_assessment.user_last_viewed,
                 id,
                 issue_assessment.issue_id,
                 transformed_interaction_id
