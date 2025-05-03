@@ -58,13 +58,14 @@ def create(client_review: Client_Reviews):
         raise HTTPException(status_code = 400, detail = 'Review is not for a client')
     query = '''
                 INSERT INTO client_reviews 
-                    (user_id, client_user_id, rating, review)
+                    (user_id, client_user_id, status, rating, review)
                 VALUES 
-                    ({}, {}, {}, '{}')
+                    ({}, {}, '{}', {}, '{}')
                 RETURNING id
             '''.format(
                     client_review.user_id, 
-                    client_review.client_user_id, 
+                    client_review.client_user_id,
+                    client_review.status.value, 
                     client_review.rating, 
                     client_review.review
                 )
