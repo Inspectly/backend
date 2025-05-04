@@ -66,6 +66,7 @@ def create(issue_assessment_comment: Issue_Assessment_Comments):
                     (issue_assessment_id, user_id, comment)
                 VALUES 
                     ({}, {}, '{}')
+                RETURNING id, created_at, updated_at    
             '''.format(
                 issue_assessment_comment.issue_assessment_id,
                 issue_assessment_comment.user_id,

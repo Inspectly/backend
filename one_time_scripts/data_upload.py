@@ -2,6 +2,7 @@ import random
 import uuid
 from faker import Faker
 import faker
+from pathlib import Path
 from app.crud.user_types import create as create_user_type 
 from app.crud.user_types import get_all as user_types_get_all
 from app.crud.users import create as create_user
@@ -36,8 +37,10 @@ from app.schema.types import Status, User_Types, User_Type, Vendor_Types, Vendor
 from app.schema.users import Users, Clients, Realtors, Vendors
 from app.schema.realtor_firms import Realtor_Firms
 from app.schema.reviews import Realtor_Reviews, Vendor_Reviews
-
-
+from app.utils.helpers import get_uuid
+from app.crud.issue_assessment_comments import create
+from app.schema.properties import Issue_Assessment_Comments
+from app.crud.issue_assessments import get_all as get_all_issue_assesments
 
 fake = Faker()
 
@@ -717,6 +720,7 @@ def populate_issue_assessments():
                     "issue_id": issue['id'],
                     "user_id": vendor['id'],
                     "interaction_id": interaction_id, 
+                    "users_interaction_id": get_uuid(interaction_id),
                     "user_type": User_Type.VENDOR,
                     "start_time": start_time,
                     "end_time": end_time,
@@ -844,28 +848,67 @@ def populate_client_reviews():
             except Exception as e:
                 print(f"Error inserting client review: {str(e)}")
 
+
+
+
+def populate_issue_assessment_comments(comments_per_assessment: int = 2):
+    """Populate the issue_assessment_comments table with fake comments."""
+    
+    issue_assessments = get_all_issue_assesments()
+    users = get_all_users()
+
+    if not issue_assessments:
+        print("No issue assessments found. Skipping comment creation.")
+        return
+
+    if not users:
+        print("No users found. Skipping comment creation.")
+        return
+
+    for issue in issue_assessments:
+        for _ in range(comments_per_assessment):
+            try:
+                user = random.choice(users)
+                comment_data = {
+                    "issue_assessment_id": issue['id'],
+                    "user_id": user['id'],
+                    "comment": fake.sentence(),
+                }
+
+                comment_obj = Issue_Assessment_Comments(**comment_data)
+                created = create(comment_obj)
+                print(f"Inserted comment: {created}")
+
+            except Exception as e:
+                print(f"Error inserting comment for issue_assessment_id={issue['id']}: {str(e)}")
+
+
+
+
 def run():
     """ Run all population methods in order or selectively by commenting out the ones you don't want to populate"""
-    populate_user_types()
-    populate_vendor_types()
-    populate_realtor_firms()
-    populate_users( )
+    # populate_user_types()
+    # populate_vendor_types()
+    # populate_realtor_firms()
+    # populate_users()
     get_user_data()
-    populate_clients()
-    populate_realtors()
-    populate_vendors()
-    populate_vendor_reviews()
-    populate_realtor_reviews()
-    populate_client_reviews()
+    # populate_clients()
+    # populate_realtors()
+    # populate_vendors()
+    # populate_vendor_reviews()
+    # populate_realtor_reviews()
+    # populate_client_reviews()
     # populate_real_admins()
-    populate_listings()
-    populate_reports()
-    populate_issues()
-    populate_attachments()
-    populate_comments()
-    populate_notes()
-    populate_issue_offers()
-    populate_issue_assessments()
+    # populate_listings()
+    # populate_reports()
+    # populate_issues()
+    # populate_attachments()
+    # populate_comments()
+    # populate_notes()
+    # populate_issue_offers()
+    # populate_issue_assessments()
+    populate_issue_assessment_comments()
+
 
 if __name__ == "__main__":
     run()
