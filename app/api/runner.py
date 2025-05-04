@@ -5,7 +5,7 @@ from app.core.security import get_api_key
 from app.core.database import get_db_cursor
 from app.api.v0.runner_v0 import api_router as runner_v0
 
-def require_api_key(api_key: str = Depends(get_api_key)): 
+def require_api_key(api_key: str = Depends(get_api_key)):
     return True
 
 api_router = APIRouter()
