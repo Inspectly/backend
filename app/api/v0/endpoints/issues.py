@@ -25,7 +25,7 @@ def get_vendor_issues(vendor_id: int):
 def get_all_issue_addresses():
     return issues.get_all_issue_addresses()
 
-@router.get('/addresses/issue_ids')
+@router.post('/addresses/issue_ids')
 def get_all_issue_addresses_issue_ids(issue_ids: list[int] = Body(..., embed = True)):
     return issues.get_all_issue_addresses_issue_ids(issue_ids)
 
