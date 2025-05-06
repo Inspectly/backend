@@ -27,6 +27,19 @@ def get_all():
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     
+def get_all_limit_offset(limit: int = 100, offset: int = 0):
+    query = '''
+                SELECT * 
+                FROM issues 
+                ORDER BY id DESC
+                LIMIT {} 
+                OFFSET {}
+            '''.format(limit, offset)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        issues = cursor.fetchall()
+        return [dict(issue) for issue in issues]
+    
 def get_report_issues(report_id: int):
     query = '''
                 SELECT * 

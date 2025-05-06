@@ -9,6 +9,10 @@ router = APIRouter()
 def get_all():
     return issues.get_all()
 
+@router.get('/paginate')
+def get_all_limit_offset(limit: int = 100, offset: int = 0):
+    return issues.get_all_limit_offset(limit, offset)
+
 @router.get('/{id}')
 def get_one(id: int):
     return issues.get_one(id)
