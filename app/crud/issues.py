@@ -27,16 +27,36 @@ def get_all():
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     
-def get_all_limit_offset(limit: int = 100, offset: int = 0):
+def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
     query = '''
-                SELECT * 
-                FROM issues 
-                ORDER BY id DESC
-                LIMIT {} 
-                OFFSET {}
-            '''.format(limit, offset)
+        SELECT i.* 
+        FROM issues i
+        JOIN reports r ON i.report_id = r.id
+        JOIN listings l ON r.listing_id = l.id
+        WHERE 1=1
+    '''
+    params = []
+    if type:
+        query += ' AND i.type = %s'
+        params.append(type)
+    if city:
+        query += ' AND l.city = %s'
+        params.append(city)
+    if state:
+        query += ' AND l.state = %s'
+        params.append(state)
+    if search:
+        query += ' AND i.summary ILIKE %s'
+        params.append(f'%{search}%')
+ 
+    query += '''
+        ORDER BY i.id DESC
+        LIMIT %s OFFSET %s
+    '''
+    params.extend([limit, offset])
+    
     with get_db_cursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, params)
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     

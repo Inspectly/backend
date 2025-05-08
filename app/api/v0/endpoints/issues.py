@@ -10,8 +10,8 @@ def get_all():
     return issues.get_all()
 
 @router.get('/paginate')
-def get_all_limit_offset(limit: int = 100, offset: int = 0):
-    return issues.get_all_limit_offset(limit, offset)
+def get_all_limit_offset(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
+    return issues.get_all_paginated(limit, offset, type, city, state, search)
 
 @router.get('/{id}')
 def get_one(id: int):
