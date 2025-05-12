@@ -58,7 +58,8 @@ def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = Non
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        issues = [dict(issue) for issue in issues]
+        return {'issues': issues, 'total': len(issues)}
     
 def get_report_issues(report_id: int):
     query = '''
