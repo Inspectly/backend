@@ -37,7 +37,7 @@ def total_issues_count(vendor_assigned = False):
         query += ' AND vendor_id IS NOT NULL'
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
     
 def total_issues_count_filter(type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
@@ -67,7 +67,7 @@ def total_issues_count_filter(type = None, city = None, state = None, search = N
     
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
 
 def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
