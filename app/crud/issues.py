@@ -39,7 +39,7 @@ def total_issues_count(vendor_assigned = False):
         cursor.execute(query)
         return cursor.fetchone()[0]
     
-def total_issues_count_filtered(type = None, city = None, state = None, search = None, vendor_assigned = False):
+def total_issues_count_filter(type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
         SELECT COUNT(*) 
         FROM issues i
@@ -69,7 +69,7 @@ def total_issues_count_filtered(type = None, city = None, state = None, search =
         cursor.execute(query, params)
         return cursor.fetchone()[0]
 
-def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
+def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
         SELECT i.* 
         FROM issues i
