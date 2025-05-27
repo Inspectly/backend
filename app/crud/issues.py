@@ -27,17 +27,19 @@ def get_all():
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     
-def total_issues_count():
+def total_issues_count(vendor_assigned = False):
     query = '''
                 SELECT COUNT(*) 
                 FROM issues
                 WHERE active = true
             '''
+    if vendor_assigned:
+        query += ' AND vendor_id IS NOT NULL'
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return cursor.fetchone()[0]
     
-def total_issues_count_filtered(type = None, city = None, state = None, search = None):
+def total_issues_count_filtered(type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
         SELECT COUNT(*) 
         FROM issues i
@@ -60,12 +62,14 @@ def total_issues_count_filtered(type = None, city = None, state = None, search =
     if search:
         query += ' AND i.summary ILIKE %s'
         params.append(f'%{search}%')
+    if vendor_assigned:
+        query += ' AND i.vendor_id IS NOT NULL'
     
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         return cursor.fetchone()[0]
 
-def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
+def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
         SELECT i.* 
         FROM issues i
@@ -87,6 +91,8 @@ def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = Non
     if search:
         query += ' AND i.summary ILIKE %s'
         params.append(f'%{search}%')
+    if vendor_assigned:
+        query += ' AND i.vendor_id IS NOT NULL'
  
     query += '''
         ORDER BY i.id DESC

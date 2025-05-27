@@ -10,16 +10,16 @@ def get_all():
     return issues.get_all()
 
 @router.get('/total')
-def total_issues_count():
-    return issues.total_issues_count()
+def total_issues_count(vendor_assigned = False):
+    return issues.total_issues_count(vendor_assigned)
 
 @router.get('/filter/total')
-def total_issues_count_paginated(type = None, city = None, state = None, search = None):
-    return issues.total_issues_count_filtered(type, city, state, search)
+def total_issues_count_paginated(type = None, city = None, state = None, search = None, vendor_assigned = False):
+    return issues.total_issues_count_filtered(type, city, state, search, vendor_assigned)
 
 @router.get('/paginate')
-def get_all_limit_offset(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
-    return issues.get_all_paginated(limit, offset, type, city, state, search)
+def get_all_limit_offset(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
+    return issues.get_all_paginated(limit, offset, type, city, state, search, vendor_assigned)
 
 @router.get('/{id}')
 def get_one(id: int):
