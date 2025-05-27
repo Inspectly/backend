@@ -30,7 +30,8 @@ def get_all():
 def total_issues_count():
     query = '''
                 SELECT COUNT(*) 
-                FROM issues 
+                FROM issues
+                WHERE active = true
             '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
@@ -43,6 +44,7 @@ def total_issues_count_filtered(type = None, city = None, state = None, search =
         JOIN reports r ON i.report_id = r.id
         JOIN listings l ON r.listing_id = l.id
         WHERE 1 = 1
+        AND i.active = true
     '''
     params = []
     
@@ -69,7 +71,8 @@ def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = Non
         FROM issues i
         JOIN reports r ON i.report_id = r.id
         JOIN listings l ON r.listing_id = l.id
-        WHERE 1 = 1
+        WHERE 1 = 1\
+        AND i.active = true
     '''
     params = []
     if type:
