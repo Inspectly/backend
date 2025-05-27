@@ -9,6 +9,14 @@ router = APIRouter()
 def get_all():
     return issues.get_all()
 
+@router.get('/total')
+def total_issues_count():
+    return issues.total_issues_count()
+
+@router.get('/filter/total')
+def total_issues_count_paginated(type = None, city = None, state = None, search = None):
+    return issues.total_issues_count_filtered(type, city, state, search)
+
 @router.get('/paginate')
 def get_all_limit_offset(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
     return issues.get_all_paginated(limit, offset, type, city, state, search)

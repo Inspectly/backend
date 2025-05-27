@@ -27,13 +27,49 @@ def get_all():
         issues = cursor.fetchall()
         return [dict(issue) for issue in issues]
     
+def total_issues_count():
+    query = '''
+                SELECT COUNT(*) 
+                FROM issues 
+            '''
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        return cursor.fetchone()[0]
+    
+def total_issues_count_filtered(type = None, city = None, state = None, search = None):
+    query = '''
+        SELECT COUNT(*) 
+        FROM issues i
+        JOIN reports r ON i.report_id = r.id
+        JOIN listings l ON r.listing_id = l.id
+        WHERE 1 = 1
+    '''
+    params = []
+    
+    if type:
+        query += ' AND i.type = %s'
+        params.append(type)
+    if city:
+        query += ' AND l.city = %s'
+        params.append(city)
+    if state:
+        query += ' AND l.state = %s'
+        params.append(state)
+    if search:
+        query += ' AND i.summary ILIKE %s'
+        params.append(f'%{search}%')
+    
+    with get_db_cursor() as cursor:
+        cursor.execute(query, params)
+        return cursor.fetchone()[0]
+
 def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None):
     query = '''
         SELECT i.* 
         FROM issues i
         JOIN reports r ON i.report_id = r.id
         JOIN listings l ON r.listing_id = l.id
-        WHERE 1=1
+        WHERE 1 = 1
     '''
     params = []
     if type:
@@ -59,7 +95,11 @@ def get_all_paginated(limit: int = 100, offset: int = 0, type = None, city = Non
         cursor.execute(query, params)
         issues = cursor.fetchall()
         issues = [dict(issue) for issue in issues]
-        return {'issues': issues, 'total': len(issues)}
+        return {
+            'issues': issues, 
+            'total': total_issues_count(), 
+            'total_filtered': total_issues_count_filtered(type, city, state, search)
+        }
     
 def get_report_issues(report_id: int):
     query = '''
