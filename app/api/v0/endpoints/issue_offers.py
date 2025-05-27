@@ -17,9 +17,13 @@ def get_one(id: int):
 def get_all_by_issue_id(issue_id: int):
     return issue_offers.get_all_by_issue_id(issue_id)
 
+@router.get('/vendor/{vendor_id}')
+def get_all_by_vendor_id(vendor_id: int):
+    return issue_offers.get_all_by_vendor_id(vendor_id)
+
 @router.get('/vendor/{vendor_id}/issue/{issue_id}')
 def get_all_by_vendor_id(vendor_id: int, issue_id: int):
-    return issue_offers.get_all_by_vendor_id(vendor_id, issue_id)
+    return issue_offers.get_all_by_vendor_id_and_issue_id(vendor_id, issue_id)
 
 @router.post('/')
 def create(issue_offer: Issue_Offers):

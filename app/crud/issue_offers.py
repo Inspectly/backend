@@ -41,7 +41,7 @@ def get_all_by_issue_id(issue_id: int):
         issue_offers = cursor.fetchall()
         return [dict(issue_offer) for issue_offer in issue_offers]
     
-def get_all_by_vendor_id(vendor_id: int, issue_id: int):
+def get_all_by_vendor_id(vendor_id: int):
     query = '''
                 SELECT * 
                 FROM issue_offers 
