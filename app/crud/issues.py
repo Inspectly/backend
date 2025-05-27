@@ -75,7 +75,7 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         FROM issues i
         JOIN reports r ON i.report_id = r.id
         JOIN listings l ON r.listing_id = l.id
-        WHERE 1 = 1\
+        WHERE 1 = 1
         AND i.active = true
     '''
     params = []
@@ -107,7 +107,7 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         return {
             'issues': issues, 
             'total': total_issues_count(), 
-            'total_filtered': total_issues_count_filtered(type, city, state, search)
+            'total_filtered': total_issues_count_filter(type, city, state, search, vendor_assigned)
         }
     
 def get_report_issues(report_id: int):
