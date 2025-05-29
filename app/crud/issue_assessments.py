@@ -77,12 +77,12 @@ def get_all_by_users_interaction_id(users_interaction_id: str):
         issue_assessments = cursor.fetchall()
         return [dict(issue_assessment) for issue_assessment in issue_assessments]
     
-def get_all_by_user_id_users_interaction_id(user_id: int):
+def get_all_by_client_id_users_interaction_id(client_id: int):
     query = '''
                 SELECT * 
                 FROM issue_assessments 
                 WHERE users_interaction_id LIKE '{}_%'
-            '''.format(user_id)
+            '''.format(client_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issue_assessments = cursor.fetchall()

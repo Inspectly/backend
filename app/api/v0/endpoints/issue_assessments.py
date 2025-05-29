@@ -25,9 +25,9 @@ def get_all_by_users_interaction_id(users_interaction_id: str):
 def get_all_by_user_id(user_id: int):
     return issue_assessments.get_all_by_user_id(user_id)
 
-@router.get('/user_id_users_interaction_id/{user_id}')
-def get_all_by_user_id_users_interaction_id(user_id: int):
-    return issue_assessments.get_all_by_user_id_users_interaction_id(user_id)
+@router.get('/client_id_users_interaction_id/{client_id}')
+def get_all_by_client_id_users_interaction_id(client_id: int):
+    return issue_assessments.get_all_by_client_id_users_interaction_id(client_id)
 
 @router.get('/vendor_id_users_interaction_id/{vendor_id}')
 def get_all_by_vendor_id_users_interaction_id(vendor_id: int):
