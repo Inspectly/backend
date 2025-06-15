@@ -18,7 +18,7 @@ def total_issues_count_filter(type = None, city = None, state = None, search = N
     return issues.total_issues_count_filter(type, city, state, search, vendor_assigned)
 
 @router.get('/filter')
-def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
+def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
     return issues.get_all_filter(limit, offset, type, city, state, search, vendor_assigned)
 
 @router.get('/{id}')

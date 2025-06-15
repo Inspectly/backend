@@ -69,7 +69,7 @@ def total_issues_count_filter(type = None, city = None, state = None, search = N
         cursor.execute(query, params)
         return cursor.fetchone()
 
-def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned = False):
+def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
     query = '''
         SELECT i.* 
         FROM issues i
@@ -99,7 +99,6 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         LIMIT %s OFFSET %s
     '''
     params.extend([limit, offset])
-    
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         issues = cursor.fetchall()
