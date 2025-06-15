@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, File, UploadFile
 
 from app.crud import reports
 from app.schema.properties import Reports
+from app.core.property_report.extract_issues import Extract_Issues
 
 router = APIRouter()
 
@@ -24,6 +25,14 @@ def get_listing_reports(listing_id: int):
 @router.post('/')
 def create(report: Reports):
     return reports.create(report)
+
+@router.post('/extract-issues') #add aws
+def extract_issues(property_report: UploadFile = File(...)):
+    if not property_report.filename.endswith('.pdf'):
+        raise HTTPException(status_code = 400, detail = 'Only PDF files are allowed')
+    extract_issues = Extract_Issues()
+    return extract_issues.extract_issues(property_report, property_report.filename)
+
 
 @router.put('/{id}')
 def update(id: int, report: Reports):
