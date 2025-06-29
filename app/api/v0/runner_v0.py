@@ -5,7 +5,7 @@ from app.api.v0.endpoints import (
     users, user_logins, user_sessions, clients, realtors, vendors,
     realtor_firms,
     listings, reports, issues, issue_assessments, attachments, comments, notes,
-    payments, stripe_user_information, stripe_payments,
+    payments, stripe_user_information, stripe_payments, stripe,
     realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews
 )
 
@@ -51,3 +51,5 @@ api_router.include_router(notes.router, prefix = '/notes', tags = ['notes'])
 api_router.include_router(payments.router, prefix = '/payments', tags = ['payments'])
 api_router.include_router(stripe_user_information.router, prefix = '/stripe_user_information', tags = ['stripe_user_information'])
 api_router.include_router(stripe_payments.router, prefix = '/stripe_payments', tags = ['stripe_payments'])
+
+api_router.include_router(stripe.router, prefix="/stripe", tags=["stripe"])

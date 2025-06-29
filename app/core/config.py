@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     API_STR: str
     V0_STR: str
     PROJECT_NAME: str
-
+    FRONTEND_BASE_URL: str
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLIC_KEY: str
-
+    STRIPE_WEBHOOK:str
     INSPECTLYAI_API_KEY: str
 
     class Config:
