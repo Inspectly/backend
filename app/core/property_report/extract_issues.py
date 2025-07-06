@@ -16,8 +16,7 @@ class Extract_Issues:
             api_key = os.environ.get('OPENAI_API_KEY')
         )
     
-    def extract_issues(self, property_report: UploadFile, report_name: str):
-        file_content = property_report.file.read()
+    def extract_issues(self, file_content: bytes, report_name: str):
         combined_content = self.parser.extract_combined_content(file_content, report_name)
         cc_json = json.dumps(combined_content, indent = 2, ensure_ascii = False)
         response = self.llm.chat.completions.create(
