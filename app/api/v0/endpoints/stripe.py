@@ -2,75 +2,35 @@ from datetime import datetime, timezone
 import stripe
 from fastapi import APIRouter, HTTPException, Header, Request
 from starlette.responses import JSONResponse
-from pydantic import BaseModel
+
 from app.crud.issue_offers import get_one as get_issue_offer_by_id, get_all_by_issue_id as get_all_offers_for_issue_id, update as update_offer 
 from app.crud.issues import get_one as get_issue_by_id, update as update_issue
-from app.crud.reports import get_one as get_report_by_id
 import os
 
 from app.schema.properties import Issue_Offers, Issues
 from app.schema.types import Status
-
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+from app.core.stripe.stripe_session import Stripe_Session
+from app.core.stripe.types import Checkout_Session_Request
 
 router = APIRouter()
 
-class CheckoutSessionRequest(BaseModel):
-    offerID: int
-
-@router.post("/create-checkout-session")
-async def create_checkout_session(data: CheckoutSessionRequest):
-    # Step 1: Fetch offer from DB
-    offer = get_issue_offer_by_id(data.offerID)
-    if not offer:
-        raise HTTPException(status_code=404, detail="Offer not found")
-    issue = get_issue_by_id(offer['issue_id'])
-    if not issue:
-        raise HTTPException(status_code=404, detail="Issue not found")
-    report = get_report_by_id(issue['report_id'])
-    if not report:
-        raise HTTPException(status_code=404, detail="Report not found")
-
-    if offer["status"] == "accepted":
-        raise HTTPException(status_code=400, detail="Offer already accepted")
-    
-    if offer["status"] == "rejected":
-        raise HTTPException(status_code=400, detail="Offer already rejected")
-
-    # Step 2: Calculate Stripe-compatible amount
-    amount_cents = int(round(float(offer["price"]) * 100))
-
-    # Step 3: Create Stripe Checkout session
+@router.post('/create-checkout-session')
+async def create_checkout_session(data: Checkout_Session_Request):
     try:
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{
-                "price_data": {
-                    "currency": "usd",
-                    "product_data": {
-                        "name": f"Payment for offer #{offer['id']}",
-                    },
-                    "unit_amount": amount_cents,
-                },
-                "quantity": 1,
-            }],
-            mode="payment",
-            success_url=(
-                f"{os.getenv('FRONTEND_BASE_URL')}"
-                f"/listings/{report['listing_id']}/reports/{issue['report_id']}/issues/{issue['id']}?tab=offers&payment=success&session_id={{CHECKOUT_SESSION_ID}}"
-            ),
-            cancel_url=(
-                f"{os.getenv('FRONTEND_BASE_URL')}"
-                f"/listings/{report['listing_id']}/reports/{issue['report_id']}/issues/{issue['id']}?tab=offers&payment=failed"
-            ),
-            metadata={
-                "offer_id": str(offer["id"])
-            }
-        )
-        return {"sessionUrl": session.url}
+        stripe_session = Stripe_Session()
+        session_url, session = stripe_session.checkout_session(data)
+        return {
+            'session_url': session_url,
+            'session': session
+        }
+    except LookupError as e:
+        raise HTTPException(status_code = 404, detail = str(e))
+    except ValueError as e:
+        raise HTTPException(status_code = 400, detail = str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code = 500, detail = str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+        raise HTTPException(status_code = 500, detail = f'Unexpected error: {e}')
 
 @router.post("/webhook")
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
