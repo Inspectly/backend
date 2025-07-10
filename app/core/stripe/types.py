@@ -10,3 +10,8 @@ class Checkout_Session_Response(BaseModel):
     session_id: str
     url: str
 
+class Stripe_Checkout_Session(Enum):
+    COMPLETED = 'checkout.session.completed'
+    PAYMENT_SUCCEEDED = 'checkout.session.async_payment_succeeded'
+    PAYMENT_FAILED = 'checkout.session.async_payment_failed'
+    EXPIRED = 'checkout.session.expired'

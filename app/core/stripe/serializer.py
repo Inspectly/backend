@@ -45,3 +45,30 @@ def validate_issue_offer(offer_id: int):
         raise
     except Exception as e:
         raise RuntimeError(f'Internal server error: {e}')
+
+def validate_webhook_metadata(session):
+    offer_id = session['metadata'].get('offer_id')
+    client_id = session['metadata'].get('client_id')
+    vendor_id = session['metadata'].get('vendor_id')
+    
+    if not offer_id:
+        raise ValueError('Webhook missing offer_id in metadata')
+    if not client_id:
+        raise ValueError('Webhook missing client_id in metadata')
+    if not vendor_id:
+        raise ValueError('Webhook missing vendor_id in metadata')
+    
+    offer = get_issue_offer_by_id(int(offer_id))
+    if not offer:
+        raise ValueError('Offer not found')
+    
+    issue_id = offer['issue_id']
+    
+    if str(vendor_id) != str(offer['vendor_id']):
+        raise ValueError('Vendor ID mismatch')
+    
+    issue = get_issue_by_id(issue_id)
+    if not issue:
+        raise ValueError('Issue not found')
+    
+    return offer_id, client_id, vendor_id, offer, issue, issue_id

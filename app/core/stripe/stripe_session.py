@@ -7,12 +7,11 @@ from app.core.stripe.serializer import validate_issue_offer, validate_user
 class Stripe_Session:
     def __init__(self):
         self.stripe_secret_key = os.getenv('STRIPE_SECRET_KEY')
-        self.stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
         self.frontend_base_url = os.getenv('FRONTEND_BASE_URL')
         self.stripe = stripe
         self.stripe.api_key = self.stripe_secret_key
 
-    def checkout_session(self, data: Checkout_Session_Request):
+    async def checkout_session(self, data: Checkout_Session_Request):
         valid_client = validate_user(data.client_id)
         valid_vendor = validate_user(data.vendor_id)
         valid_offer = validate_issue_offer(data.offer_id)
@@ -44,6 +43,3 @@ class Stripe_Session:
             return session.url, session
         except Exception as e:
             raise RuntimeError(f'Internal server error: {e}')
-
-    def webhook(self):
-        pass

@@ -52,4 +52,4 @@ api_router.include_router(payments.router, prefix = '/payments', tags = ['paymen
 api_router.include_router(stripe_user_information.router, prefix = '/stripe_user_information', tags = ['stripe_user_information'])
 api_router.include_router(stripe_payments.router, prefix = '/stripe_payments', tags = ['stripe_payments'])
 
-api_router.include_router(stripe.router, prefix="/stripe", tags=["stripe"])
+api_router.include_router(stripe.router, prefix = '/stripe', tags = ['stripe'])
