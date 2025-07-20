@@ -1,4 +1,3 @@
-from app.core.stripe.types import Validation_Response
 from app.crud.issue_offers import (
     get_one as get_issue_offer_by_id
 )
