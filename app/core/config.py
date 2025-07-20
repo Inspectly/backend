@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     FRONTEND_BASE_URL: str
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLIC_KEY: str
-    STRIPE_WEBHOOK:str
     INSPECTLYAI_API_KEY: str
     STRIPE_WEBHOOK_SECRET: str
 
