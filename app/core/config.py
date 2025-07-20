@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     STRIPE_PUBLIC_KEY: str
     STRIPE_WEBHOOK:str
     INSPECTLYAI_API_KEY: str
+    STRIPE_WEBHOOK_SECRET: str
 
     class Config:
         env_file = '.env'

@@ -7,7 +7,7 @@ from app.crud.vendor_types import get_one_vendor_type
 
 from app.utils.helpers import get_user_type_from_id
 
-def get_one(id: int): 
+def get_one(id: int):
     query = '''
                 SELECT * 
                 FROM vendors 
