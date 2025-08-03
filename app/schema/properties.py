@@ -23,6 +23,36 @@ class Reports(BaseModel):
     listing_id: int
     aws_link: Optional[str] = None
     name: str
+
+class Report_Offers(BaseModel):
+    report_id: int
+    vendor_id: Optional[int] = None
+    price: float
+    status: Bid_Status
+    user_last_viewed: Optional[str] = None
+    comment_vendor: Optional[str] = None
+    comment_client: Optional[str] = None
+
+class Report_Assessments(BaseModel):
+    report_id: int
+    user_id: int
+    user_type: User_Type
+    interaction_id: str
+    users_interaction_id: str
+    start_time: str
+    end_time: str
+    status: Assessment_Status
+    user_last_viewed: Optional[str] = None
+    min_assessment_time: Optional[int] = None
+
+class Report_Assessments_Delete(BaseModel):
+    report_id: int
+    interaction_id: str
+
+class Report_Assessment_Comments(BaseModel):
+    report_assessment_id: int
+    user_id: int
+    comment: str
     
 class Issues(BaseModel):
     report_id: int
