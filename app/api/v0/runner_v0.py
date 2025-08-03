@@ -7,7 +7,7 @@ from app.api.v0.endpoints import (
     listings, reports, issues, issue_assessments, attachments, comments, notes,
     payments, stripe_user_information, stripe_payments,
     realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews,
-    tasks
+    tasks, report_offers, report_assessments, report_assessment_comments
 )
 
 api_router = APIRouter()
@@ -44,6 +44,10 @@ api_router.include_router(issues.router, prefix = '/issues', tags = ['issues'])
 api_router.include_router(issue_offers.router, prefix = '/issue_offers', tags = ['issue_offers'])
 api_router.include_router(issue_assessments.router, prefix = '/issue_assessments', tags = ['issue_assessments'])
 api_router.include_router(issue_assessment_comments.router, prefix = '/issue_assessment_comments', tags = ['issue_assessment_comments'])
+
+api_router.include_router(report_offers.router, prefix = '/report_offers', tags = ['report_offers'])
+api_router.include_router(report_assessments.router, prefix = '/report_assessments', tags = ['report_assessments'])
+api_router.include_router(report_assessment_comments.router, prefix = '/report_assessment_comments', tags = ['report_assessment_comments'])
 
 api_router.include_router(attachments.router, prefix = '/attachments', tags = ['attachments'])
 api_router.include_router(comments.router, prefix = '/comments', tags = ['comments'])
