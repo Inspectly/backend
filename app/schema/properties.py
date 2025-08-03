@@ -13,6 +13,11 @@ class Listings(BaseModel):
     postal_code: str
     image_url: Optional[str] = None
 
+class Reports_Simple(BaseModel):
+    user_id: int
+    listing_id: int
+    name: str
+
 class Reports(BaseModel):
     user_id: int
     listing_id: int

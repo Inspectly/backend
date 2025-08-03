@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException, File, UploadFile
+import json
+from fastapi import APIRouter, HTTPException, File, UploadFile, Form, BackgroundTasks
 
-from app.crud import reports
-from app.schema.properties import Reports
+from app.crud import reports, tasks
+from app.schema.tasks import Tasks, Task_Type, Status
+from app.schema.properties import Reports, Reports_Simple
+from app.core.property_report.aws_operations import AWS_Operations
 from app.core.property_report.extract_issues import Extract_Issues
 
 router = APIRouter()
@@ -26,12 +29,41 @@ def get_listing_reports(listing_id: int):
 def create(report: Reports):
     return reports.create(report)
 
-@router.post('/extract-issues') #add aws
-def extract_issues(property_report: UploadFile = File(...)):
+@router.post('/extract/issues')
+async def extract_issues(
+    background_tasks: BackgroundTasks,
+    user_id: int = Form(...),
+    listing_id: int = Form(...), 
+    name: str = Form(...),
+    property_report: UploadFile = File(...)
+):
     if not property_report.filename.endswith('.pdf'):
         raise HTTPException(status_code = 400, detail = 'Only PDF files are allowed')
+    
+    file_content = await property_report.read()
+    await property_report.seek(0)
+
+    # aws_operations = AWS_Operations()
+    # aws_link = await aws_operations.upload_file(user_id, listing_id, name, property_report)
+    aws_link = 'temp:link:aws:s3'
+    report = await reports.create(Reports(
+        user_id = user_id,
+        listing_id = listing_id,
+        aws_link = aws_link,
+        name = name
+    ))
+    task_id = await tasks.create(Tasks(
+        report_id = report['id'], 
+        task_type = Task_Type.EXTRACT_ISSUES, 
+        status = Status.PENDING
+    ))
     extract_issues = Extract_Issues()
-    return extract_issues.extract_issues(property_report, property_report.filename)
+    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename, report['id'])
+    return {
+        'report_id': report['id'], 
+        'task_id': task_id['id'], 
+        'aws_link': aws_link
+    }
 
 
 @router.put('/{id}')

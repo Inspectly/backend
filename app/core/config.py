@@ -10,11 +10,15 @@ class Settings(BaseSettings):
     API_STR: str
     V0_STR: str
     PROJECT_NAME: str
+    INSPECTLYAI_API_KEY: str
+    
     FRONTEND_BASE_URL: str
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLIC_KEY: str
-    INSPECTLYAI_API_KEY: str
     STRIPE_WEBHOOK_SECRET: str
+
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
 
     class Config:
         env_file = '.env'

@@ -49,7 +49,7 @@ def get_listing_reports(listing_id: int):
         reports = cursor.fetchall()
         return [dict(report) for report in reports]
     
-def create(report: Reports):
+async def create(report: Reports):
     query = '''
                 INSERT INTO reports 
                     (user_id, listing_id, aws_link, name)
