@@ -54,3 +54,4 @@ api_router.include_router(stripe_user_information.router, prefix = '/stripe_user
 api_router.include_router(stripe_payments.router, prefix = '/stripe_payments', tags = ['stripe_payments'])
 
 api_router.include_router(tasks.router, prefix = '/tasks', tags = ['tasks'])
+api_router.include_router(stripe.router, prefix = '/stripe', tags = ['stripe'])
