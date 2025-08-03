@@ -43,8 +43,9 @@ async def extract_issues(
     file_content = await property_report.read()
     await property_report.seek(0)
 
-    aws_operations = AWS_Operations()
-    aws_link = await aws_operations.upload_file(user_id, listing_id, name, property_report)
+    # aws_operations = AWS_Operations()
+    # aws_link = await aws_operations.upload_file(user_id, listing_id, name, property_report)
+    aws_link = 'temp:link:aws:s3'
     report = await reports.create(Reports(
         user_id = user_id,
         listing_id = listing_id,
@@ -57,7 +58,7 @@ async def extract_issues(
         status = Status.PENDING
     ))
     extract_issues = Extract_Issues()
-    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename)
+    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename, report['id'])
     return {
         'report_id': report['id'], 
         'task_id': task_id['id'], 

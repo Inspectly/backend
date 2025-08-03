@@ -1,25 +1,27 @@
+import asyncio
 import os
 import json
 from fastapi import UploadFile
 from openai import OpenAI, AsyncOpenAI
 
+from app.crud import issues
+from app.schema.properties import Issues
 from app.core.property_report.prompt import PROMPT
 from app.core.property_report.classes import Report_Response
 from app.core.property_report.tools import REPORT_RESPONSE_TOOL
 from app.core.property_report.report_parser import Report_Parser
 
-
 class Extract_Issues:
     def __init__(self):
         self.parser = Report_Parser()
-        self.llm = OpenAI(
+        self.llm = AsyncOpenAI(
             api_key = os.environ.get('OPENAI_API_KEY')
         )
     
-    def extract_issues(self, file_content: bytes, report_name: str):
+    async def extract_issues(self, file_content: bytes, report_name: str, report_id: int):
         combined_content = self.parser.extract_combined_content(file_content, report_name)
         cc_json = json.dumps(combined_content, indent = 2, ensure_ascii = False)
-        response = self.llm.chat.completions.create(
+        response = await self.llm.chat.completions.create(
             temperature = 0.2,
             model = 'gpt-4.1',
             messages = [
@@ -33,12 +35,28 @@ class Extract_Issues:
             arguments_str = response.choices[0].message.tool_calls[0].function.arguments
             structured_data = Report_Response.model_validate_json(arguments_str)
 
-            print("✅ Successfully parsed structured report.")
-            return structured_data
+            print('✅ Successfully parsed structured report.')
+            for issue_type in structured_data.IssueTypes:
+                for issue in issue_type.issues:
+                    new_issue = Issues(
+                        report_id = report_id,
+                        type = issue_type.type,
+                        description = issue.description.replace("'", "''"),
+                        summary = issue.name.replace("'", "''"),
+                        status = 'pending',
+                        active = True,
+                        image_url = ''
+                    )
+                    await issues.create(new_issue)
+            print('✅ Successfully created issues.')
         except Exception as e:
             print('Error: ', e)
             return None
 
 if __name__ == '__main__':
     extract_issues = Extract_Issues()
-    print(extract_issues.extract_issues('1.pdf', '1.pdf'))
+    with open('1.pdf', 'rb') as file:
+        file_content = file.read()
+
+    result = asyncio.run(extract_issues.extract_issues(file_content, '1.pdf'))
+    print(result)
