@@ -4,12 +4,14 @@ import json
 from fastapi import UploadFile
 from openai import OpenAI, AsyncOpenAI
 
-from app.crud import issues
+from app.crud import tasks, issues
+from app.schema.types import Status
 from app.schema.properties import Issues
 from app.core.property_report.prompt import PROMPT
 from app.core.property_report.classes import Report_Response
 from app.core.property_report.tools import REPORT_RESPONSE_TOOL
 from app.core.property_report.report_parser import Report_Parser
+from app.schema.tasks import Tasks, Task_Type, Status as Task_Status
 
 class Extract_Issues:
     def __init__(self):
@@ -18,7 +20,7 @@ class Extract_Issues:
             api_key = os.environ.get('OPENAI_API_KEY')
         )
     
-    async def extract_issues(self, file_content: bytes, report_name: str, report_id: int):
+    async def extract_issues(self, file_content: bytes, report_name: str, report_id: int, task_id: int):
         combined_content = self.parser.extract_combined_content(file_content, report_name)
         cc_json = json.dumps(combined_content, indent = 2, ensure_ascii = False)
         response = await self.llm.chat.completions.create(
@@ -43,12 +45,18 @@ class Extract_Issues:
                         type = issue_type.type,
                         description = issue.description.replace("'", "''"),
                         summary = issue.name.replace("'", "''"),
-                        status = 'pending',
+                        status = Status.OPEN.value,
                         active = True,
                         image_url = ''
                     )
                     await issues.create(new_issue)
             print('✅ Successfully created issues.')
+            await tasks.update(task_id, Tasks(
+                id = task_id,
+                report_id = report_id,
+                task_type = Task_Type.EXTRACT_ISSUES.value,
+                status = Task_Status.COMPLETED.value
+            ))
         except Exception as e:
             print('Error: ', e)
             return None

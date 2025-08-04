@@ -199,7 +199,7 @@ def get_issue_address(id: int):
             raise HTTPException(status_code = 404, detail = 'Address not found')
         return dict(address)
     
-def create(issue: Issues):
+async def create(issue: Issues):
     query = '''
                 INSERT INTO issues 
                     (report_id, type, description, summary, severity, status, active, image_url)
@@ -212,7 +212,7 @@ def create(issue: Issues):
                 issue.description,
                 issue.summary,
                 issue.severity,
-                issue.status,
+                issue.status.value,
                 issue.active,
                 issue.image_url
             )
@@ -244,7 +244,7 @@ def update(id: int, issue: Issues):
                 issue.description,
                 issue.summary,
                 issue.severity,
-                issue.status,
+                issue.status.value,
                 issue.active,
                 issue.image_url,
                 id

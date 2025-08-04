@@ -54,11 +54,11 @@ async def extract_issues(
     ))
     task_id = await tasks.create(Tasks(
         report_id = report['id'], 
-        task_type = Task_Type.EXTRACT_ISSUES, 
-        status = Status.PENDING
+        task_type = Task_Type.EXTRACT_ISSUES.value, 
+        status = Status.PENDING.value
     ))
     extract_issues = Extract_Issues()
-    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename, report['id'])
+    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename, report['id'], task_id['id'])
     return {
         'report_id': report['id'], 
         'task_id': task_id['id'], 

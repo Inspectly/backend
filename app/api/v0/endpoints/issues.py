@@ -46,8 +46,8 @@ def get_issue_address(id: int):
     return issues.get_issue_address(id)
 
 @router.post('/')
-def create(issue: Issues):
-    return issues.create(issue)
+async def create(issue: Issues):
+    return await issues.create(issue)
 
 @router.put('/{id}')
 def update(id: int, issue: Issues):

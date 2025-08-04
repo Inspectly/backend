@@ -43,19 +43,19 @@ async def create(task: Tasks):
                 (report_id, task_type, status)
                 VALUES ({}, '{}', '{}')
                 RETURNING id
-            '''.format(task.report_id, task.task_type, task.status)
+            '''.format(task.report_id, task.task_type.value, task.status.value)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         task_id = cursor.fetchone()
         return dict(task_id)
     
-def update(id: int, task: Tasks):
+async def update(id: int, task: Tasks):
     query = '''
                 UPDATE report_extraction_tasks 
                 SET status = '{}' 
                 WHERE id = {} 
                 AND report_id = {}
-            '''.format(task.status, id, task.report_id)
+            '''.format(task.status.value, id, task.report_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         return True
