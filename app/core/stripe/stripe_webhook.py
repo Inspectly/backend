@@ -54,7 +54,7 @@ class Stripe_Webhook:
                         update_offer(current_offer['id'], updated_offer)
 
                 issue['vendor_id'] = vendor_id
-                issue['status'] = Status.IN_PROGRESS
+                issue['status'] = Status.IN_PROGRESS.value
                 issue_input = Issues(**{k: issue[k] for k in Issues.model_fields if k in issue})
                 update_issue(issue_id, issue_input)
 

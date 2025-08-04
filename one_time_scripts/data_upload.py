@@ -760,7 +760,7 @@ def populate_vendor_reviews():
                     "user_id": user['id'],
                     "vendor_user_id": vendor['vendor_user_id'],
                     "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
-                    "status": Review_Status.PENDING,
+                    "status": Review_Status.PENDING.value,
                     "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
                 }
                 
@@ -796,7 +796,7 @@ def populate_realtor_reviews():
                 review_data = {
                     "user_id": user['id'],
                     "realtor_user_id": realtor['realtor_user_id'],
-                    "status": Review_Status.PENDING,
+                    "status": Review_Status.PENDING.value,
                     "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
                     "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
                 }
@@ -833,7 +833,7 @@ def populate_client_reviews():
                 review_data = {
                     "user_id": user['id'],
                     "client_user_id": client['user_id'],
-                    "status": Review_Status.PENDING,
+                    "status": Review_Status.PENDING.value,
                     "rating": round(random.uniform(1.0, 5.0), 1),  # Rating from 1.0 to 5.0 with one decimal
                     "review": fake.paragraph(nb_sentences=random.randint(1, 3))  # 1-3 sentences for review
                 }
