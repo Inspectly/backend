@@ -223,39 +223,48 @@ def create(issue: Issues):
             return dict(issue)
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
-    
+
+
 def update(id: int, issue: Issues):
+    # Handle optional fields with NULL fallback and escaping
+    vendor_val = "NULL" if issue.vendor_id is None else issue.vendor_id
+    desc_val = "NULL" if issue.description is None else "'{}'".format(issue.description)
+    summary_val = "NULL" if issue.summary is None else "'{}'".format(issue.summary)
+    severity_val = "NULL" if issue.severity is None else "'{}'".format(issue.severity)
+    image_url_val = "NULL" if issue.image_url is None else "'{}'".format(issue.image_url)
+
     query = '''
-                UPDATE issues 
-                SET 
-                    vendor_id = {},
-                    type = '{}', 
-                    description = '{}', 
-                    summary = '{}', 
-                    severity = '{}', 
-                    status = '{}', 
-                    active = '{}',
-                    image_url = '{}'
-                WHERE id = {}
-                RETURNING id, vendor_id, updated_at
-            '''.format(
-                issue.vendor_id,
-                issue.type,
-                issue.description,
-                issue.summary,
-                issue.severity,
-                issue.status,
-                issue.active,
-                issue.image_url,
-                id
-            )
+        UPDATE issues
+        SET
+            vendor_id = {},
+            type = '{}',
+            description = {},
+            summary = {},
+            severity = {},
+            status = '{}',
+            active = '{}',
+            image_url = {}
+        WHERE id = {}
+        RETURNING id, vendor_id, updated_at
+    '''.format(
+        vendor_val,
+        issue.type,
+        desc_val,
+        summary_val,
+        severity_val,
+        issue.status,
+        issue.active,
+        image_url_val,
+        id
+    )
+
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            issue = cursor.fetchone()
-            return dict(issue)
+            updated_issue = cursor.fetchone()
+            return dict(updated_issue)
     except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 def delete(id: int):
     query = '''
