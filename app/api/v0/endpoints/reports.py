@@ -26,8 +26,8 @@ def get_listing_reports(listing_id: int):
     return reports.get_listing_reports(listing_id)
 
 @router.post('/')
-def create(report: Reports):
-    return reports.create(report)
+async def create(report: Reports):
+    return await reports.create(report)
 
 @router.post('/extract/issues')
 async def extract_issues(
