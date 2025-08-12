@@ -226,41 +226,35 @@ def create(issue: Issues):
 
 
 def update(id: int, issue: Issues):
-    # Handle optional fields with NULL fallback and escaping
-    vendor_val = "NULL" if issue.vendor_id is None else issue.vendor_id
-    desc_val = "NULL" if issue.description is None else "'{}'".format(issue.description)
-    summary_val = "NULL" if issue.summary is None else "'{}'".format(issue.summary)
-    severity_val = "NULL" if issue.severity is None else "'{}'".format(issue.severity)
-    image_url_val = "NULL" if issue.image_url is None else "'{}'".format(issue.image_url)
-
     query = '''
         UPDATE issues
         SET
-            vendor_id = {},
-            type = '{}',
-            description = {},
-            summary = {},
-            severity = {},
-            status = '{}',
-            active = '{}',
-            image_url = {}
-        WHERE id = {}
+            vendor_id = %s,
+            type = %s,
+            description = %s,
+            summary = %s,
+            severity = %s,
+            status = %s,
+            active = %s,
+            image_url = %s
+        WHERE id = %s
         RETURNING id, vendor_id, updated_at
-    '''.format(
-        vendor_val,
+    '''
+    params = (
+        issue.vendor_id,
         issue.type,
-        desc_val,
-        summary_val,
-        severity_val,
+        issue.description,
+        issue.summary,
+        issue.severity,
         issue.status,
         issue.active,
-        image_url_val,
+        issue.image_url,
         id
     )
 
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, params)
             updated_issue = cursor.fetchone()
             return dict(updated_issue)
     except Exception as e:
