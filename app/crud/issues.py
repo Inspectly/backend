@@ -223,22 +223,26 @@ async def create(issue: Issues):
             return dict(issue)
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
-    
+
+
 def update(id: int, issue: Issues):
     query = '''
-                UPDATE issues 
-                SET 
-                    vendor_id = {},
-                    type = '{}', 
-                    description = '{}', 
-                    summary = '{}', 
-                    severity = '{}', 
-                    status = '{}', 
-                    active = '{}',
-                    image_url = '{}'
-                WHERE id = {}
-                RETURNING id, vendor_id, updated_at
-            '''.format(
+        UPDATE issues
+        SET
+            vendor_id = %s,
+            type = %s,
+            description = %s,
+            summary = %s,
+            severity = %s,
+            status = %s,
+            active = %s,
+            image_url = %s
+        WHERE id = %s
+        RETURNING id, vendor_id, updated_at
+    '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 issue.vendor_id,
                 issue.type,
                 issue.description,
@@ -248,14 +252,11 @@ def update(id: int, issue: Issues):
                 issue.active,
                 issue.image_url,
                 id
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
-            issue = cursor.fetchone()
-            return dict(issue)
+            ))
+            updated_issue = cursor.fetchone()
+            return dict(updated_issue)
     except Exception as e:
-        raise HTTPException(status_code = 400, detail = str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 def delete(id: int):
     query = '''
