@@ -240,21 +240,19 @@ def update(id: int, issue: Issues):
         WHERE id = %s
         RETURNING id, vendor_id, updated_at
     '''
-    params = (
-        issue.vendor_id,
-        issue.type,
-        issue.description,
-        issue.summary,
-        issue.severity,
-        issue.status,
-        issue.active,
-        issue.image_url,
-        id
-    )
-
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query, params)
+            cursor.execute(query, (
+                issue.vendor_id,
+                issue.type,
+                issue.description,
+                issue.summary,
+                issue.severity,
+                issue.status,
+                issue.active,
+                issue.image_url,
+                id
+            ))
             updated_issue = cursor.fetchone()
             return dict(updated_issue)
     except Exception as e:
