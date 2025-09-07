@@ -236,7 +236,8 @@ def update(id: int, issue: Issues):
             severity = %s,
             status = %s,
             active = %s,
-            image_url = %s
+            image_url = %s,
+            review_status = %s
         WHERE id = %s
         RETURNING id, vendor_id, updated_at
     '''
@@ -251,6 +252,7 @@ def update(id: int, issue: Issues):
                 issue.status.value,
                 issue.active,
                 issue.image_url,
+                issue.review_status,
                 id
             ))
             updated_issue = cursor.fetchone()

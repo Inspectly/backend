@@ -60,7 +60,7 @@ async def create(report: Reports):
                 report.user_id, 
                 report.listing_id, 
                 report.aws_link, 
-                report.name
+                report.name,
             )
     try:
         with get_db_cursor() as cursor:
@@ -75,12 +75,14 @@ def update(id: int, report: Reports):
                 UPDATE reports 
                 SET 
                     aws_link = '{}', 
-                    name = '{}' 
+                    name = '{}',
+                    review_status = '{}'
                 WHERE id = {}
                 RETURNING id, user_id, listing_id, updated_at
             '''.format(
                 report.aws_link, 
                 report.name, 
+                report.review_status,
                 id
             )
     try:

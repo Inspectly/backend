@@ -23,6 +23,7 @@ class Reports(BaseModel):
     listing_id: int
     aws_link: Optional[str] = None
     name: str
+    review_status: Optional[str] = None
 
 class Report_Offers(BaseModel):
     report_id: int
@@ -64,6 +65,7 @@ class Issues(BaseModel):
     status: Status
     active: bool
     image_url: Optional[str] = None
+    review_status: Optional[str] = None
 
 class Issue_Offers(BaseModel):
     issue_id: int
