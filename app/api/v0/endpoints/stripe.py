@@ -16,6 +16,8 @@ async def create_checkout_session(data: Checkout_Session_Request):
             'session_url': session_url,
             'session': session
         }
+    except HTTPException:
+        raise
     except LookupError as e:
         raise HTTPException(status_code = 404, detail = str(e))
     except ValueError as e:
@@ -32,6 +34,8 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         payload = await request.body()
         result = await stripe_webhook.webhook(payload, stripe_signature)
         return JSONResponse(status_code = 200, content = {'status': result['status']})
+    except HTTPException:
+        raise
     except ValueError as e:
         return JSONResponse(status_code = 400, content = {'status': 'error', 'detail': str(e)})
     except RuntimeError as e:
