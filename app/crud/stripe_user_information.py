@@ -6,7 +6,7 @@ from app.schema.payments import User_Stripe_Information
 def get_one(id: int):
     query = '''
                 SELECT * 
-                FROM stripe_user_information 
+                FROM user_stripe_information 
                 WHERE id = {}
             '''.format(id)
     with get_db_cursor() as cursor:
@@ -19,7 +19,7 @@ def get_one(id: int):
 def get_all():
     query = '''
                 SELECT * 
-                FROM stripe_user_information
+                FROM user_stripe_information
                 ORDER BY id DESC
             '''
     with get_db_cursor() as cursor:
@@ -30,7 +30,7 @@ def get_all():
 def get_user_stripe_information(user_id: int):
     query = '''
                 SELECT * 
-                FROM stripe_user_information 
+                FROM user_stripe_information 
                 WHERE user_id = {}
             '''.format(user_id)
     with get_db_cursor() as cursor:
@@ -43,7 +43,7 @@ def get_user_stripe_information(user_id: int):
 def get_user_stripe_information_by_stripe_user_id(stripe_user_id: str):
     query = '''
                 SELECT * 
-                FROM stripe_user_information 
+                FROM user_stripe_information 
                 WHERE stripe_user_id = {}
             '''.format(stripe_user_id)
     with get_db_cursor() as cursor:
@@ -55,7 +55,7 @@ def get_user_stripe_information_by_stripe_user_id(stripe_user_id: str):
     
 def create(user_stripe_information: User_Stripe_Information):
     query = '''
-                INSERT INTO stripe_user_information 
+                INSERT INTO user_stripe_information 
                     (user_id, stripe_user_id)
                 VALUES 
                     ({}, '{}')
@@ -74,7 +74,7 @@ def create(user_stripe_information: User_Stripe_Information):
 
 def update(id: int, user_stripe_information: User_Stripe_Information):
     query = '''
-                UPDATE stripe_user_information 
+                UPDATE user_stripe_information 
                     SET 
                         user_id = {}, 
                         stripe_user_id = '{}'
@@ -94,7 +94,7 @@ def update(id: int, user_stripe_information: User_Stripe_Information):
 
 def delete(id: int):
     query = '''
-                DELETE FROM stripe_user_information 
+                DELETE FROM user_stripe_information 
                 WHERE id = {}
             '''.format(id)
     try:

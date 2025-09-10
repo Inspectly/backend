@@ -23,7 +23,7 @@ class Stripe_Session:
                             'currency': 'cad',
                             'unit_amount': int(round(float(valid_offer['price']) * 100)),
                             'product_data': {
-                                'name': f'Payment for offer #{valid_offer['id']}'
+                                'name': f'Payment for offer #{valid_offer["id"]}'
                             }
                         },
                         'quantity': 1
@@ -32,8 +32,8 @@ class Stripe_Session:
                 customer = valid_client['stripe_user_id'], # person making the payment
                 mode = 'payment',
                 payment_method_types = ['card'],
-                success_url = f'{self.frontend_base_url}/listings/{valid_offer['listing_id']}/reports/{valid_offer['report_id']}/issues/{valid_offer['issue_id']}?tab=offers&payment=success&session_id={{CHECKOUT_SESSION_ID}}',
-                cancel_url = f'{self.frontend_base_url}/listings/{valid_offer['listing_id']}/reports/{valid_offer['report_id']}/issues/{valid_offer['issue_id']}?tab=offers&payment=failed',
+                success_url = f'{self.frontend_base_url}/listings/{valid_offer["listing_id"]}/reports/{valid_offer["report_id"]}/issues/{valid_offer["issue_id"]}?tab=offers&payment=success&session_id={{CHECKOUT_SESSION_ID}}',
+                cancel_url = f'{self.frontend_base_url}/listings/{valid_offer["listing_id"]}/reports/{valid_offer["report_id"]}/issues/{valid_offer["issue_id"]}?tab=offers&payment=failed',
                 metadata = {
                     'offer_id': str(valid_offer['id']),
                     'client_id': str(valid_client['user_id']),
