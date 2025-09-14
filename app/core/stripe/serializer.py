@@ -38,7 +38,8 @@ def validate_issue_offer(offer_id: int):
         report = get_report_by_id(issue['report_id'])
         if not report:
             raise LookupError(f'Report with id {issue["report_id"]} not found')
-        
+        offer['report_id'] = report['id']
+        offer['listing_id'] = report['listing_id']
         return offer
     except (LookupError, ValueError):
         raise
