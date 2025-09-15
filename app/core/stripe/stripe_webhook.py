@@ -37,7 +37,7 @@ class Stripe_Webhook:
     async def webhook(self, payload, stripe_signature: str):
         logfire.info(f'payload: {payload}')
         logfire.info(f'stripe_signature: {stripe_signature}')
-        event = self._validate_webhook(payload, stripe_signature)
+        event = await self._validate_webhook(payload, stripe_signature)
         logfire.info(f'event: {event}')
         event_type = event['type']
         session = event['data']
