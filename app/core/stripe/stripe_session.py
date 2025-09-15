@@ -1,4 +1,5 @@
 import os
+import logfire
 import stripe
 
 from app.core.stripe.types import Checkout_Session_Request
@@ -6,6 +7,7 @@ from app.core.stripe.serializer import validate_issue_offer, validate_user
 
 class Stripe_Session:
     def __init__(self):
+        logfire.configure(token = os.getenv('LOGFIRE_API_KEY'), service_name = 'stripe')
         self.stripe_secret_key = os.getenv('STRIPE_SECRET_KEY')
         self.frontend_base_url = os.getenv('FRONTEND_BASE_URL')
         self.stripe = stripe
@@ -15,6 +17,9 @@ class Stripe_Session:
         valid_client = validate_user(data.client_id)
         valid_vendor = validate_user(data.vendor_id)
         valid_offer = validate_issue_offer(data.offer_id)
+        logfire.info(f'valid_client: {valid_client}')
+        logfire.info(f'valid_vendor: {valid_vendor}')
+        logfire.info(f'valid_offer: {valid_offer}')
         try:
             session = self.stripe.checkout.Session.create(
                 line_items = [
