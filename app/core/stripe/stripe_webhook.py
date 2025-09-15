@@ -18,12 +18,14 @@ from app.crud.issues import (
 class Stripe_Webhook:
     def __init__(self):
         self.stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+        logfire.configure(token = os.getenv('LOGFIRE_API_KEY'), service_name = 'stripe_webhook')
     
     async def _validate_webhook(self, payload, stripe_signature: str):
         try:
             event = stripe.Webhook.construct_event(
                 payload, stripe_signature, self.stripe_webhook_secret
             )
+            logfire.info(f'event: {event}')
             return event
         except ValueError:
             raise ValueError('Invalid payload')
@@ -33,6 +35,8 @@ class Stripe_Webhook:
             raise RuntimeError(f'Internal server error: {e}')
     
     async def webhook(self, payload, stripe_signature: str):
+        logfire.info(f'payload: {payload}')
+        logfire.info(f'stripe_signature: {stripe_signature}')
         event = self._validate_webhook(payload, stripe_signature)
         event_type = event['type']
         session = event['data']
@@ -40,7 +44,12 @@ class Stripe_Webhook:
         if (event_type == Stripe_Checkout_Session.COMPLETED or event_type == Stripe_Checkout_Session.PAYMENT_SUCCEEDED):
             try:
                 offer_id, client_id, vendor_id, offer, issue, issue_id = validate_webhook_metadata(session)
-
+                logfire.info(f'offer_id: {offer_id}')
+                logfire.info(f'client_id: {client_id}')
+                logfire.info(f'vendor_id: {vendor_id}')
+                logfire.info(f'offer: {offer}')
+                logfire.info(f'issue: {issue}')
+                logfire.info(f'issue_id: {issue_id}')
                 all_offers = get_all_offers_for_issue_id(issue_id)
                 for current_offer in all_offers:
                     if (current_offer['id'] == int(offer_id)):
