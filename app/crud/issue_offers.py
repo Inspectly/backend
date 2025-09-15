@@ -90,7 +90,8 @@ def create(issue_offer: Issue_Offers):
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
-def update(id: int, issue_offer: Issue_Offers):
+def update(id: int, issue_offer: Issue_Offers, _logfire):
+    _logfire.log(f'id: {id}, issue_offer: {issue_offer}')
     query = '''
                 UPDATE issue_offers 
                 SET 

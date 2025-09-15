@@ -1,4 +1,5 @@
 import os
+import logfire
 import stripe
 from datetime import datetime, timezone
 
@@ -31,7 +32,7 @@ class Stripe_Webhook:
         except Exception as e:
             raise RuntimeError(f'Internal server error: {e}')
     
-    async def webhook(self, payload, stripe_signature: str):
+    async def webhook(self, payload, stripe_signature: str, _logfire):
         event = self._validate_webhook(payload, stripe_signature)
         event_type = event['type']
         session = event['data']['object']
@@ -46,17 +47,21 @@ class Stripe_Webhook:
                         current_offer['status'] = Bid_Status.ACCEPTED
                         current_offer['user_last_viewed'] = datetime.now(timezone.utc).isoformat()
                         updated_offer = Issue_Offers(**{k: current_offer[k] for k in Issue_Offers.model_fields if k in current_offer})
-                        update_offer(current_offer['id'], updated_offer)
+                        _logfire.log(f'updated_offer: {updated_offer}')
+                        update_offer(current_offer['id'], updated_offer, _logfire)
                     elif (current_offer['id'] != int(offer_id) and current_offer['status'] not in ['rejected', 'accepted']):
                         current_offer['status'] = Bid_Status.REJECTED
                         current_offer['user_last_viewed'] = datetime.now(timezone.utc).isoformat()
                         updated_offer = Issue_Offers(**{k: current_offer[k] for k in Issue_Offers.model_fields if k in current_offer})
-                        update_offer(current_offer['id'], updated_offer)
+                        _logfire.log(f'updated_offer: {updated_offer}')
+                        update_offer(current_offer['id'], updated_offer, _logfire)
+                        
 
                 issue['vendor_id'] = vendor_id
                 issue['status'] = Status.IN_PROGRESS
                 issue_input = Issues(**{k: issue[k] for k in Issues.model_fields if k in issue})
-                update_issue(issue_id, issue_input)
+                _logfire.log(f'issue_input: {issue_input}')
+                update_issue(issue_id, issue_input, _logfire)
 
                 return {'status': f'stripe payment from {client_id} for offer {offer_id} successful'}
 

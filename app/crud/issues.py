@@ -225,7 +225,8 @@ async def create(issue: Issues):
         raise HTTPException(status_code = 400, detail = str(e))
 
 
-def update(id: int, issue: Issues):
+def update(id: int, issue: Issues, _logfire):
+    _logfire.log(f'id: {id}, issue: {issue}')
     query = '''
         UPDATE issues
         SET
@@ -249,7 +250,7 @@ def update(id: int, issue: Issues):
                 issue.description,
                 issue.summary,
                 issue.severity,
-                issue.status.value,
+                issue.status,
                 issue.active,
                 issue.image_url,
                 issue.review_status,

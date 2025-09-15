@@ -1,5 +1,8 @@
+import logfire
+
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, Header, Request
+from stripe.util import os
 
 from app.core.stripe.stripe_webhook import Stripe_Webhook
 from app.core.stripe.stripe_session import Stripe_Session
@@ -29,10 +32,12 @@ async def create_checkout_session(data: Checkout_Session_Request):
 
 @router.post('/checkout/webhook')
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+    _logfire = logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'stripe_webhook', local = True)
+    _logfire.log(f'request: {request}')
     try:
         stripe_webhook = Stripe_Webhook()
         payload = await request.body()
-        result = await stripe_webhook.webhook(payload, stripe_signature)
+        result = await stripe_webhook.webhook(payload, stripe_signature, _logfire)
         return JSONResponse(status_code = 200, content = {'status': result['status']})
     except HTTPException:
         raise
