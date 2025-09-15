@@ -18,7 +18,7 @@ from app.crud.issues import (
 class Stripe_Webhook:
     def __init__(self):
         self.stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-        logfire.configure(token = os.getenv('LOGFIRE_API_KEY'), service_name = 'stripe_webhook')
+        logfire.configure(token = os.getenv('LOGFIRE_API_KEY'), service_name = 'stripe_webhook', scrubbing=False)
     
     async def _validate_webhook(self, payload, stripe_signature: str):
         try:
@@ -38,8 +38,11 @@ class Stripe_Webhook:
         logfire.info(f'payload: {payload}')
         logfire.info(f'stripe_signature: {stripe_signature}')
         event = self._validate_webhook(payload, stripe_signature)
+        logfire.info(f'event: {event}')
         event_type = event['type']
         session = event['data']
+        logfire.info(f'event_type: {event_type}')
+        logfire.info(f'session: {session}')
 
         if (event_type == Stripe_Checkout_Session.COMPLETED or event_type == Stripe_Checkout_Session.PAYMENT_SUCCEEDED):
             try:
