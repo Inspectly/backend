@@ -44,7 +44,7 @@ class Stripe_Webhook:
         logfire.info(f'event_type: {event_type}')
         logfire.info(f'session: {session}')
 
-        if (event_type == Stripe_Checkout_Session.COMPLETED or event_type == Stripe_Checkout_Session.PAYMENT_SUCCEEDED):
+        if (event_type == Stripe_Checkout_Session.COMPLETED.value or event_type == Stripe_Checkout_Session.PAYMENT_SUCCEEDED.value):
             try:
                 offer_id, client_id, vendor_id, offer, issue, issue_id = validate_webhook_metadata(session)
                 logfire.info(f'offer_id: {offer_id}')
