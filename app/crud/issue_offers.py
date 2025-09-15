@@ -1,4 +1,6 @@
+import os
 from fastapi import HTTPException
+import logfire
 
 from app.schema.types import User_Type
 from app.core.database import get_db_cursor
@@ -90,8 +92,9 @@ def create(issue_offer: Issue_Offers):
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
-def update(id: int, issue_offer: Issue_Offers, _logfire):
-    _logfire.log(f'id: {id}, issue_offer: {issue_offer}')
+def update(id: int, issue_offer: Issue_Offers):
+    logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'issue_offers', local = True)
+    logfire.log(f'id: {id}, issue_offer: {issue_offer}')
     query = '''
                 UPDATE issue_offers 
                 SET 

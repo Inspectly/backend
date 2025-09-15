@@ -1,5 +1,6 @@
 from fastapi import HTTPException
-
+import logfire
+import os
 from app.schema.properties import Issues
 from app.core.database import get_db_cursor
 
@@ -225,8 +226,9 @@ async def create(issue: Issues):
         raise HTTPException(status_code = 400, detail = str(e))
 
 
-def update(id: int, issue: Issues, _logfire):
-    _logfire.log(f'id: {id}, issue: {issue}')
+def update(id: int, issue: Issues):
+    logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'issues', local = True)
+    logfire.log(f'id: {id}, issue: {issue}')
     query = '''
         UPDATE issues
         SET

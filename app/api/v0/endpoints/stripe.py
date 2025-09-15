@@ -32,12 +32,12 @@ async def create_checkout_session(data: Checkout_Session_Request):
 
 @router.post('/checkout/webhook')
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
-    _logfire = logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'stripe_webhook', local = True)
-    _logfire.log(f'request: {request}')
+    logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'stripe_webhook', local = True)
+    logfire.log(f'request: {request}')
     try:
         stripe_webhook = Stripe_Webhook()
         payload = await request.body()
-        result = await stripe_webhook.webhook(payload, stripe_signature, _logfire)
+        result = await stripe_webhook.webhook(payload, stripe_signature)
         return JSONResponse(status_code = 200, content = {'status': result['status']})
     except HTTPException:
         raise
