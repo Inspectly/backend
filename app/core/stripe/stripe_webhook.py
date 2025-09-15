@@ -2,7 +2,7 @@ import os
 import stripe
 from datetime import datetime, timezone
 
-from app.schema.types import Status
+from app.schema.types import Status, Bid_Status
 from app.schema.properties import Issue_Offers, Issues
 from app.core.stripe.types import Stripe_Checkout_Session
 from app.core.stripe.serializer import validate_webhook_metadata
@@ -43,18 +43,18 @@ class Stripe_Webhook:
                 all_offers = get_all_offers_for_issue_id(issue_id)
                 for current_offer in all_offers:
                     if (current_offer['id'] == int(offer_id)):
-                        current_offer['status'] = 'accepted'
+                        current_offer['status'] = Bid_Status.ACCEPTED
                         current_offer['user_last_viewed'] = datetime.now(timezone.utc).isoformat()
                         updated_offer = Issue_Offers(**{k: current_offer[k] for k in Issue_Offers.model_fields if k in current_offer})
                         update_offer(current_offer['id'], updated_offer)
                     elif (current_offer['id'] != int(offer_id) and current_offer['status'] not in ['rejected', 'accepted']):
-                        current_offer['status'] = 'rejected'
+                        current_offer['status'] = Bid_Status.REJECTED
                         current_offer['user_last_viewed'] = datetime.now(timezone.utc).isoformat()
                         updated_offer = Issue_Offers(**{k: current_offer[k] for k in Issue_Offers.model_fields if k in current_offer})
                         update_offer(current_offer['id'], updated_offer)
 
                 issue['vendor_id'] = vendor_id
-                issue['status'] = Status.IN_PROGRESS.value
+                issue['status'] = Status.IN_PROGRESS
                 issue_input = Issues(**{k: issue[k] for k in Issues.model_fields if k in issue})
                 update_issue(issue_id, issue_input)
 
