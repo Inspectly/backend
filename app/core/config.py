@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLIC_KEY: str
     STRIPE_WEBHOOK_SECRET: str
+    LOGFIRE_API_KEY: str
 
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str

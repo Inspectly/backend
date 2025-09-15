@@ -93,8 +93,6 @@ def create(issue_offer: Issue_Offers):
         raise HTTPException(status_code = 400, detail = str(e))
 
 def update(id: int, issue_offer: Issue_Offers):
-    logfire.configure(token = os.environ.get('LOGFIRE_API_KEY'), service_name = 'issue_offers', local = True)
-    logfire.log(f'id: {id}, issue_offer: {issue_offer}')
     query = '''
                 UPDATE issue_offers 
                 SET 
