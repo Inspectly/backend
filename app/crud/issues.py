@@ -1,6 +1,4 @@
 from fastapi import HTTPException
-import logfire
-import os
 from app.schema.properties import Issues
 from app.core.database import get_db_cursor
 
