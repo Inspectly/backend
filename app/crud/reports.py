@@ -52,15 +52,16 @@ def get_listing_reports(listing_id: int):
 async def create(report: Reports):
     query = '''
                 INSERT INTO reports 
-                    (user_id, listing_id, aws_link, name)
+                    (user_id, listing_id, aws_link, name, review_status)
                 VALUES 
-                    ({}, {}, '{}', '{}')
+                    ({}, {}, '{}', '{}', '{}')
                 RETURNING id, user_id, listing_id, created_at
             '''.format(
                 report.user_id, 
                 report.listing_id, 
                 report.aws_link, 
                 report.name,
+                report.review_status
             )
     try:
         with get_db_cursor() as cursor:
