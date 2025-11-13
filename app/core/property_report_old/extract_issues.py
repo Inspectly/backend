@@ -7,10 +7,10 @@ from openai import OpenAI, AsyncOpenAI
 from app.crud import tasks, issues
 from app.schema.types import Status
 from app.schema.properties import Issues
-from app.core.property_report.prompt import PROMPT
-from app.core.property_report.classes import Report_Response
-from app.core.property_report.tools import REPORT_RESPONSE_TOOL
-from app.core.property_report.report_parser import Report_Parser
+from app.core.property_report_old.prompt import PROMPT
+from app.core.property_report_old.classes import Report_Response
+from app.core.property_report_old.tools import REPORT_RESPONSE_TOOL
+from app.core.property_report_old.report_parser import Report_Parser
 from app.schema.tasks import Tasks, Task_Type, Status as Task_Status
 
 class Extract_Issues:

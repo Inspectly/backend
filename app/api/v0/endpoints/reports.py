@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, File, UploadFile, Form, Background
 from app.crud import reports, tasks
 from app.schema.tasks import Tasks, Task_Type, Status
 from app.schema.properties import Reports, Reports_Simple
-from app.core.property_report.aws_operations import AWS_Operations
-from app.core.property_report.extract_issues import Extract_Issues
+from app.core.common.aws_operations import AWS_Operations
+from app.core.property_report_extract.issue_extract import IssueExtract
 
 router = APIRouter()
 
@@ -40,7 +40,7 @@ async def extract_issues(
     if not property_report.filename.endswith('.pdf'):
         raise HTTPException(status_code = 400, detail = 'Only PDF files are allowed')
     
-    file_content = await property_report.read()
+    property_report_content = await property_report.read()
     await property_report.seek(0)
 
     # aws_operations = AWS_Operations()
@@ -57,8 +57,8 @@ async def extract_issues(
         task_type = Task_Type.EXTRACT_ISSUES.value, 
         status = Status.PENDING.value
     ))
-    extract_issues = Extract_Issues()
-    background_tasks.add_task(extract_issues.extract_issues, file_content, property_report.filename, report['id'], task_id['id'])
+    extract_issues = IssueExtract(report['id'], property_report.filename, property_report_content, task_id['id'])
+    background_tasks.add_task(extract_issues.run)
     return {
         'report_id': report['id'], 
         'task_id': task_id['id'], 

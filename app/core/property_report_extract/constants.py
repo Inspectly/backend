@@ -1,0 +1,7 @@
+import os
+
+MAX_PDF_BYTES = 20 * 1024 * 1024
+MIN_IMAGE_SIZE = 100 * 1024
+SCREENSHOT_ZOOM = 1
+
+DATA_OUTPUT_FOLDER = 'data/output'
