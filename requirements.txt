@@ -10,3 +10,4 @@ pydantic_ai
 pydantic_settings
 python-dotenv
 starlette
+fitz
