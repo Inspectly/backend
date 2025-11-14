@@ -1,6 +1,5 @@
 Faker
 fastapi
-fitz
 logfire
 openai
 psycopg2_binary
