@@ -12,3 +12,4 @@ python-multipart==0.0.20
 aiobotocore==2.23.2
 logfire==3.20.0
 logfire-api==3.23.0
+pydantic_ai==1.2.1
