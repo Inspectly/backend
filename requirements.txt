@@ -1,3 +1,6 @@
+aiobotocore
+boto3
+botocore
 Faker
 fastapi
 logfire
