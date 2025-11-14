@@ -6,6 +6,5 @@ openai
 psycopg2_binary
 pydantic_ai
 pydantic_settings
-pymupdf
 python-dotenv
 starlette
