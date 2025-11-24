@@ -92,6 +92,8 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         params.append(f'%{search}%')
     if vendor_assigned:
         query += ' AND i.vendor_id IS NOT NULL'
+    else:
+        query += ' AND i.vendor_id IS NULL'
  
     query += '''
         ORDER BY i.id DESC
