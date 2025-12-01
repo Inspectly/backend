@@ -44,6 +44,8 @@ class Vendors(BaseModel):
     vendor_type: Vendor_Types
     vendor_types: str
     code: str
+    license: Optional[str] = None
+    verified: bool = Field(default = False)
     name: str
     email: str
     phone: str
