@@ -4,12 +4,12 @@ from typing import List
 from pathlib import Path
 from pydantic_ai.messages import BinaryContent
 
-from app.core.property_report_extract_v1.types import Issue
+from app.core.property_report_extract.types import Issue
 from app.core.common.models.open_ai import OpenAIModels
-from app.core.property_report_extract_v1.agents.agents_image import Agents
-from app.core.property_report_extract_v1.constants import DATA_OUTPUT_FOLDER
-from app.core.property_report_extract_v1.helper import extract_images_from_pdf, screenshot_pdf_pages, delete_images_and_screenshots
-from app.core.property_report_extract_v1.prompts.prompts import (
+from app.core.property_report_extract.agents.agents_image import Agents
+from app.core.property_report_extract.constants import DATA_OUTPUT_FOLDER
+from app.core.property_report_extract.helper import extract_images_from_pdf, screenshot_pdf_pages, delete_images_and_screenshots
+from app.core.property_report_extract.prompts.prompts import (
     IMAGE_DESCRIPTION_USER_PROMPT,
     IMAGE_CLASSIFIER_USER_PROMPT,
     IMAGE_EXTRACTOR_USER_PROMPT,
