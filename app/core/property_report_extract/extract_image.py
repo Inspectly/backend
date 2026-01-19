@@ -8,7 +8,7 @@ from app.core.property_report_extract.types import Issue
 from app.core.common.models.open_ai import OpenAIModels
 from app.core.property_report_extract.agents.agents_image import Agents
 from app.core.property_report_extract.constants import DATA_OUTPUT_FOLDER
-from app.core.property_report_extract.helper import extract_images_from_pdf, screenshot_pdf_pages, delete_images_and_screenshots
+from app.core.property_report_extract.helper import extract_images_from_pdf, screenshot_pdf_pages, delete_images_and_screenshots, upload_image_to_imgbb
 from app.core.property_report_extract.prompts.prompts import (
     IMAGE_DESCRIPTION_USER_PROMPT,
     IMAGE_CLASSIFIER_USER_PROMPT,
@@ -65,6 +65,8 @@ class ExtractImage:
         image['description'] = description
         classification = await self._get_image_classification(image_data, description)
         image['is_issue'] = classification
+        if classification:
+            image['imgbb_url'] = upload_image_to_imgbb(image['filepath'], self.logfire)
         return image
 
     async def _assign_image_to_issue(self, image: dict, screenshot_data: bytes, issues: List[Issue]) -> dict:
@@ -81,7 +83,7 @@ class ExtractImage:
                 )
             ]
         )
-        return {'filename': image['filename'], 'issue_id': response.output.id}
+        return {'filename': image['filename'], 'issue_id': response.output.id, 'imgbb_url': image['imgbb_url']}
 
     async def _verify_single_issue(self, issue: Issue, issue_images_dict: dict, screenshots_dict: dict) -> Issue:
         if not issue.images:
@@ -165,6 +167,12 @@ class ExtractImage:
                 for issue in issues
             ])
 
+            for issue in verified_issues:
+                for image_filename in issue.images:
+                    for assignment in assignments:
+                        if assignment['filename'] == image_filename:
+                            issue.imgbb_urls.append(assignment['imgbb_url'])
+                            break
 
             return verified_issues
 

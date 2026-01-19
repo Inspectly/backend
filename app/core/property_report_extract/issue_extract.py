@@ -6,7 +6,7 @@ from app.schema.properties import Issues
 from app.core.property_report_extract.types import Issue
 from app.core.property_report_extract.extract_image import ExtractImage
 from app.core.property_report_extract.extract_issue import ExtractIssues
-from app.core.property_report_extract.helper import write_issues_to_json
+from app.core.property_report_extract.helper import write_issues_to_json, delete_images_and_screenshots
 from app.core.common.llm_observability.pydantic_logfire.instrument_logfire import Instrument_Type, instrument_logfire
 from app.schema.tasks import Tasks, Task_Type, Status as Task_Status
 
@@ -44,10 +44,12 @@ class IssueExtract:
                     summary = issue.name.replace("'", "''"),
                     status = Status.OPEN.value,
                     active = True,
-                    image_urls = []
+                    image_urls = issue.imgbb_urls
                 )
                 await issues.create(new_issue)
             self.logfire.info(f'Wrote {len(extracted_issues)} issues to database')
+            await delete_images_and_screenshots(self.task_id)
+            self.logfire.info(f'Deleted images and screenshots for task {self.task_id}')
         await tasks.update(self.task_id, Tasks(
             id = self.task_id,
             report_id = self.report_id,

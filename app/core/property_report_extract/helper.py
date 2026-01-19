@@ -1,10 +1,15 @@
 import os
 import fitz
 import json
+import base64
 import shutil
+import requests
 from io import BytesIO
 from pathlib import Path
 from typing import Union
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from app.core.property_report_extract.types import Issue
 from app.core.property_report_extract.constants import MIN_IMAGE_SIZE, SCREENSHOT_ZOOM, DATA_OUTPUT_FOLDER
@@ -92,6 +97,23 @@ def screenshot_pdf_pages(pdf_file, output_folder, logfire, zoom = SCREENSHOT_ZOO
     except Exception as e:
         logfire.error(f'Error in {screenshot_pdf_pages.__name__}: {e}')
         raise ValueError(f'Error in {screenshot_pdf_pages.__name__}: {e}') from e
+
+def upload_image_to_imgbb(image_file_path: str, logfire) -> str:
+    with open(image_file_path, 'rb') as f:
+        image_data = base64.b64encode(f.read()).decode('utf-8')
+    response = requests.post(
+        os.getenv('IMGBB_API_URL'),
+        {
+            'key': os.getenv('IMGBB_API_KEY'),
+            'image': image_data
+        }
+    )
+    if response.status_code == 200:
+        logfire.info(f'Image Successfully Uploaded: {response.json()["data"]["image"]["url"]}')
+        return response.json()['data']['image']['url']
+    else:
+        logfire.error(f'ERROR: Server Response {response.status_code}: {response.json()["error"]["message"]}')
+        return None
 
 async def delete_images_and_screenshots(task_id: str) -> None:
     try:

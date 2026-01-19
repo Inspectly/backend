@@ -19,7 +19,8 @@ class Issue(BaseModel):
     id: int = Field(..., description = 'The id of the issue')
     name: str = Field(..., description = 'The name/title of the issue, typically extracted from issue headings. Often formatted as "CATEGORY \ Subcategory" (e.g., "SLOPED ROOF FLASHINGS \ Roof/sidewall flashings"). This is the title that appears at the start of each issue block.')
     description: str = Field(..., description = 'A multiline string containing the complete issue details including: Condition (current state/problem), Implication(s) (potential consequences), Location (where in the property), and Task (recommended action: Improve/Repair/Monitor/etc). Preserve the original formatting with labels like "Condition:", "Implication(s):", "Location:", "Task:".')
-    images: List[str] = Field(default_factory = list, description = 'List of image filenames referenced in the markdown for this issue (e.g., ["ME_page_2_image_1.png", "ME_page_3_image_1.jpeg"]). Extract from image references like ![ref](filename).')
+    images: List[str] = Field(default_factory = list, description = 'List of images for the issue. each imagge is a path to the image file.')
+    imgbb_urls: List[str] = Field(default_factory = list, description = 'The url of the image file uploaded to imgbb.')
     type: Optional[IssueTypes] = Field(default = None, description = 'The system or category name from the inspection report. Must match one of: ROOFING, EXTERIOR, STRUCTURE, ELECTRICAL, HEATING, COOLING, INSULATION, PLUMBING, INTERIOR, or other if not in this list. Extract from section headers.')
     
 class ReportIssues(BaseModel):
