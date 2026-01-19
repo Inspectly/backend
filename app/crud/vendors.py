@@ -63,10 +63,10 @@ def create(vendor: Vendors):
             raise HTTPException(status_code = 400, detail = f'Invalid additional vendor type {vendor_type} does not exist')
     
     query = '''
-                INSERT INTO vendors 
-                    (vendor_user_id, vendor_type, vendor_types, code, name, email, phone, address, city, state, country, postal_code, rating, review)
-                VALUES 
-                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}')
+                INSERT INTO vendors
+                    (vendor_user_id, vendor_type, vendor_types, code, name, email, phone, address, city, state, country, postal_code, rating, review, years_of_experience, service_area, response_time, insurance, warranty)
+                VALUES
+                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}', {}, '{}', '{}', '{}', '{}')
                 RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
@@ -82,7 +82,12 @@ def create(vendor: Vendors):
                 vendor.country,
                 vendor.postal_code,
                 vendor.rating,
-                vendor.review
+                vendor.review,
+                vendor.years_of_experience if vendor.years_of_experience is not None else 'NULL',
+                vendor.service_area if vendor.service_area else '',
+                vendor.response_time if vendor.response_time else '',
+                vendor.insurance if vendor.insurance else '',
+                vendor.warranty if vendor.warranty else ''
             )
     try:
         with get_db_cursor() as cursor:
@@ -108,23 +113,28 @@ def update(id: int, vendor: Vendors):
             raise HTTPException(status_code = 400, detail = f'Invalid additional vendor type {vendor_type} does not exist')
     
     query = '''
-                UPDATE vendors 
-                SET  
-                    vendor_type = '{}', 
-                    vendor_types = '{}', 
-                    code = '{}', 
+                UPDATE vendors
+                SET
+                    vendor_type = '{}',
+                    vendor_types = '{}',
+                    code = '{}',
                     license = '{}',
                     verified = {},
                     name = '{}',
-                    email = '{}', 
-                    phone = '{}', 
-                    address = '{}', 
-                    city = '{}', 
-                    state = '{}', 
-                    country = '{}', 
-                    postal_code = '{}', 
-                    rating = {}, 
-                    review = '{}'
+                    email = '{}',
+                    phone = '{}',
+                    address = '{}',
+                    city = '{}',
+                    state = '{}',
+                    country = '{}',
+                    postal_code = '{}',
+                    rating = {},
+                    review = '{}',
+                    years_of_experience = {},
+                    service_area = '{}',
+                    response_time = '{}',
+                    insurance = '{}',
+                    warranty = '{}'
                 WHERE id = {}
                 AND vendor_user_id = {}
                 RETURNING id, vendor_user_id, code, name, updated_at
@@ -144,6 +154,11 @@ def update(id: int, vendor: Vendors):
                 vendor.postal_code,
                 vendor.rating,
                 vendor.review,
+                vendor.years_of_experience if vendor.years_of_experience is not None else 'NULL',
+                vendor.service_area if vendor.service_area else '',
+                vendor.response_time if vendor.response_time else '',
+                vendor.insurance if vendor.insurance else '',
+                vendor.warranty if vendor.warranty else '',
                 id,
                 vendor.vendor_user_id
             )

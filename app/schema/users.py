@@ -56,6 +56,11 @@ class Vendors(BaseModel):
     postal_code: str
     rating: Optional[int] = Field(default = -1)
     review: Optional[str] = None
+    years_of_experience: Optional[int] = None
+    service_area: Optional[str] = None
+    response_time: Optional[str] = None
+    insurance: Optional[str] = None
+    warranty: Optional[str] = None
 
     @validator('rating')
     def set_default_rating(cls, v):
