@@ -1,11 +1,23 @@
+import json
 from fastapi import HTTPException
 from app.schema.properties import Issues
 from app.core.database import get_db_cursor
 
+
+def _deserialize_issue(issue_dict: dict) -> dict:
+    """Helper function to deserialize image_urls from JSON string to list."""
+    if issue_dict.get('image_urls'):
+        try:
+            issue_dict['image_urls'] = json.loads(issue_dict['image_urls'])
+        except (json.JSONDecodeError, TypeError):
+            # If it's not valid JSON or already a list, keep as is
+            pass
+    return issue_dict
+
 def get_one(id: int):
     query = '''
-                SELECT * 
-                FROM issues 
+                SELECT *
+                FROM issues
                 WHERE id = {}
             '''.format(id)
     with get_db_cursor() as cursor:
@@ -13,18 +25,18 @@ def get_one(id: int):
         issue = cursor.fetchone()
         if not issue:
             raise HTTPException(status_code = 404, detail = 'Issue not found')
-        return dict(issue)
+        return _deserialize_issue(dict(issue))
     
 def get_all():
     query = '''
-                SELECT * 
-                FROM issues 
+                SELECT *
+                FROM issues
                 ORDER BY id DESC
             '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        return [_deserialize_issue(dict(issue)) for issue in issues]
     
 def total_issues_count(vendor_assigned = False):
     query = '''
@@ -103,34 +115,34 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         issues = cursor.fetchall()
-        issues = [dict(issue) for issue in issues]
+        issues = [_deserialize_issue(dict(issue)) for issue in issues]
         return {
-            'issues': issues, 
-            'total': total_issues_count(), 
+            'issues': issues,
+            'total': total_issues_count(),
             'total_filtered': total_issues_count_filter(type, city, state, search, vendor_assigned)
         }
     
 def get_report_issues(report_id: int):
     query = '''
-                SELECT * 
-                FROM issues 
+                SELECT *
+                FROM issues
                 WHERE report_id = {}
             '''.format(report_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        return [_deserialize_issue(dict(issue)) for issue in issues]
 
 def get_vendor_issues(vendor_id: int):
     query = '''
-                SELECT * 
-                FROM issues 
+                SELECT *
+                FROM issues
                 WHERE vendor_id = {}
             '''.format(vendor_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        return [_deserialize_issue(dict(issue)) for issue in issues]
 
 def get_all_issue_addresses():
     query = '''
@@ -201,13 +213,19 @@ def get_issue_address(id: int):
         return dict(address)
     
 async def create(issue: Issues):
+    # Convert image_urls list to JSON string for storage
+    image_urls_json = json.dumps(issue.image_urls) if issue.image_urls else None
+
     query = '''
-                INSERT INTO issues 
-                    (report_id, type, description, summary, severity, status, active, image_url)
-                VALUES 
-                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+                INSERT INTO issues
+                    (report_id, type, description, summary, severity, status, active, image_urls)
+                VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id, report_id, vendor_id, created_at
-            '''.format(
+            '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 issue.report_id,
                 issue.type,
                 issue.description,
@@ -215,11 +233,8 @@ async def create(issue: Issues):
                 issue.severity,
                 issue.status.value,
                 issue.active,
-                issue.image_url
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
+                image_urls_json
+            ))
             issue = cursor.fetchone()
             return dict(issue)
     except Exception as e:
@@ -227,6 +242,9 @@ async def create(issue: Issues):
 
 
 def update(id: int, issue: Issues):
+    # Convert image_urls list to JSON string for storage
+    image_urls_json = json.dumps(issue.image_urls) if issue.image_urls else None
+
     query = '''
         UPDATE issues
         SET
@@ -237,7 +255,7 @@ def update(id: int, issue: Issues):
             severity = %s,
             status = %s,
             active = %s,
-            image_url = %s,
+            image_urls = %s,
             review_status = %s
         WHERE id = %s
         RETURNING id, vendor_id, updated_at
@@ -252,7 +270,7 @@ def update(id: int, issue: Issues):
                 issue.severity,
                 issue.status,
                 issue.active,
-                issue.image_url,
+                image_urls_json,
                 issue.review_status,
                 id
             ))

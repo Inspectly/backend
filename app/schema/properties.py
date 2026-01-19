@@ -64,7 +64,7 @@ class Issues(BaseModel):
     severity: Optional[str] = None
     status: Status
     active: bool
-    image_url: Optional[str] = None
+    image_urls: Optional[List[str]] = None
     review_status: Optional[str] = None
 
 class Issue_Offers(BaseModel):

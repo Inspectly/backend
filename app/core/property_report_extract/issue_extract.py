@@ -44,7 +44,7 @@ class IssueExtract:
                     summary = issue.name.replace("'", "''"),
                     status = Status.OPEN.value,
                     active = True,
-                    image_url = ''
+                    image_urls = []
                 )
                 await issues.create(new_issue)
             self.logfire.info(f'Wrote {len(extracted_issues)} issues to database')

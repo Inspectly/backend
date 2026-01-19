@@ -548,14 +548,14 @@ def populate_issues(issues_per_report: int = 3):
                 vendor = random.choice(vendors_available) 
                 issue_data = {
                     "report_id": report['id'],
-                    "vendor_id": vendor['id'],  
+                    "vendor_id": vendor['id'],
                     "type": fake.random_element(elements=('general','structural','electrician','plumber','painter','cleaner','hvac','roofing','insulation','drywall','plaster','carpentry','landscaping','other')),
                     "description": fake.text(),
                     "summary": fake.catch_phrase(),
                     "severity": fake.random_element(elements=("low", "medium", "high")),
-                    "status": random.choice(list(Status)), 
+                    "status": random.choice(list(Status)),
                     "active": random.choice([True, False]),
-                    "image_url": fake.image_url(), 
+                    "image_urls": [fake.image_url() for _ in range(random.randint(0, 3))],
                 }
 
                 issue_create = Issues(**issue_data)
