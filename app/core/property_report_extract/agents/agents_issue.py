@@ -23,6 +23,7 @@ class Agents:
 
         self.issues_extract_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'issues_extract_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUES_EXTRACT_SYSTEM_PROMPT,
             output_type = ReportIssues
@@ -30,6 +31,7 @@ class Agents:
 
         self.issues_verifier_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'issues_verifier_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUES_VERIFIER_SYSTEM_PROMPT,
             output_type = ReportIssues
@@ -37,6 +39,7 @@ class Agents:
 
         self.issue_validator_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'issue_validator_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUE_VALIDATION_SYSTEM_PROMPT,
             output_type = Issue
@@ -44,6 +47,7 @@ class Agents:
 
         self.issue_type_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'issue_type_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUE_TYPE_SYSTEM_PROMPT,
             output_type = str
@@ -51,6 +55,7 @@ class Agents:
 
         self.issue_type_validator_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'issue_type_validator_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUE_TYPE_VALIDATION_SYSTEM_PROMPT,
             output_type = str

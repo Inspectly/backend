@@ -23,6 +23,7 @@ class Agents:
 
         self.image_description_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'image_description_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = IMAGE_DESCRIPTION_SYSTEM_PROMPT,
             output_type = str,
@@ -30,6 +31,7 @@ class Agents:
 
         self.image_classifier_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'image_classifier_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = IMAGE_CLASSIFIER_SYSTEM_PROMPT,
             output_type = ImageClassification,
@@ -37,6 +39,7 @@ class Agents:
 
         self.image_extractor_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'image_extractor_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = IMAGE_EXTRACTOR_SYSTEM_PROMPT,
             output_type = Issue,
@@ -44,6 +47,7 @@ class Agents:
 
         self.image_verifier_agent = Agent(
             self.model_provider.get_model(**kwargs),
+            name = 'image_verifier_agent',
             model_settings = self.model_provider.get_model_settings(**kwargs),
             system_prompt = IMAGE_VERIFIER_SYSTEM_PROMPT,
             output_type = Issue,
