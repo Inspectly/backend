@@ -5,13 +5,12 @@ from app.core.database import get_db_cursor
 
 
 def _deserialize_issue(issue_dict: dict) -> dict:
-    """Helper function to deserialize image_urls from JSON string to list."""
     if issue_dict.get('image_urls'):
-        try:
-            issue_dict['image_urls'] = json.loads(issue_dict['image_urls'])
-        except (json.JSONDecodeError, TypeError):
-            # If it's not valid JSON or already a list, keep as is
-            pass
+        if isinstance(issue_dict['image_urls'], str):
+            try:
+                issue_dict['image_urls'] = json.loads(issue_dict['image_urls'])
+            except (json.JSONDecodeError, TypeError):
+                issue_dict['image_urls'] = [issue_dict['image_urls']]
     return issue_dict
 
 def get_one(id: int):
@@ -213,9 +212,6 @@ def get_issue_address(id: int):
         return dict(address)
     
 async def create(issue: Issues):
-    # Convert image_urls list to JSON string for storage
-    image_urls_json = json.dumps(issue.image_urls) if issue.image_urls else None
-
     query = '''
                 INSERT INTO issues
                     (report_id, type, description, summary, severity, status, active, image_urls)
@@ -233,7 +229,7 @@ async def create(issue: Issues):
                 issue.severity,
                 issue.status.value,
                 issue.active,
-                image_urls_json
+                issue.image_urls if issue.image_urls else None
             ))
             issue = cursor.fetchone()
             return dict(issue)
@@ -242,9 +238,6 @@ async def create(issue: Issues):
 
 
 def update(id: int, issue: Issues):
-    # Convert image_urls list to JSON string for storage
-    image_urls_json = json.dumps(issue.image_urls) if issue.image_urls else None
-
     query = '''
         UPDATE issues
         SET
@@ -270,7 +263,7 @@ def update(id: int, issue: Issues):
                 issue.severity,
                 issue.status,
                 issue.active,
-                image_urls_json,
+                issue.image_urls if issue.image_urls else None,
                 issue.review_status,
                 id
             ))

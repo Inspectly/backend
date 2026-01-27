@@ -37,6 +37,7 @@ class ExtractIssues:
                 BinaryContent(data = self.pdf, media_type = 'application/pdf')
             ])
             self.logfire.info(f'Verified {len(extracted_issues_verified.output.issues)} issue types')
+            self.logfire.info(f'Verified issues: {extracted_issues_verified.output.issues}')
 
             issue_validation_tasks = [
                 self.agents.issue_validator_agent.run([
