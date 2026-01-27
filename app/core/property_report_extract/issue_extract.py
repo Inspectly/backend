@@ -48,8 +48,9 @@ class IssueExtract:
                 )
                 await issues.create(new_issue)
             self.logfire.info(f'Wrote {len(extracted_issues)} issues to database')
-            await delete_images_and_screenshots(self.task_id)
-            self.logfire.info(f'Deleted images and screenshots for task {self.task_id}')
+            #TODO: update tasks table to indicate its complete
+            # await delete_images_and_screenshots(self.task_id)
+            # self.logfire.info(f'Deleted images and screenshots for task {self.task_id}')
         await tasks.update(self.task_id, Tasks(
             id = self.task_id,
             report_id = self.report_id,
