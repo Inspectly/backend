@@ -31,7 +31,7 @@ class IssueExtract:
         return issues
 
     async def run(self):
-        with self.logfire.span(f'Extract Issues | {self.report_id}'):
+        with self.logfire.span(f'Extract Issues | {self.report_id} | {self.task_id}'):
             extracted_issues = await self._extract_issues()
             extracted_issues = await self._extract_images(extracted_issues)
             self.logfire.info(f'Extracted {len(extracted_issues)} issues. Extraction complete')
