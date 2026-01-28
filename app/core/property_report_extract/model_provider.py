@@ -12,7 +12,7 @@ from app.core.common.framework.pydantic.model_provider import IModelProvider
 class ModelProvider(IModelProvider):
     def __init__(self, **kwargs: Any):
         super().__init__()
-        self.primary_model = kwargs.get('primary_model', OpenAIModels.gpt_5_mini)
+        self.primary_model = kwargs.get('primary_model', OpenAIModels.gpt_5_1)
         self.fallback_model = kwargs.get('fallback_model', OpenAIModels.gpt_4_1_mini)
         self.openai_provider = OpenAIProvider(openai_client = AsyncOpenAI(api_key = os.getenv('OPENAI_API_KEY')))
         
