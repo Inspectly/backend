@@ -55,3 +55,9 @@ class Review_Status(str, Enum):
     PENDING = 'pending'
     APPROVED = 'approved'
     REJECTED = 'rejected'
+
+class Dispute_Status(str, Enum):
+    OPEN = 'open'
+    IN_REVIEW = 'in_review'
+    RESOLVED = 'resolved'
+    CLOSED = 'closed'
