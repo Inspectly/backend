@@ -66,6 +66,22 @@ class Vendors(BaseModel):
     def set_default_rating(cls, v):
         return v if v is not None else -1
 
+class Vendor_Employees(BaseModel):
+    vendor_id: int
+    first_name: str
+    last_name: str
+    skills: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    city: str
+    state: Optional[str] = None
+    country: Optional[str] = None
+    postal_code: Optional[str] = None
+    rating: Optional[int] = Field(default = -1)
+    review: Optional[str] = None
+    years_of_experience: Optional[int] = None
+
 class User_Logins(BaseModel):
     user_id: int
     email_login: bool = Field(default = False)

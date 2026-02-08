@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 
 from app.api.v0.endpoints import (
-    issue_offers, user_types, vendor_types, 
+    issue_offers, user_types, vendor_types,
     users, user_logins, user_sessions, clients, realtors, vendors,
-    realtor_firms,
+    realtor_firms, vendor_employees,
     listings, reports, issues, issue_assessments, attachments, comments, notes,
     payments, stripe_user_information, stripe_payments, stripe,
     realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews,
@@ -34,6 +34,7 @@ api_router.include_router(vendors.router, prefix = '/vendors', tags = ['vendors'
 api_router.include_router(client_reviews.router, prefix = '/client_reviews', tags = ['client_reviews'])
 api_router.include_router(realtor_reviews.router, prefix = '/realtor_reviews', tags = ['realtor_reviews'])
 api_router.include_router(vendor_reviews.router, prefix = '/vendor_reviews', tags = ['vendor_reviews'])
+api_router.include_router(vendor_employees.router, prefix = '/vendor_employees', tags = ['vendor_employees'])
 
 api_router.include_router(realtor_firms.router, prefix = '/realtor_firms', tags = ['realtor_firms'])
 
