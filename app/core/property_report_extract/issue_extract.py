@@ -12,8 +12,9 @@ from app.schema.tasks import Tasks, Task_Type, Status as Task_Status
 
 @instrument_logfire(instrument_type = Instrument_Type.PANDANTIC_AI, project = 'issue_extract')
 class IssueExtract:
-    def __init__(self, report_id: int, report_name: str, property_report: bytes, task_id: int):
+    def __init__(self, report_id: int, listing_id: int, report_name: str, property_report: bytes, task_id: int):
         self.report_id = report_id
+        self.listing_id = listing_id
         self.report_name = report_name
         self.pdf = property_report
         self.task_id = task_id
@@ -39,6 +40,7 @@ class IssueExtract:
             for issue in extracted_issues:
                 new_issue = Issues(
                     report_id = self.report_id,
+                    listing_id = self.listing_id,
                     type = issue.type,
                     description = issue.description.replace("'", "''"),
                     summary = issue.name.replace("'", "''"),

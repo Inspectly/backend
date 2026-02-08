@@ -29,6 +29,10 @@ def get_one(id: int):
 def get_report_issues(report_id: int):
     return issues.get_report_issues(report_id)
 
+@router.get('/listing/{listing_id}')
+def get_listing_issues(listing_id: int):
+    return issues.get_listing_issues(listing_id)
+
 @router.get('/vendor/{vendor_id}')
 def get_vendor_issues(vendor_id: int):
     return issues.get_vendor_issues(vendor_id)

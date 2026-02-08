@@ -51,15 +51,14 @@ def total_issues_count(vendor_assigned = False):
     
 def total_issues_count_filter(type = None, city = None, state = None, search = None, vendor_assigned = False):
     query = '''
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM issues i
-        JOIN reports r ON i.report_id = r.id
-        JOIN listings l ON r.listing_id = l.id
+        JOIN listings l ON i.listing_id = l.id
         WHERE 1 = 1
         AND i.active = true
     '''
     params = []
-    
+
     if type:
         query += ' AND i.type = %s'
         params.append(type)
@@ -74,17 +73,16 @@ def total_issues_count_filter(type = None, city = None, state = None, search = N
         params.append(f'%{search}%')
     if vendor_assigned:
         query += ' AND i.vendor_id IS NOT NULL'
-    
+
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         return cursor.fetchone()
 
 def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
     query = '''
-        SELECT i.* 
+        SELECT i.*
         FROM issues i
-        JOIN reports r ON i.report_id = r.id
-        JOIN listings l ON r.listing_id = l.id
+        JOIN listings l ON i.listing_id = l.id
         WHERE 1 = 1
         AND i.active = true
     '''
@@ -132,6 +130,17 @@ def get_report_issues(report_id: int):
         issues = cursor.fetchall()
         return [_deserialize_issue(dict(issue)) for issue in issues]
 
+def get_listing_issues(listing_id: int):
+    query = '''
+                SELECT *
+                FROM issues
+                WHERE listing_id = {}
+            '''.format(listing_id)
+    with get_db_cursor() as cursor:
+        cursor.execute(query)
+        issues = cursor.fetchall()
+        return [_deserialize_issue(dict(issue)) for issue in issues]
+
 def get_vendor_issues(vendor_id: int):
     query = '''
                 SELECT *
@@ -145,19 +154,17 @@ def get_vendor_issues(vendor_id: int):
 
 def get_all_issue_addresses():
     query = '''
-                SELECT 
+                SELECT
                     i.id as issue_id,
                     l.address,
                     l.city,
                     l.state,
                     l.country,
                     l.postal_code
-                FROM 
+                FROM
                     issues i
-                JOIN 
-                    reports r ON i.report_id = r.id
-                JOIN 
-                    listings l ON r.listing_id = l.id
+                JOIN
+                    listings l ON i.listing_id = l.id
             '''
     with get_db_cursor() as cursor:
         cursor.execute(query)
@@ -166,20 +173,18 @@ def get_all_issue_addresses():
 
 def get_all_issue_addresses_issue_ids(issue_ids: list[int]):
     query = '''
-                SELECT 
+                SELECT
                     i.id as issue_id,
                     l.address,
                     l.city,
                     l.state,
                     l.country,
                     l.postal_code
-                FROM 
+                FROM
                     issues i
-                JOIN 
-                    reports r ON i.report_id = r.id
-                JOIN 
-                    listings l ON r.listing_id = l.id
-                WHERE 
+                JOIN
+                    listings l ON i.listing_id = l.id
+                WHERE
                     i.id IN ({})
             '''.format(', '.join(str(id) for id in issue_ids))
     with get_db_cursor() as cursor:
@@ -189,19 +194,17 @@ def get_all_issue_addresses_issue_ids(issue_ids: list[int]):
 
 def get_issue_address(id: int):
     query = '''
-                SELECT 
+                SELECT
                     l.address,
                     l.city,
                     l.state,
                     l.country,
                     l.postal_code
-                FROM 
+                FROM
                     issues i
-                JOIN 
-                    reports r ON i.report_id = r.id
-                JOIN 
-                    listings l ON r.listing_id = l.id
-                WHERE 
+                JOIN
+                    listings l ON i.listing_id = l.id
+                WHERE
                     i.id = {}
             '''.format(id)
     with get_db_cursor() as cursor:
@@ -211,18 +214,30 @@ def get_issue_address(id: int):
             raise HTTPException(status_code = 404, detail = 'Address not found')
         return dict(address)
     
+def _validate_report_and_listing(report_id: int, listing_id: int):
+    with get_db_cursor() as cursor:
+        cursor.execute('SELECT id FROM listings WHERE id = %s', (listing_id,))
+        if not cursor.fetchone():
+            raise HTTPException(status_code=404, detail=f'Listing {listing_id} not found')
+        if report_id and report_id != 0:
+            cursor.execute('SELECT id FROM reports WHERE id = %s', (report_id,))
+            if not cursor.fetchone():
+                raise HTTPException(status_code=404, detail=f'Report {report_id} not found')
+
 async def create(issue: Issues):
+    _validate_report_and_listing(issue.report_id, issue.listing_id)
     query = '''
                 INSERT INTO issues
-                    (report_id, type, description, summary, severity, status, active, image_urls)
+                    (report_id, listing_id, type, description, summary, severity, status, active, image_urls)
                 VALUES
-                    (%s, %s, %s, %s, %s, %s, %s, %s)
-                RETURNING id, report_id, vendor_id, created_at
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id, report_id, listing_id, vendor_id, created_at
             '''
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query, (
                 issue.report_id,
+                issue.listing_id,
                 issue.type,
                 issue.description,
                 issue.summary,

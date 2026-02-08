@@ -57,7 +57,7 @@ async def extract_issues(
         task_type = Task_Type.EXTRACT_ISSUES.value, 
         status = Status.PENDING.value
     ))
-    extract_issues = IssueExtract(report['id'], property_report.filename, property_report_content, task_id['id'])
+    extract_issues = IssueExtract(report['id'], listing_id, property_report.filename, property_report_content, task_id['id'])
     background_tasks.add_task(extract_issues.run)
     return {
         'report_id': report['id'], 

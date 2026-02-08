@@ -56,7 +56,8 @@ class Report_Assessment_Comments(BaseModel):
     comment: str
     
 class Issues(BaseModel):
-    report_id: int
+    report_id: Optional[int] = 0
+    listing_id: int
     type: str
     vendor_id: Optional[int] = None
     description: Optional[str] = None
