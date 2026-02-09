@@ -18,12 +18,16 @@ def get_all_by_issue_dispute_id(issue_dispute_id: int):
 def create(issue_dispute_message: Issue_Dispute_Messages, issue_dispute_id: int):
     query = '''
         INSERT INTO issue_dispute_messages (issue_dispute_id, message, user_type)
-        VALUES ({}, '{}', '{}')
+        VALUES (%s, %s, %s)
         RETURNING id
-    '''.format(issue_dispute_id, issue_dispute_message.message, issue_dispute_message.user_type)
+    '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (
+                issue_dispute_id,
+                issue_dispute_message.message,
+                issue_dispute_message.user_type
+            ))
             issue_dispute_message_id = cursor.fetchone()
             return dict(issue_dispute_message_id)
     except Exception as e:

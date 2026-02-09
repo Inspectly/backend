@@ -54,12 +54,16 @@ def get_open_disputes_by_issue_offer_id(issue_offer_id: int):
 def create(issue_dispute: Issue_Disputes):
     query = '''
         INSERT INTO issue_disputes (issue_offer_id, status, status_message)
-        VALUES ({}, '{}', '{}')
+        VALUES (%s, %s, %s)
         RETURNING id
-    '''.format(issue_dispute.issue_offer_id, Dispute_Status.OPEN, issue_dispute.status_message)
+    '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (
+                issue_dispute.issue_offer_id,
+                Dispute_Status.OPEN,
+                issue_dispute.status_message
+            ))
             issue_dispute_id = cursor.fetchone()
             return dict(issue_dispute_id)
     except Exception as e:
@@ -67,14 +71,18 @@ def create(issue_dispute: Issue_Disputes):
 
 def update(id: int, issue_dispute: Issue_Disputes):
     query = '''
-        UPDATE issue_disputes 
-        SET status = '{}', status_message = '{}' 
-        WHERE id = {} 
+        UPDATE issue_disputes
+        SET status = %s, status_message = %s
+        WHERE id = %s
         RETURNING id
-    '''.format(issue_dispute.status, issue_dispute.status_message, id)
+    '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (
+                issue_dispute.status,
+                issue_dispute.status_message,
+                id
+            ))
             issue_dispute_id = cursor.fetchone()
             return dict(issue_dispute_id)
     except Exception as e:

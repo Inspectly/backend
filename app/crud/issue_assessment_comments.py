@@ -62,19 +62,19 @@ def get_comments_by_user_id_and_issue_assessment_id(user_id: int, issue_assessme
     
 def create(issue_assessment_comment: Issue_Assessment_Comments):
     query = '''
-                INSERT INTO issue_assessment_comments 
+                INSERT INTO issue_assessment_comments
                     (issue_assessment_id, user_id, comment)
-                VALUES 
-                    ({}, {}, '{}')
-                RETURNING id, created_at, updated_at    
-            '''.format(
+                VALUES
+                    (%s, %s, %s)
+                RETURNING id, created_at, updated_at
+            '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 issue_assessment_comment.issue_assessment_id,
                 issue_assessment_comment.user_id,
                 issue_assessment_comment.comment
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
+            ))
             issue_assessment_comment_id = cursor.fetchone()
             return dict(issue_assessment_comment_id)
     except Exception as e:
@@ -82,14 +82,14 @@ def create(issue_assessment_comment: Issue_Assessment_Comments):
     
 def update(id: int, issue_assessment_comment: Issue_Assessment_Comments):
     query = '''
-                UPDATE issue_assessment_comments 
-                SET 
-                    comment = '{}'
-                WHERE id = {}
-            '''.format(issue_assessment_comment.comment, id)
+                UPDATE issue_assessment_comments
+                SET
+                    comment = %s
+                WHERE id = %s
+            '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (issue_assessment_comment.comment, id))
             issue_assessment_comment_id = cursor.fetchone()
             return dict(issue_assessment_comment_id)
     except Exception as e:

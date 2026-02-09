@@ -52,16 +52,16 @@ def get_user_comments(user_id: int):
 def create(comment: Comments):
     query = '''
                 INSERT INTO comments (issue_id, user_id, comment)
-                VALUES ({}, {}, '{}')
+                VALUES (%s, %s, %s)
                 RETURNING id, issue_id, user_id, created_at
-            '''.format(
+            '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 comment.issue_id,
                 comment.user_id,
                 comment.comment
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
+            ))
             comment = cursor.fetchone()
             return dict(comment)
     except Exception as e:
@@ -69,14 +69,14 @@ def create(comment: Comments):
     
 def update(id: int, comment: Comments):
     query = '''
-                UPDATE comments 
-                SET comment = '{}'
-                WHERE id = {}
+                UPDATE comments
+                SET comment = %s
+                WHERE id = %s
                 RETURNING id, issue_id, user_id, updated_at
-            '''.format(comment.comment, id)
+            '''
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, (comment.comment, id))
             comment = cursor.fetchone()
             return dict(comment)
     except Exception as e:

@@ -70,22 +70,22 @@ def create(issue_offer: Issue_Offers):
     if (user_type != User_Type.VENDOR):
         raise HTTPException(status_code = 400, detail = 'Offer is not from a vendor')
     query = '''
-                INSERT INTO issue_offers 
+                INSERT INTO issue_offers
                     (issue_id, vendor_id, price, status, comment_vendor, comment_client)
-                VALUES 
-                    ({}, {}, {}, '{}', '{}', '{}')
+                VALUES
+                    (%s, %s, %s, %s, %s, %s)
                 RETURNING id, issue_id, vendor_id, created_at
-            '''.format(
+            '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 issue_offer.issue_id,
                 issue_offer.vendor_id,
                 issue_offer.price,
                 issue_offer.status,
                 issue_offer.comment_vendor,
                 issue_offer.comment_client
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
+            ))
             issue_offer_id = cursor.fetchone()
             return dict(issue_offer_id)
     except Exception as e:
@@ -93,17 +93,20 @@ def create(issue_offer: Issue_Offers):
 
 def update(id: int, issue_offer: Issue_Offers):
     query = '''
-                UPDATE issue_offers 
-                SET 
-                    price = {}, 
-                    status = '{}', 
-                    comment_vendor = '{}', 
-                    comment_client = '{}',
-                    user_last_viewed = '{}'
-                WHERE id = {}
-                AND issue_id = {}
+                UPDATE issue_offers
+                SET
+                    price = %s,
+                    status = %s,
+                    comment_vendor = %s,
+                    comment_client = %s,
+                    user_last_viewed = %s
+                WHERE id = %s
+                AND issue_id = %s
                 RETURNING id, updated_at
-            '''.format(
+            '''
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query, (
                 issue_offer.price,
                 issue_offer.status,
                 issue_offer.comment_vendor,
@@ -111,10 +114,7 @@ def update(id: int, issue_offer: Issue_Offers):
                 issue_offer.user_last_viewed,
                 id,
                 issue_offer.issue_id
-            )
-    try:
-        with get_db_cursor() as cursor:
-            cursor.execute(query)
+            ))
             issue_offer_id = cursor.fetchone()
             return dict(issue_offer_id)
     except Exception as e:
