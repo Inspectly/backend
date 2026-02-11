@@ -4,8 +4,8 @@ import logfire
 from enum import Enum
 from app.core.config import settings
 
-from dotenv import load_dotenv
-load_dotenv(override = True)
+# from dotenv import load_dotenv
+# load_dotenv(override = True)
 
 class Instrument_Type(Enum):
     PANDANTIC_AI = 'pydantic_ai'
