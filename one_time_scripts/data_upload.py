@@ -1,9 +1,10 @@
 import random
 import uuid
+import asyncio
 from faker import Faker
 import faker
 from pathlib import Path
-from app.crud.user_types import create as create_user_type 
+from app.crud.user_types import create as create_user_type
 from app.crud.user_types import get_all as user_types_get_all
 from app.crud.users import create as create_user
 from app.crud.users import get_all as get_all_users
@@ -24,17 +25,29 @@ from app.crud.attachments import create as create_attachment
 from app.crud.comments import create as create_comment
 from app.crud.notes import create as create_note
 from app.crud.issue_offers import create as create_issue_offer
+from app.crud.issue_offers import get_all as get_all_issue_offers
 from app.crud.issue_assessments import create as create_issue_assessment
 from app.crud.vendor_reviews import create as create_vendor_review
 from app.crud.realtor_reviews import create as create_realtor_review
 from app.crud.realtors import get_all as get_all_realtors
 from app.crud.clients import get_all as get_all_clients
+from app.crud.report_offers import create as create_report_offer
+from app.crud.report_assessments import create as create_report_assessment
+from app.crud.report_assessments import get_all as get_all_report_assessments
+from app.crud.report_assessment_comments import create as create_report_assessment_comment
+from app.crud.issue_disputes import create as create_issue_dispute
+from app.crud.issue_disputes import get_all as get_all_issue_disputes
+from app.crud.issue_dispute_messages import create as create_issue_dispute_message
+from app.crud.issue_dispute_attachments import create as create_issue_dispute_attachment
+from app.crud.vendor_employees import create as create_vendor_employee
 from app.schema.reviews import Client_Reviews
 from app.crud.client_reviews import create as create_client_review
-from app.schema.types import Review_Status
+from app.schema.types import Review_Status, Bid_Status, Assessment_Status, Dispute_Status
 from app.schema.properties import Attachments, Comments, Issue_Assessments, Issue_Offers, Listings, Notes, Reports, Issues
+from app.schema.properties import Report_Offers, Report_Assessments, Report_Assessment_Comments
+from app.schema.properties import Issue_Disputes, Issue_Dispute_Messages, Issue_Dispute_Attachments
 from app.schema.types import Status, User_Types, User_Type, Vendor_Types, Vendor_Type
-from app.schema.users import Users, Clients, Realtors, Vendors
+from app.schema.users import Users, Clients, Realtors, Vendors, Vendor_Employees
 from app.schema.realtor_firms import Realtor_Firms
 from app.schema.reviews import Realtor_Reviews, Vendor_Reviews
 from app.utils.helpers import get_uuid
@@ -411,7 +424,7 @@ def populate_vendors():
     for vendor_type in vendor_types:
         for vendor_user in vendor_users_available:
             try:
-                additional_types = random.sample([t.value for t in vendor_types if t != vendor_type], 
+                additional_types = random.sample([t.value for t in vendor_types if t != vendor_type],
                                                 k=random.randint(0, min(4, len(vendor_types)-1)))
                 additional_types_str = ','.join(additional_types)
                 vendor_type_instance = Vendor_Types(vendor_type=vendor_type)
@@ -430,14 +443,21 @@ def populate_vendors():
                     "postal_code": fake.postcode(),
                     "rating": random.randint(1, 5),
                     "review": fake.text(),
+                    "license": fake.bothify('LIC-####-??'),
+                    "verified": random.choice([True, False]),
+                    "years_of_experience": random.randint(1, 30),
+                    "service_area": fake.city(),
+                    "response_time": fake.random_element(elements=("1 hour", "2 hours", "4 hours", "same day", "next day")),
+                    "insurance": fake.random_element(elements=("full", "partial", "none", None)),
+                    "warranty": fake.random_element(elements=("1 year", "2 years", "5 years", "lifetime", None)),
                 }
 
                 vendor_create = Vendors(**vendor_data)
                 created_vendor = create_vendor(vendor_create)
                 print(f"Inserted vendor: {created_vendor}")
-                vendors_created_for_type.add(vendor_type) # Add to the set
-                vendor_users_available.remove(vendor_user) # Remove the user from the list
-                break # Break out of the inner loop once the vendor is created
+                vendors_created_for_type.add(vendor_type)
+                vendor_users_available.remove(vendor_user)
+                break
             except Exception as e:
                 print(f"Error inserting vendor: {str(e)}")
 
@@ -446,7 +466,7 @@ def populate_vendors():
         try:
             vendor_type_enum = random.choice(list(Vendor_Type))
             vendor_type_instance = Vendor_Types(vendor_type=vendor_type_enum)
-            additional_types = random.sample([t.value for t in vendor_types if t != vendor_type], 
+            additional_types = random.sample([t.value for t in vendor_types if t != vendor_type_enum],
                                             k=random.randint(0, min(3, len(vendor_types)-1)))
             additional_types_str = ','.join(additional_types)
             vendor_data = {
@@ -464,9 +484,16 @@ def populate_vendors():
                 "postal_code": fake.postcode(),
                 "rating": random.randint(1, 5),
                 "review": fake.text(),
+                "license": fake.bothify('LIC-####-??'),
+                "verified": random.choice([True, False]),
+                "years_of_experience": random.randint(1, 30),
+                "service_area": fake.city(),
+                "response_time": fake.random_element(elements=("1 hour", "2 hours", "4 hours", "same day", "next day")),
+                "insurance": fake.random_element(elements=("full", "partial", "none", None)),
+                "warranty": fake.random_element(elements=("1 year", "2 years", "5 years", "lifetime", None)),
             }
 
-            vendor_create =Vendors(**vendor_data)
+            vendor_create = Vendors(**vendor_data)
             created_vendor = create_vendor(vendor_create)
             print(f"Inserted vendor: {created_vendor}")
 
@@ -515,16 +542,17 @@ def populate_reports():
     
     for listing in listings:
         try:
-            user = random.choice(users_available) 
+            user = random.choice(users_available)
             report_data = {
                 "user_id": user['id'],
-                "listing_id": listing['id'], 
-                "aws_link": fake.url(), 
-                "name": fake.catch_phrase(), 
+                "listing_id": listing['id'],
+                "aws_link": fake.url(),
+                "name": fake.catch_phrase(),
+                "review_status": fake.random_element(elements=("pending", "approved", "rejected", None)),
             }
 
-            report_create = Reports(**report_data)  
-            created_report = create_report(report_create)  
+            report_create = Reports(**report_data)
+            created_report = asyncio.run(create_report(report_create))
             print(f"Inserted report: {created_report}")
 
         except Exception as e:
@@ -537,18 +565,19 @@ def populate_issues(issues_per_report: int = 3):
     if not reports:
         print("No reports found. Please create reports first.")
         return
-  
+
+    listings = get_all_listings()
+    if not listings:
+        print("No listings found. Please create listings first.")
+        return
+
     for report in reports:
         for _ in range(issues_per_report):
             try:
-                vendors_available = get_all_vendors()
-                if not vendors_available:
-                    print("No vendors found. Skipping issue creation.")
-                    return 
-                vendor = random.choice(vendors_available) 
+                listing = random.choice(listings)
                 issue_data = {
                     "report_id": report['id'],
-                    "vendor_id": vendor['id'],
+                    "listing_id": listing['id'],
                     "type": fake.random_element(elements=('general','structural','electrician','plumber','painter','cleaner','hvac','roofing','insulation','drywall','plaster','carpentry','landscaping','other')),
                     "description": fake.text(),
                     "summary": fake.catch_phrase(),
@@ -559,7 +588,7 @@ def populate_issues(issues_per_report: int = 3):
                 }
 
                 issue_create = Issues(**issue_data)
-                created_issue = create_issue(issue_create)
+                created_issue = asyncio.run(create_issue(issue_create))
                 print(f"Inserted issue: {created_issue}")
 
             except Exception as e:
@@ -664,29 +693,26 @@ def populate_issue_offers():
         return
 
     for issue in issues:
-        num_bids = random.randint(1, 3)  
+        num_bids = random.randint(1, 3)
 
         for _ in range(num_bids):
             try:
-                vendor = random.choice(vendors_available) 
-                status = random.choice(['received','accepted','rejected']) 
+                vendor = random.choice(vendors_available)
                 issue_bid_data = {
                     "issue_id": issue['id'],
                     "vendor_id": vendor['vendor_user_id'],
-                    "price": round(random.uniform(100, 5000), 2),  
-                    "status": status, 
+                    "price": round(random.uniform(100, 5000), 2),
+                    "status": random.choice(list(Bid_Status)),
                     "comment_vendor": fake.text(),
                     "comment_client": fake.text(),
-                    "active": random.choice([True, False]),
                 }
 
-                print(issue_bid_data)
                 issue_bid_create = Issue_Offers(**issue_bid_data)
                 created_issue_bid = create_issue_offer(issue_bid_create)
-                print(f"Inserted issue bid: {created_issue_bid}")
+                print(f"Inserted issue offer: {created_issue_bid}")
 
             except Exception as e:
-                print(f"Error inserting issue bid: {str(e)}")
+                print(f"Error inserting issue offer: {str(e)}")
 
 def populate_issue_assessments():
     """Populate the issue_assessments table, 1-3 assessments per issue. Vendor id is chosen randomly"""
@@ -706,32 +732,31 @@ def populate_issue_assessments():
         return
 
     for issue in issues:
-        num_assessments = random.randint(1, 3)  
+        num_assessments = random.randint(1, 3)
         interaction = 1
         for _ in range(num_assessments):
             try:
-                vendor = random.choice(vendors_available) 
+                vendor = random.choice(vendors_available)
                 client = random.choice(clients_available)
                 interaction_id = f"{vendor['id']}_{client['id']}_{interaction}"
                 start_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
                 end_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
-                status = random.choice(['received','accepted','rejected']) 
                 issue_assessment_data = {
                     "issue_id": issue['id'],
                     "user_id": vendor['id'],
-                    "interaction_id": interaction_id, 
+                    "interaction_id": interaction_id,
                     "users_interaction_id": get_uuid(interaction_id),
                     "user_type": User_Type.VENDOR,
                     "start_time": start_time,
                     "end_time": end_time,
-                    "status": status, 
-                    "min_assessment_time": random.randint(1,30)
+                    "status": random.choice(list(Assessment_Status)),
+                    "min_assessment_time": random.randint(1, 30)
                 }
 
                 issue_assessment_create = Issue_Assessments(**issue_assessment_data)
                 created_issue_assessment = create_issue_assessment(issue_assessment_create)
                 print(f"Inserted issue assessment: {created_issue_assessment}")
-                interaction+=1
+                interaction += 1
 
             except Exception as e:
                 print(f"Error inserting issue assessment: {str(e)}")
@@ -883,31 +908,248 @@ def populate_issue_assessment_comments(comments_per_assessment: int = 2):
                 print(f"Error inserting comment for issue_assessment_id={issue['id']}: {str(e)}")
 
 
+def populate_report_offers():
+    """Populate the report_offers table, 1-3 offers per report. Randomly chooses a vendor id from existing vendors."""
+
+    reports = get_all_reports()
+    if not reports:
+        print("No reports found. Please create reports first.")
+        return
+
+    vendors_available = get_all_vendors()
+    if not vendors_available:
+        print("No vendors found. Skipping report offer creation.")
+        return
+
+    for report in reports:
+        num_offers = random.randint(1, 3)
+
+        for _ in range(num_offers):
+            try:
+                vendor = random.choice(vendors_available)
+                report_offer_data = {
+                    "report_id": report['id'],
+                    "vendor_id": vendor['vendor_user_id'],
+                    "price": round(random.uniform(100, 5000), 2),
+                    "status": random.choice(list(Bid_Status)),
+                    "comment_vendor": fake.text(),
+                    "comment_client": fake.text(),
+                }
+
+                report_offer_create = Report_Offers(**report_offer_data)
+                created_report_offer = create_report_offer(report_offer_create)
+                print(f"Inserted report offer: {created_report_offer}")
+
+            except Exception as e:
+                print(f"Error inserting report offer: {str(e)}")
+
+
+def populate_report_assessments():
+    """Populate the report_assessments table, 1-3 assessments per report."""
+
+    reports = get_all_reports()
+    if not reports:
+        print("No reports found. Please create reports first.")
+        return
+
+    clients_available = get_all_clients()
+    if not clients_available:
+        print("No clients found. Skipping report assessment creation.")
+        return
+
+    vendors_available = get_all_vendors()
+    if not vendors_available:
+        print("No vendors found. Skipping report assessment creation.")
+        return
+
+    for report in reports:
+        num_assessments = random.randint(1, 3)
+        interaction = 1
+        for _ in range(num_assessments):
+            try:
+                vendor = random.choice(vendors_available)
+                client = random.choice(clients_available)
+                interaction_id = f"{vendor['id']}_{client['id']}_{interaction}"
+                start_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
+                end_time = str(fake.date_time_between(start_date="-1y", end_date="now"))
+                report_assessment_data = {
+                    "report_id": report['id'],
+                    "user_id": vendor['id'],
+                    "interaction_id": interaction_id,
+                    "users_interaction_id": get_uuid(interaction_id),
+                    "user_type": User_Type.VENDOR,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "status": random.choice(list(Assessment_Status)),
+                    "min_assessment_time": random.randint(1, 30)
+                }
+
+                report_assessment_create = Report_Assessments(**report_assessment_data)
+                created_report_assessment = create_report_assessment(report_assessment_create)
+                print(f"Inserted report assessment: {created_report_assessment}")
+                interaction += 1
+
+            except Exception as e:
+                print(f"Error inserting report assessment: {str(e)}")
+
+
+def populate_report_assessment_comments(comments_per_assessment: int = 2):
+    """Populate the report_assessment_comments table with fake comments."""
+
+    report_assessments = get_all_report_assessments()
+    users = get_all_users()
+
+    if not report_assessments:
+        print("No report assessments found. Skipping comment creation.")
+        return
+
+    if not users:
+        print("No users found. Skipping comment creation.")
+        return
+
+    for assessment in report_assessments:
+        for _ in range(comments_per_assessment):
+            try:
+                user = random.choice(users)
+                comment_data = {
+                    "report_assessment_id": assessment['id'],
+                    "user_id": user['id'],
+                    "comment": fake.sentence(),
+                }
+
+                comment_obj = Report_Assessment_Comments(**comment_data)
+                created = create_report_assessment_comment(comment_obj)
+                print(f"Inserted report assessment comment: {created}")
+
+            except Exception as e:
+                print(f"Error inserting report assessment comment: {str(e)}")
+
+
+def populate_issue_disputes():
+    """Populate the issue_disputes table with disputes on existing issue offers, plus messages and attachments."""
+
+    issue_offers = get_all_issue_offers()
+    if not issue_offers:
+        print("No issue offers found. Please create issue offers first.")
+        return
+
+    # Create disputes for ~30% of offers
+    offers_to_dispute = random.sample(issue_offers, k=min(len(issue_offers), max(1, len(issue_offers) // 3)))
+
+    for offer in offers_to_dispute:
+        try:
+            dispute_data = {
+                "issue_offer_id": offer['id'],
+                "status": Dispute_Status.OPEN,
+                "status_message": fake.sentence(),
+            }
+
+            dispute_create = Issue_Disputes(**dispute_data)
+            created_dispute = create_issue_dispute(dispute_create)
+            dispute_id = created_dispute['id']
+            print(f"Inserted issue dispute: {created_dispute}")
+
+            # Add 1-3 messages per dispute
+            num_messages = random.randint(1, 3)
+            for _ in range(num_messages):
+                try:
+                    message_data = {
+                        "message": fake.paragraph(),
+                        "user_type": random.choice([User_Type.CLIENT, User_Type.VENDOR]),
+                    }
+                    message_create = Issue_Dispute_Messages(**message_data)
+                    created_message = create_issue_dispute_message(message_create, dispute_id)
+                    print(f"  Inserted dispute message: {created_message}")
+                except Exception as e:
+                    print(f"  Error inserting dispute message: {str(e)}")
+
+            # Add 0-2 attachments per dispute
+            num_attachments = random.randint(0, 2)
+            for _ in range(num_attachments):
+                try:
+                    attachment_data = {
+                        "attachment_url": fake.image_url(),
+                        "user_type": random.choice([User_Type.CLIENT, User_Type.VENDOR]),
+                    }
+                    attachment_create = Issue_Dispute_Attachments(**attachment_data)
+                    created_attachment = create_issue_dispute_attachment(attachment_create, dispute_id)
+                    print(f"  Inserted dispute attachment: {created_attachment}")
+                except Exception as e:
+                    print(f"  Error inserting dispute attachment: {str(e)}")
+
+        except Exception as e:
+            print(f"Error inserting issue dispute: {str(e)}")
+
+
+def populate_vendor_employees(employees_per_vendor: int = 2):
+    """Populate the vendor_employees table with fake employee data for each vendor."""
+
+    vendors_available = get_all_vendors()
+    if not vendors_available:
+        print("No vendors found. Skipping vendor employee creation.")
+        return
+
+    skills_list = ['plumbing', 'electrical', 'carpentry', 'painting', 'drywall', 'roofing',
+                   'hvac', 'landscaping', 'general maintenance', 'insulation', 'flooring', 'tiling']
+
+    for vendor in vendors_available:
+        num_employees = random.randint(1, employees_per_vendor)
+        for _ in range(num_employees):
+            try:
+                employee_data = {
+                    "vendor_id": vendor['id'],
+                    "first_name": fake.first_name(),
+                    "last_name": fake.last_name(),
+                    "skills": ','.join(random.sample(skills_list, k=random.randint(1, 4))),
+                    "email": fake.email(),
+                    "phone": fake.phone_number(),
+                    "address": fake.street_address(),
+                    "city": fake.city(),
+                    "state": fake.state(),
+                    "country": fake.country(),
+                    "postal_code": fake.postcode(),
+                    "rating": random.randint(1, 5),
+                    "review": fake.text(),
+                    "years_of_experience": random.randint(1, 20),
+                }
+
+                employee_create = Vendor_Employees(**employee_data)
+                created_employee = create_vendor_employee(employee_create)
+                print(f"Inserted vendor employee: {created_employee}")
+
+            except Exception as e:
+                print(f"Error inserting vendor employee: {str(e)}")
 
 
 def run():
     """ Run all population methods in order or selectively by commenting out the ones you don't want to populate"""
-    # populate_user_types()
-    # populate_vendor_types()
-    # populate_realtor_firms()
-    # populate_users()
+    populate_user_types()
+    populate_vendor_types()
+    populate_realtor_firms()
+    populate_users()
     get_user_data()
-    # populate_clients()
-    # populate_realtors()
-    # populate_vendors()
-    # populate_vendor_reviews()
-    # populate_realtor_reviews()
-    # populate_client_reviews()
-    # populate_real_admins()
-    # populate_listings()
-    # populate_reports()
-    # populate_issues()
-    # populate_attachments()
-    # populate_comments()
-    # populate_notes()
-    # populate_issue_offers()
-    # populate_issue_assessments()
+    populate_clients()
+    populate_realtors()
+    populate_vendors()
+    populate_vendor_employees()
+    populate_vendor_reviews()
+    populate_realtor_reviews()
+    populate_client_reviews()
+    populate_real_admins()
+    populate_listings()
+    populate_reports()
+    populate_issues()
+    populate_attachments()
+    populate_comments()
+    populate_notes()
+    populate_issue_offers()
+    populate_issue_assessments()
     populate_issue_assessment_comments()
+    populate_report_offers()
+    populate_report_assessments()
+    populate_report_assessment_comments()
+    populate_issue_disputes()
+    pass
 
 
 if __name__ == "__main__":
