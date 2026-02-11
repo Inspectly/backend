@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
 
+    IMGBB_API_KEY: str
+    IMGBB_API_URL: str
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'
