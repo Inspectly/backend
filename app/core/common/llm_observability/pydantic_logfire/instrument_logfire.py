@@ -2,6 +2,7 @@ import os
 import uuid
 import logfire
 from enum import Enum
+from app.core.config import settings
 
 from dotenv import load_dotenv
 load_dotenv(override = True)
@@ -20,7 +21,7 @@ def instrument_logfire(instrument_type: Instrument_Type = Instrument_Type.PANDAN
             else:
                 prefix = project
             self.logfire = logfire.configure(
-                token = os.environ.get('LOGFIRE_API_KEY'),
+                token = settings.LOGFIRE_API_KEY,
                 service_name = f'{prefix}-{str(uuid.uuid4())[:5]}' if prefix else str(uuid.uuid4())[:5],
                 scrubbing = False,
                 local = True
