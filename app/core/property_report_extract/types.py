@@ -17,7 +17,7 @@ class IssueTypes(str, Enum):
 
 class Issue(BaseModel):
     id: int = Field(..., description = 'The id of the issue')
-    name: str = Field(..., description = 'The name/title of the issue, typically extracted from issue headings. Often formatted as "CATEGORY \ Subcategory" (e.g., "SLOPED ROOF FLASHINGS \ Roof/sidewall flashings"). This is the title that appears at the start of each issue block.')
+    name: str = Field(..., description = 'The name/title of the issue, typically extracted from issue headings. Often formatted as "CATEGORY \\ Subcategory" (e.g., "SLOPED ROOF FLASHINGS \\ Roof/sidewall flashings"). This is the title that appears at the start of each issue block.')
     description: str = Field(..., description = 'A multiline string containing the complete issue details including: Condition (current state/problem), Implication(s) (potential consequences), Location (where in the property), and Task (recommended action: Improve/Repair/Monitor/etc). Preserve the original formatting with labels like "Condition:", "Implication(s):", "Location:", "Task:".')
     images: List[str] = Field(default_factory = list, description = 'List of images for the issue. each imagge is a path to the image file.')
     imgbb_urls: List[str] = Field(default_factory = list, description = 'The url of the image file uploaded to imgbb.')

@@ -42,8 +42,8 @@ class IssueExtract:
                     report_id = self.report_id,
                     listing_id = self.listing_id,
                     type = issue.type,
-                    description = issue.description.replace("'", "''"),
-                    summary = issue.name.replace("'", "''"),
+                    description = issue.description.replace("\\", "-"),
+                    summary = issue.name.replace("\\", "-"),
                     status = Status.OPEN.value,
                     active = True,
                     image_urls = issue.imgbb_urls
