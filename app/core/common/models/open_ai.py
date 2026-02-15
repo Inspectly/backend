@@ -17,7 +17,7 @@ class OpenAIModels:
         model_settings = Settings(
             allow_temperature = False,
             allow_reasoning_effort = True,
-            reasoning_effort = ReasoningEffort.high,
+            reasoning_effort = ReasoningEffort.medium,
         )
     )
 
