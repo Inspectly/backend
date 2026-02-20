@@ -1,8 +1,11 @@
 from fastapi import HTTPException
+import stripe
 
+from app.schema.payments import User_Stripe_Information
 from app.schema.users import Users
 from app.core.database import get_db_cursor
 from app.crud.user_types import get_one_user_type
+from app.crud.stripe_user_information import create as create_stripe_user_information
 
 def get_one(id: int):
     query = '''
@@ -71,8 +74,34 @@ def create(user: Users):
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            user = cursor.fetchone()
-            return dict(user)
+            db_user = cursor.fetchone()
+            if not db_user:
+                raise HTTPException(status_code=500, detail='Failed to create user')
+            app_user_id = db_user['id']
+            try:
+                customer = stripe.Customer.create(
+                    metadata={
+                        "app_user_id": str(app_user_id),
+                        "firebase_id": user.firebase_id or "",
+                        "user_type": user.user_type.user_type.value or "",
+                    },
+                )
+            except Exception as se:
+                delete(app_user_id)
+                raise HTTPException(status_code=502, detail=f"Stripe create customer failed: {se}")
+
+        try:
+            info = User_Stripe_Information(
+                user_id=app_user_id,
+                stripe_user_id=customer.id,
+            )
+            create_stripe_user_information(info)
+        except Exception as e:
+            stripe.Customer.delete(customer.id)
+            delete(app_user_id)
+            raise HTTPException(status_code=500, detail=f"Failed to link User to Stripe User Information table: {e}")
+        return dict(db_user)
+
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
     
