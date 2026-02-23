@@ -3,6 +3,7 @@ boto3
 botocore
 Faker
 fastapi
+fastapi-pagination
 logfire
 openai
 psycopg2_binary

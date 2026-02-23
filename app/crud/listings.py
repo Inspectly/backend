@@ -16,16 +16,23 @@ def get_one(id: int):
             raise HTTPException(status_code = 404, detail = 'Listing not found')
         return dict(listing)
     
-def get_all():
+def get_all(limit: int = 50, offset: int = 0):
     query = '''
-                SELECT * 
+                SELECT *
                 FROM listings
                 ORDER BY id DESC
+                LIMIT %s OFFSET %s
             '''
+    count_query = 'SELECT COUNT(*) as total FROM listings'
     with get_db_cursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(count_query)
+        total = cursor.fetchone()['total']
+        cursor.execute(query, (limit, offset))
         listings = cursor.fetchall()
-        return [dict(listing) for listing in listings]
+        return {
+            'items': [dict(listing) for listing in listings],
+            'total': total
+        }
     
 def get_user_listings(user_id: int):
     query = '''

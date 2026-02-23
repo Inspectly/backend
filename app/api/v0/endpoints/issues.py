@@ -1,13 +1,23 @@
+import math
 from fastapi import APIRouter, HTTPException, Body
+from fastapi_pagination import Page
+from fastapi_pagination.api import resolve_params
 
 from app.crud import issues
 from app.schema.properties import Issues
 
 router = APIRouter()
 
-@router.get('/')
+@router.get('/', response_model=Page)
 def get_all():
-    return issues.get_all()
+    params = resolve_params()
+    raw = params.to_raw_params()
+    result = issues.get_all(limit=raw.limit, offset=raw.offset)
+    return Page.create(
+        items=result['items'],
+        params=params,
+        total=result['total'],
+    )
 
 @router.get('/total')
 def total_issues_count(vendor_assigned = False):
@@ -17,9 +27,16 @@ def total_issues_count(vendor_assigned = False):
 def total_issues_count_filter(type = None, city = None, state = None, search = None, vendor_assigned = False):
     return issues.total_issues_count_filter(type, city, state, search, vendor_assigned)
 
-@router.get('/filter')
-def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
-    return issues.get_all_filter(limit, offset, type, city, state, search, vendor_assigned)
+@router.get('/filter', response_model=Page)
+def get_all_filter(type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
+    params = resolve_params()
+    raw = params.to_raw_params()
+    result = issues.get_all_filter(limit=raw.limit, offset=raw.offset, type=type, city=city, state=state, search=search, vendor_assigned=vendor_assigned)
+    return Page.create(
+        items=result['items'],
+        params=params,
+        total=result['total'],
+    )
 
 @router.get('/{id}')
 def get_one(id: int):

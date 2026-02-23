@@ -1,13 +1,22 @@
 from fastapi import APIRouter, HTTPException
+from fastapi_pagination import Page
+from fastapi_pagination.api import resolve_params
 
 from app.crud import listings
 from app.schema.properties import Listings
 
 router = APIRouter()
 
-@router.get('/')
+@router.get('/', response_model=Page)
 def get_all():
-    return listings.get_all()
+    params = resolve_params()
+    raw = params.to_raw_params()
+    result = listings.get_all(limit=raw.limit, offset=raw.offset)
+    return Page.create(
+        items=result['items'],
+        params=params,
+        total=result['total'],
+    )
 
 @router.get('/{id}')
 def get_one(id: int):

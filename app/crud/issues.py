@@ -26,16 +26,23 @@ def get_one(id: int):
             raise HTTPException(status_code = 404, detail = 'Issue not found')
         return _deserialize_issue(dict(issue))
     
-def get_all():
+def get_all(limit: int = 50, offset: int = 0):
     query = '''
                 SELECT *
                 FROM issues
                 ORDER BY id DESC
+                LIMIT %s OFFSET %s
             '''
+    count_query = 'SELECT COUNT(*) as total FROM issues'
     with get_db_cursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(count_query)
+        total = cursor.fetchone()['total']
+        cursor.execute(query, (limit, offset))
         issues = cursor.fetchall()
-        return [_deserialize_issue(dict(issue)) for issue in issues]
+        return {
+            'items': [_deserialize_issue(dict(issue)) for issue in issues],
+            'total': total
+        }
     
 def total_issues_count(vendor_assigned = False):
     query = '''
@@ -79,8 +86,7 @@ def total_issues_count_filter(type = None, city = None, state = None, search = N
         return cursor.fetchone()
 
 def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, state = None, search = None, vendor_assigned: bool = False):
-    query = '''
-        SELECT i.*
+    base_query = '''
         FROM issues i
         JOIN listings l ON i.listing_id = l.id
         WHERE 1 = 1
@@ -88,35 +94,36 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
     '''
     params = []
     if type:
-        query += ' AND i.type = %s'
+        base_query += ' AND i.type = %s'
         params.append(type)
     if city:
-        query += ' AND l.city = %s'
+        base_query += ' AND l.city = %s'
         params.append(city)
     if state:
-        query += ' AND l.state = %s'
+        base_query += ' AND l.state = %s'
         params.append(state)
     if search:
-        query += ' AND i.summary ILIKE %s'
+        base_query += ' AND i.summary ILIKE %s'
         params.append(f'%{search}%')
     if vendor_assigned:
-        query += ' AND i.vendor_id IS NOT NULL'
+        base_query += ' AND i.vendor_id IS NOT NULL'
     else:
-        query += ' AND i.vendor_id IS NULL'
- 
-    query += '''
+        base_query += ' AND i.vendor_id IS NULL'
+
+    count_query = 'SELECT COUNT(*) as total ' + base_query
+    query = 'SELECT i.* ' + base_query + '''
         ORDER BY i.id DESC
         LIMIT %s OFFSET %s
     '''
-    params.extend([limit, offset])
+
     with get_db_cursor() as cursor:
-        cursor.execute(query, params)
+        cursor.execute(count_query, params)
+        total = cursor.fetchone()['total']
+        cursor.execute(query, params + [limit, offset])
         issues = cursor.fetchall()
-        issues = [_deserialize_issue(dict(issue)) for issue in issues]
         return {
-            'issues': issues,
-            'total': total_issues_count(),
-            'total_filtered': total_issues_count_filter(type, city, state, search, vendor_assigned)
+            'items': [_deserialize_issue(dict(issue)) for issue in issues],
+            'total': total
         }
     
 def get_report_issues(report_id: int):

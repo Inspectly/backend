@@ -1,5 +1,7 @@
 import json
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form, BackgroundTasks
+from fastapi_pagination import Page
+from fastapi_pagination.api import resolve_params
 
 from app.crud import reports, tasks
 from app.schema.tasks import Tasks, Task_Type, Status
@@ -9,9 +11,16 @@ from app.core.property_report_extract.issue_extract import IssueExtract
 
 router = APIRouter()
 
-@router.get('/')
+@router.get('/', response_model=Page)
 def get_all():
-    return reports.get_all()
+    params = resolve_params()
+    raw = params.to_raw_params()
+    result = reports.get_all(limit=raw.limit, offset=raw.offset)
+    return Page.create(
+        items=result['items'],
+        params=params,
+        total=result['total'],
+    )
 
 @router.get('/{id}')
 def get_one(id: int):

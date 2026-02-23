@@ -16,16 +16,23 @@ def get_one(id: int):
             raise HTTPException(status_code = 404, detail = 'Report not found')
         return dict(report)
 
-def get_all():
+def get_all(limit: int = 50, offset: int = 0):
     query = '''
-                SELECT * 
-                FROM reports 
+                SELECT *
+                FROM reports
                 ORDER BY id DESC
+                LIMIT %s OFFSET %s
             '''
+    count_query = 'SELECT COUNT(*) as total FROM reports'
     with get_db_cursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(count_query)
+        total = cursor.fetchone()['total']
+        cursor.execute(query, (limit, offset))
         reports = cursor.fetchall()
-        return [dict(report) for report in reports]
+        return {
+            'items': [dict(report) for report in reports],
+            'total': total
+        }
     
 def get_user_reports(user_id: int):
     query = '''
