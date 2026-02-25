@@ -8,7 +8,7 @@ from app.api.v0.endpoints import (
     payments, stripe_user_information, stripe_payments, stripe,
     realtor_reviews, vendor_reviews, issue_assessment_comments, client_reviews,
     tasks, report_offers, report_assessments, report_assessment_comments,
-    image
+    image, issue_disputes, issue_dispute_messages, issue_dispute_attachments
 )
 
 api_router = APIRouter()
@@ -63,3 +63,7 @@ api_router.include_router(tasks.router, prefix = '/tasks', tags = ['tasks'])
 api_router.include_router(stripe.router, prefix = '/stripe', tags = ['stripe'])
 
 api_router.include_router(image.router, prefix = '/images', tags = ['images'])
+
+api_router.include_router(issue_disputes.router, prefix = '/issue_disputes', tags = ['issue_disputes'])
+api_router.include_router(issue_dispute_messages.router, prefix = '/issue_dispute_messages', tags = ['issue_dispute_messages'])
+api_router.include_router(issue_dispute_attachments.router, prefix = '/issue_dispute_attachments', tags = ['issue_dispute_attachments'])
