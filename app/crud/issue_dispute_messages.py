@@ -26,7 +26,7 @@ def create(issue_dispute_message: Issue_Dispute_Messages, issue_dispute_id: int)
             cursor.execute(query, (
                 issue_dispute_id,
                 issue_dispute_message.message,
-                issue_dispute_message.user_type
+                issue_dispute_message.user_type.value
             ))
             issue_dispute_message_id = cursor.fetchone()
             return dict(issue_dispute_message_id)

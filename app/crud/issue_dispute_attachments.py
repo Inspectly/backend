@@ -20,7 +20,7 @@ def create(issue_dispute_attachment: Issue_Dispute_Attachments, issue_dispute_id
         INSERT INTO issue_dispute_attachments (issue_dispute_id, attachment_url, user_type)
         VALUES ({}, '{}', '{}')
         RETURNING id
-    '''.format(issue_dispute_id, issue_dispute_attachment.attachment_url, issue_dispute_attachment.user_type)
+    '''.format(issue_dispute_id, issue_dispute_attachment.attachment_url, issue_dispute_attachment.user_type.value)
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
