@@ -80,7 +80,8 @@ ISSUES_EXTRACT_SYSTEM_PROMPT = f'''
 		- A JSON object containing the list of issues extracted from the report.
 		- The output **must** conform to the following format (with each issue’s information filled in accordingly):
 	{ISSUES_OUTPUT_FORMAT}
-		- **Important:** Do not populate the "image" or "type" fields (leave them blank or omit them). Only "name" and "description" should be provided for each issue at this extraction stage.
+		- **Important:** Do not populate the "images", "imgbb_urls", or "type" fields (leave them blank or omit them). Only "name" and "description" should be provided for each issue at this extraction stage.
+		- IT IS VERY IMPORTANT TO LEAVE THE "images", "imgbb_urls", AND "type" FIELDS BLANK OR OMITTED.
 		- The order of issues in the output does not need to follow the report order exactly, but it can. The key is that all issues are listed.
 
 	[EXAMPLES]
