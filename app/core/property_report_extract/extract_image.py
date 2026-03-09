@@ -89,35 +89,48 @@ class ExtractImage:
         if not issue.images:
             return issue
         
-        image_details = []
-        for idx, image_filename in enumerate(issue.images, start = 1):
-            if image_filename in issue_images_dict:
+        try:
+            valid_image_filenames = [image_filename for image_filename in issue.images if image_filename in issue_images_dict]
+            if not valid_image_filenames:
+                self.logfire.info(f'No verifiable images found for issue {issue.id} ({issue.name}), skipping verification')
+                return issue
+
+            image_details = []
+            for idx, image_filename in enumerate(valid_image_filenames, start = 1):
                 image_meta = issue_images_dict[image_filename]
                 image_details.append(f"{idx}. {image_filename}\n   Description: {image_meta['description']}")
-        
-        user_prompt_parts = [
-            IMAGE_VERIFIER_USER_PROMPT.format(
-                issue_id = issue.id,
-                issue_name = issue.name,
-                issue_description = issue.description,
-                issue_type = issue.type.value if issue.type else '',
-                image_count = len(issue.images),
-                image_details = '\n'.join(image_details)
-            )
-        ]
-        
-        for image_filename in issue.images:
-            if image_filename in issue_images_dict:
+            
+            user_prompt_parts = [
+                IMAGE_VERIFIER_USER_PROMPT.format(
+                    issue_id = issue.id,
+                    issue_name = issue.name,
+                    issue_description = issue.description,
+                    issue_type = issue.type.value if issue.type else '',
+                    image_count = len(valid_image_filenames),
+                    image_details = '\n'.join(image_details)
+                )
+            ]
+            
+            for image_filename in valid_image_filenames:
                 image_meta = issue_images_dict[image_filename]
-                
-                screenshot_data = Path(screenshots_dict[image_meta['page_number']]).read_bytes()
+                screenshot_path = screenshots_dict.get(image_meta['page_number'])
+                if not screenshot_path:
+                    self.logfire.error(
+                        f'Missing screenshot for page {image_meta["page_number"]} while verifying issue {issue.id} ({issue.name})'
+                    )
+                    continue
+
+                screenshot_data = Path(screenshot_path).read_bytes()
                 user_prompt_parts.append(BinaryContent(data = screenshot_data, media_type = 'image/png'))
                 
                 image_data = Path(image_meta['filepath']).read_bytes()
                 user_prompt_parts.append(BinaryContent(data = image_data, media_type = 'image/png'))
-        
-        response = await self.agents.image_verifier_agent.run(user_prompt = user_prompt_parts)
-        return response.output
+            
+            response = await self.agents.image_verifier_agent.run(user_prompt = user_prompt_parts)
+            return response.output
+        except Exception as e:
+            self.logfire.error(f'Error verifying issue {issue.id} ({issue.name}), keeping original issue: {e}')
+            return issue
     
     async def extract_images(self, issues: List[Issue]):
         try:
@@ -162,10 +175,18 @@ class ExtractImage:
             
             issue_images_dict = {img['filename']: img for img in issue_images}
         
-            verified_issues = await asyncio.gather(*[
+            verification_results = await asyncio.gather(*[
                 self._verify_single_issue(issue, issue_images_dict, screenshots_dict)
                 for issue in issues
-            ])
+            ], return_exceptions = True)
+
+            verified_issues = []
+            for issue, result in zip(issues, verification_results):
+                if isinstance(result, Exception):
+                    self.logfire.error(f'Error verifying issue {issue.id} ({issue.name}), keeping original issue: {result}')
+                    verified_issues.append(issue)
+                else:
+                    verified_issues.append(result)
 
             for issue in verified_issues:
                 for image_filename in issue.images:
