@@ -4,8 +4,9 @@ ISSUES_OUTPUT_FORMAT = '''
 			{
 				"name": <string>,
 				"description": <string>,
-				"image": leave it blank,
-				"type": leave it blank
+				"images": <list of strings>
+				"imgbb_urls": <list of strings>
+				"type": <string>
 			},
 			{...},
 			...
@@ -17,13 +18,14 @@ ISSUE_OUTPUT_FORMAT = '''
 	{
 		"name": <string>,
 		"description": <string>,
-		"image": leave it blank,
+		"images": <list of strings>
+		"imgbb_urls": <list of strings>
 		"type": leave it blank
 	}
 '''
 
 ISSUE_TYPES = '''
-	  - ROOFING
+	- ROOFING
     - EXTERIOR
     - STRUCTURE
     - ELECTRICAL
@@ -103,6 +105,9 @@ ISSUES_EXTRACT_SYSTEM_PROMPT = f'''
 						{{
 							"name": "SLOPED ROOF FLASHINGS / Roof/sidewall flashings",
 							"description": "Condition: Kickout flashing - missing.\\nImplication(s): Chance of water damage to structure, finishes and contents.\\nLocation: North First Floor\\nTask: Improve"
+							"images": [],
+							"imgbb_urls": [],
+							"type": ""
 						}}
 					]
 				}}
@@ -136,14 +141,23 @@ ISSUES_EXTRACT_SYSTEM_PROMPT = f'''
 						{{
 							"name": "Building Exterior - Front Entry Dead Bolt Misalignment",
 							"description": "The strike to the front entry dead bolt is not properly aligned and the dead bolt is not operational.\\nTask: Adjust strike as needed to correct."
+							"images": [],
+							"imgbb_urls": [],
+							"type": ""
 						}},
 						{{
 							"name": "Building Exterior - Stucco Holes/Cracks",
 							"description": "Patch/repair/seal all holes and openings (cracks wider than 1mm) in stucco to help prevent moisture, insect, or vermin penetration."
+							"images": [],
+							"imgbb_urls": [],
+							"type": ""
 						}},
 						{{
 							"name": "Building Exterior - Exposed Wood Surfaces Maintenance",
 							"description": "Keep all exposed wood surfaces (including fascia, soffits, gable ends) well-painted to protect against weathering and deterioration."
+							"images": [],
+							"imgbb_urls": [],
+							"type": ""
 						}}
 					]
 				}}
@@ -174,6 +188,9 @@ ISSUES_EXTRACT_SYSTEM_PROMPT = f'''
 						{{
 							"name": "Roof Drainage Systems: Downspouts drain near house",
 							"description": "One or more downspouts drain too close to the home\\'s foundation, which can result in excessive moisture at the foundation and potential water leakage or structural movement.\\nTask: Add extensions to drain a minimum of 4–6 feet from the foundation (to redirect water further away).\\nRecommendation: Contact a qualified professional.\\nEstimated Cost: CAD$20 - CAD$40."
+							"images": [],
+							"imgbb_urls": [],
+							"type": ""
 						}}
 					]
 				}}
