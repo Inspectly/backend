@@ -280,13 +280,13 @@ ISSUES_VERIFIER_SYSTEM_PROMPT = f'''
 		- A single JSON object in the SAME format as {ISSUES_OUTPUT_FORMAT}.
 		- Populate "name" and "description" for all issues.
 		- For existing issues: keep fields exactly as provided.
-		- For newly added issues: populate "name" and "description"; leave "image" and "type" blank (per schema).
+		- For newly added issues: populate "name" and "description"; leave "images", "imgbb_urls", and "type" blank (per schema).
 
 	[EXAMPLE]
 		Candidate issues (input):
 			{{
 				"issues": [
-					{{ "name": "Loose toilet", "description": "Main bathroom." }}
+					{{ "name": "Loose toilet", "description": "Main bathroom.", "images": [], "imgbb_urls": [], "type": "" }}
 				]
 			}}
 
@@ -297,7 +297,7 @@ ISSUES_VERIFIER_SYSTEM_PROMPT = f'''
 			{{
 				"issues": [
 					{{ "name": "Loose toilet', "description": "Main bathroom." }},
-					{{ "name": "Sink: Cracked caulking", "description": "Location: Kitchen sink.\\nTask: Re-seal."}}
+					{{ "name": "Sink: Cracked caulking", "description": "Location: Kitchen sink.\\nTask: Re-seal.", "images": [], "imgbb_urls": [], "type": "" }}
 				]
 			}}
 '''
@@ -326,7 +326,7 @@ ISSUES_VERIFIER_USER_PROMPT = '''
 	[OUTPUT]
 		- Return ONLY a single JSON object matching the exact schema as the input of list of issues
 		- Populate "name" and "description" for all issues.
-		- Leave "image" and "type" blank for each issue.
+		- Leave "images", "imgbb_urls", and "type" blank for each issue.
 '''
 
 
@@ -397,7 +397,7 @@ ISSUE_VALIDATION_SYSTEM_PROMPT = f'''
 
 	[OUTPUT]
 		Output type: **single issue JSON object** in the following schema.
-		Populate "name" and "description" only; set "image" and "type" to empty strings.
+		Populate "name" and "description" only; set "images", "imgbb_urls", and "type" to empty strings.
 		{ISSUE_OUTPUT_FORMAT}
 
 	[EXAMPLES]
@@ -413,7 +413,8 @@ ISSUE_VALIDATION_SYSTEM_PROMPT = f'''
 				{{
 					"name": "Receptacles: Missing cover",
 					"description": "Condition: Missing cover.\\nLocation: Garage wall\\nTask: Install cover",
-					"image": "",
+					"images": [],
+					"imgbb_urls": [],
 					"type": ""
 				}}
 
@@ -430,7 +431,8 @@ ISSUE_VALIDATION_SYSTEM_PROMPT = f'''
 				{{
 					"name": "Roof Drainage Systems — Downspouts drain near house",
 					"description": "Implication(s): Excessive moisture at foundation; potential leakage or structural movement.\\nLocation: North side; Rear corner\\nTask: Add extensions to drain a minimum of 4–6 feet from the foundation.\\nEstimated Cost: CAD$20 - CAD$40",
-					"image": "",
+					"images": [],
+					"imgbb_urls": [],
 					"type": ""
 				}}
 '''
@@ -462,7 +464,7 @@ ISSUE_VALIDATION_USER_PROMPT = '''
 	[OUTPUT]
 		- Return ONLY ONE JSON object that matches the exact input structure of the issue that was passed above:
 		- Populate "name" and "description".
-		- Set "image" and "type" to empty strings.
+		- Set "images", "imgbb_urls", and "type" to empty strings.
 '''
 
 
@@ -911,7 +913,7 @@ IMAGE_VERIFIER_SYSTEM_PROMPT = '''
 			• Keep as empty string "" (type is assigned elsewhere).
 
 	[INPUT]
-		- Issue (JSON): {"id": <int>, "name": "<str>", "description": "<str>", "image": "<str>", "type": "<str>"}
+		- Issue (JSON): {"id": <int>, "name": "<str>", "description": "<str>", "images": ["filename1.png", "filename2.png", ...], "imgbb_urls": [], "type": "<str>"}
 		- Image name: {image_name}
 		- Image description: {description}
 
@@ -920,7 +922,8 @@ IMAGE_VERIFIER_SYSTEM_PROMPT = '''
 			{
 			"name": "<string>",
 			"description": "<multiline string>",
-			"image": "<filename>",
+			"images": ["filename1.png", "filename2.png", ...],
+			"imgbb_urls": [],
 			"type": "<string>"
 			}
 '''
@@ -951,6 +954,7 @@ IMAGE_VERIFIER_USER_PROMPT = '''
 			"name": "{issue_name}",
 			"description": "{issue_description}",
 			"images": ["filename1.png", "filename2.png", ...],
+			"imgbb_urls": [],
 			"type": "{issue_type}"
 		}}
 
