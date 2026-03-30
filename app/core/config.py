@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pydantic_settings import BaseSettings
+import stripe
 
 class Settings(BaseSettings):
     DB_HOST: str
@@ -37,6 +38,7 @@ def get_settings():
     return Settings()
 
 settings = get_settings()
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 if __name__ == "__main__":
     print(settings.DATABASE_URL)
