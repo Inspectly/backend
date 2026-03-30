@@ -251,7 +251,7 @@ async def create(issue: Issues):
                 issue.severity,
                 issue.status.value,
                 issue.active,
-                issue.image_urls if issue.image_urls else None
+                json.dumps(issue.image_urls) if issue.image_urls else None
             ))
             issue = cursor.fetchone()
             return dict(issue)
@@ -285,7 +285,7 @@ def update(id: int, issue: Issues):
                 issue.severity,
                 issue.status,
                 issue.active,
-                issue.image_urls if issue.image_urls else None,
+                json.dumps(issue.image_urls) if issue.image_urls else None,
                 issue.review_status,
                 id
             ))
