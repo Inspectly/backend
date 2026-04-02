@@ -32,27 +32,37 @@ class IssueExtract:
         return issues
 
     async def run(self):
-        with self.logfire.span(f'Extract Issues | {self.report_id} | {self.task_id}'):
-            extracted_issues = await self._extract_issues()
-            extracted_issues = await self._extract_images(extracted_issues)
-            self.logfire.info(f'Extracted {len(extracted_issues)} issues. Extraction complete')
-            self.logfire.info(f'Issues: {extracted_issues}')
-            for issue in extracted_issues:
-                new_issue = Issues(
-                    report_id = self.report_id,
-                    listing_id = self.listing_id,
-                    type = issue.type,
-                    description = issue.description.replace("\\", "-"),
-                    summary = issue.name.replace("\\", "-"),
-                    status = Status.OPEN.value,
-                    active = True,
-                    image_urls = issue.imgbb_urls
-                )
-                await issues.create(new_issue)
-            self.logfire.info(f'Wrote {len(extracted_issues)} issues to database')
-        await tasks.update(self.task_id, Tasks(
-            id = self.task_id,
-            report_id = self.report_id,
-            task_type = Task_Type.EXTRACT_ISSUES.value,
-            status = Task_Status.COMPLETED.value
-        ))
+        try:
+            with self.logfire.span(f'Extract Issues | {self.report_id} | {self.task_id}'):
+                extracted_issues = await self._extract_issues()
+                extracted_issues = await self._extract_images(extracted_issues)
+                self.logfire.info(f'Extracted {len(extracted_issues)} issues. Extraction complete')
+                self.logfire.info(f'Issues: {extracted_issues}')
+                for issue in extracted_issues:
+                    new_issue = Issues(
+                        report_id = self.report_id,
+                        listing_id = self.listing_id,
+                        type = issue.type,
+                        description = issue.description.replace("\\", "-"),
+                        summary = issue.name.replace("\\", "-"),
+                        status = Status.OPEN.value,
+                        active = True,
+                        image_urls = issue.imgbb_urls
+                    )
+                    await issues.create(new_issue)
+                self.logfire.info(f'Wrote {len(extracted_issues)} issues to database')
+            await tasks.update(self.task_id, Tasks(
+                id = self.task_id,
+                report_id = self.report_id,
+                task_type = Task_Type.EXTRACT_ISSUES.value,
+                status = Task_Status.COMPLETED.value
+            ))
+        except Exception as e:
+            self.logfire.error(f'Task {self.task_id} failed: {e}')
+            await tasks.update(self.task_id, Tasks(
+                id = self.task_id,
+                report_id = self.report_id,
+                task_type = Task_Type.EXTRACT_ISSUES.value,
+                status = Task_Status.FAILED.value
+            ))
+            raise
