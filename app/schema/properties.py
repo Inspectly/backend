@@ -68,6 +68,10 @@ class Issues(BaseModel):
     image_urls: Optional[List[str]] = None
     review_status: Optional[str] = None
 
+class Issue_Images(BaseModel):
+    issue_id: int
+    url: str
+
 class Issue_Offers(BaseModel):
     issue_id: int
     vendor_id: Optional[int] = None

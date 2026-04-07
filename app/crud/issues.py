@@ -1,17 +1,7 @@
-import json
 from fastapi import HTTPException
-from app.schema.properties import Issues
+from app.schema.properties import Issues, Issue_Images
 from app.core.database import get_db_cursor
-
-
-def _deserialize_issue(issue_dict: dict) -> dict:
-    if issue_dict.get('image_urls'):
-        if isinstance(issue_dict['image_urls'], str):
-            try:
-                issue_dict['image_urls'] = json.loads(issue_dict['image_urls'])
-            except (json.JSONDecodeError, TypeError):
-                issue_dict['image_urls'] = [issue_dict['image_urls']]
-    return issue_dict
+from app.crud import issue_images
 
 def get_one(id: int):
     query = '''
@@ -24,7 +14,7 @@ def get_one(id: int):
         issue = cursor.fetchone()
         if not issue:
             raise HTTPException(status_code = 404, detail = 'Issue not found')
-        return _deserialize_issue(dict(issue))
+        return dict(issue)
     
 def get_all(limit: int = 50, offset: int = 0):
     query = '''
@@ -40,7 +30,7 @@ def get_all(limit: int = 50, offset: int = 0):
         cursor.execute(query, (limit, offset))
         issues = cursor.fetchall()
         return {
-            'items': [_deserialize_issue(dict(issue)) for issue in issues],
+            'items': [dict(issue) for issue in issues],
             'total': total
         }
     
@@ -122,7 +112,7 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         cursor.execute(query, params + [limit, offset])
         issues = cursor.fetchall()
         return {
-            'items': [_deserialize_issue(dict(issue)) for issue in issues],
+            'items': [dict(issue) for issue in issues],
             'total': total
         }
     
@@ -135,7 +125,7 @@ def get_report_issues(report_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [_deserialize_issue(dict(issue)) for issue in issues]
+        return [dict(issue) for issue in issues]
 
 def get_listing_issues(listing_id: int):
     query = '''
@@ -146,7 +136,7 @@ def get_listing_issues(listing_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [_deserialize_issue(dict(issue)) for issue in issues]
+        return [dict(issue) for issue in issues]
 
 def get_vendor_issues(vendor_id: int):
     query = '''
@@ -157,7 +147,7 @@ def get_vendor_issues(vendor_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [_deserialize_issue(dict(issue)) for issue in issues]
+        return [dict(issue) for issue in issues]
 
 def get_all_issue_addresses():
     query = '''
@@ -235,9 +225,9 @@ async def create(issue: Issues):
     _validate_report_and_listing(issue.report_id, issue.listing_id)
     query = '''
                 INSERT INTO issues
-                    (report_id, listing_id, type, description, summary, severity, status, active, image_urls)
+                    (report_id, listing_id, type, description, summary, severity, status, active)
                 VALUES
-                    (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id, report_id, listing_id, vendor_id, created_at
             '''
     try:
@@ -251,10 +241,14 @@ async def create(issue: Issues):
                 issue.severity,
                 issue.status.value,
                 issue.active,
-                issue.image_urls if issue.image_urls else None
             ))
-            issue = cursor.fetchone()
-            return dict(issue)
+            created_issue = cursor.fetchone()
+
+        if issue.image_urls:
+            for url in issue.image_urls:
+                issue_images.create(Issue_Images(issue_id=created_issue['id'], url=url))
+
+        return dict(created_issue)
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
@@ -270,7 +264,6 @@ def update(id: int, issue: Issues):
             severity = %s,
             status = %s,
             active = %s,
-            image_urls = %s,
             review_status = %s
         WHERE id = %s
         RETURNING id, vendor_id, updated_at
@@ -285,7 +278,6 @@ def update(id: int, issue: Issues):
                 issue.severity,
                 issue.status,
                 issue.active,
-                issue.image_urls if issue.image_urls else None,
                 issue.review_status,
                 id
             ))
