@@ -3,6 +3,11 @@ from app.schema.properties import Issues, Issue_Images
 from app.core.database import get_db_cursor
 from app.crud import issue_images
 
+def _attach_image_urls(issue_dict: dict) -> dict:
+    images = issue_images.get_issue_images(issue_dict['id'])
+    issue_dict['image_urls'] = [img['url'] for img in images]
+    return issue_dict
+
 def get_one(id: int):
     query = '''
                 SELECT *
@@ -14,7 +19,7 @@ def get_one(id: int):
         issue = cursor.fetchone()
         if not issue:
             raise HTTPException(status_code = 404, detail = 'Issue not found')
-        return dict(issue)
+        return _attach_image_urls(dict(issue))
     
 def get_all(limit: int = 50, offset: int = 0):
     query = '''
@@ -30,10 +35,10 @@ def get_all(limit: int = 50, offset: int = 0):
         cursor.execute(query, (limit, offset))
         issues = cursor.fetchall()
         return {
-            'items': [dict(issue) for issue in issues],
+            'items': [_attach_image_urls(dict(issue)) for issue in issues],
             'total': total
         }
-    
+
 def total_issues_count(vendor_assigned = False):
     query = '''
                 SELECT COUNT(*) 
@@ -112,7 +117,7 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         cursor.execute(query, params + [limit, offset])
         issues = cursor.fetchall()
         return {
-            'items': [dict(issue) for issue in issues],
+            'items': [_attach_image_urls(dict(issue)) for issue in issues],
             'total': total
         }
     
@@ -125,7 +130,7 @@ def get_report_issues(report_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        return [_attach_image_urls(dict(issue)) for issue in issues]
 
 def get_listing_issues(listing_id: int):
     query = '''
@@ -135,8 +140,8 @@ def get_listing_issues(listing_id: int):
             '''.format(listing_id)
     with get_db_cursor() as cursor:
         cursor.execute(query)
-        issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        issues_list = cursor.fetchall()
+        return [_attach_image_urls(dict(issue)) for issue in issues_list]
 
 def get_vendor_issues(vendor_id: int):
     query = '''
@@ -147,7 +152,7 @@ def get_vendor_issues(vendor_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [dict(issue) for issue in issues]
+        return [_attach_image_urls(dict(issue)) for issue in issues]
 
 def get_all_issue_addresses():
     query = '''
