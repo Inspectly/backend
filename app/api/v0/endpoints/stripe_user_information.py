@@ -25,6 +25,10 @@ def get_user_stripe_information_by_stripe_user_id(stripe_user_id: str):
 def create(user_stripe_information: User_Stripe_Information):
     return stripe_user_information.create(user_stripe_information)
 
+@router.post('/existing-user/{user_id}')
+def create_stripe_existing_user(user_id: int):
+    return stripe_user_information.create_stripe_existing_user(user_id)
+
 @router.put('/{id}')
 def update(id: int, user_stripe_information: User_Stripe_Information):
     return stripe_user_information.update(id, user_stripe_information)

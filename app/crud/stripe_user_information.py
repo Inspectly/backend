@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+import stripe
 
 from app.core.database import get_db_cursor
 from app.schema.payments import User_Stripe_Information
@@ -72,6 +73,40 @@ def create(user_stripe_information: User_Stripe_Information):
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
 
+def create_stripe_existing_user(user_id: int):
+    query = '''
+                SELECT firebase_id, user_type
+                FROM users
+                WHERE id = {}
+            '''.format(user_id)
+    try:
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            user = cursor.fetchone()
+            if not user:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            customer = stripe.Customer.create(
+                metadata={
+                    "app_user_id": str(user_id),
+                    "firebase_id": user['firebase_id'] or "",
+                    "user_type": user['user_type'] or "",
+                },
+            )
+
+            create(
+                User_Stripe_Information(
+                    user_id=user_id,
+                    stripe_user_id=customer.id
+                )
+            )
+
+            return {"user_id": user_id, "stripe_customer_id": customer.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 def update(id: int, user_stripe_information: User_Stripe_Information):
     query = '''
                 UPDATE user_stripe_information 

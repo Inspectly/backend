@@ -92,7 +92,7 @@ def create(user: Users):
                 )
             except Exception as se:
                 raise HTTPException(status_code=502, detail=f"Stripe create customer failed: {se}")
-
+        return user_id
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
     
