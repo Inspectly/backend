@@ -1,8 +1,11 @@
 from fastapi import HTTPException
+import stripe
 
 from app.schema.users import Users
 from app.core.database import get_db_cursor
 from app.crud.user_types import get_one_user_type
+from app.schema.payments import User_Stripe_Information
+from app.crud.stripe_user_information import create as create_stripe_user_information
 
 def get_one(id: int):
     query = '''
@@ -72,7 +75,24 @@ def create(user: Users):
         with get_db_cursor() as cursor:
             cursor.execute(query)
             user = cursor.fetchone()
-            return dict(user)
+            user_id = user['id']
+            try:
+                customer = stripe.Customer.create_async(
+                    metadata={
+                        "app_user_id": str(user_id),
+                        "firebase_id": user.firebase_id or "",
+                        "user_type": user.user_type.user_type.value or "",
+                    },
+                )
+                create_stripe_user_information(
+                    User_Stripe_Information(
+                        user_id=user_id,
+                        stripe_user_id=customer.id
+                    )
+                )
+            except Exception as se:
+                raise HTTPException(status_code=502, detail=f"Stripe create customer failed: {se}")
+
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
     
