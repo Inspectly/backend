@@ -1,22 +1,21 @@
-import os
 import stripe
 
+from app.core.config import settings
 from app.core.stripe.types import Checkout_Session_Request
 from app.core.stripe.serializer import validate_issue_offer, validate_user
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 class Stripe_Session:
     def __init__(self):
-        self.stripe_secret_key = os.getenv('STRIPE_SECRET_KEY')
-        self.frontend_base_url = os.getenv('FRONTEND_BASE_URL')
-        self.stripe = stripe
-        self.stripe.api_key = self.stripe_secret_key
+        self.frontend_base_url = settings.FRONTEND_BASE_URL
 
     async def checkout_session(self, data: Checkout_Session_Request):
         valid_client = validate_user(data.client_id)
         valid_vendor = validate_user(data.vendor_id)
         valid_offer = validate_issue_offer(data.offer_id)
         try:
-            session = self.stripe.checkout.Session.create(
+            session = stripe.checkout.Session.create(
                 line_items = [
                     {
                         'price_data': {

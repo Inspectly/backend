@@ -3,9 +3,12 @@ import stripe
 
 from app.schema.users import Users
 from app.core.database import get_db_cursor
+from app.core.config import settings
 from app.crud.user_types import get_one_user_type
 from app.schema.payments import User_Stripe_Information
 from app.crud.stripe_user_information import create as create_stripe_user_information
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def get_one(id: int):
     query = '''
@@ -57,14 +60,14 @@ def get_one_by_firebase_id(firebase_id: str):
             raise HTTPException(status_code = 404, detail = 'User not found')
         return dict(user)
 
-def create(user: Users):
+async def create(user: Users):
     user_type = get_one_user_type(user.user_type.user_type.value)
     if (user_type['user_type'] != user.user_type.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
     query = '''
-                INSERT INTO users 
+                INSERT INTO users
                     (user_type, firebase_id)
-                VALUES 
+                VALUES
                     ('{}', '{}')
                 RETURNING id, created_at
             '''.format(
@@ -74,10 +77,10 @@ def create(user: Users):
     try:
         with get_db_cursor() as cursor:
             cursor.execute(query)
-            user = cursor.fetchone()
-            user_id = user['id']
+            result = cursor.fetchone()
+            user_id = result['id']
             try:
-                customer = stripe.Customer.create_async(
+                customer = await stripe.Customer.create_async(
                     metadata={
                         "app_user_id": str(user_id),
                         "firebase_id": user.firebase_id or "",

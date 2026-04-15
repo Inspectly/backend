@@ -18,8 +18,8 @@ def get_one_by_firebase_id(firebase_id: str):
     return users.get_one_by_firebase_id(firebase_id)
 
 @router.post('/')
-def create(user: Users):
-    return users.create(user)
+async def create(user: Users):
+    return await users.create(user)
 
 @router.put('/{id}')
 def update(id: int, user: Users):

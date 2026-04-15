@@ -1,7 +1,7 @@
-import os
 import stripe
 from datetime import datetime, timezone
 
+from app.core.config import settings
 from app.schema.types import Status, Bid_Status
 from app.schema.properties import Issue_Offers, Issues
 from app.core.stripe.types import Stripe_Checkout_Session
@@ -16,7 +16,7 @@ from app.crud.issues import (
 
 class Stripe_Webhook:
     def __init__(self):
-        self.stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+        self.stripe_webhook_secret = settings.STRIPE_WEBHOOK_SECRET
     
     async def _validate_webhook(self, payload, stripe_signature: str):
         try:
