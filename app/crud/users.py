@@ -64,7 +64,7 @@ async def create(user: Users):
     user_type = get_one_user_type(user.user_type.user_type.value)
     if (user_type['user_type'] != user.user_type.user_type.value):
         raise HTTPException(status_code = 400, detail = 'Invalid user type')
-    query = '''
+    insert_user_query = '''
                 INSERT INTO users
                     (user_type, firebase_id)
                 VALUES
@@ -76,7 +76,7 @@ async def create(user: Users):
             )
     try:
         with get_db_cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(insert_user_query)
             result = cursor.fetchone()
             user_id = result['id']
             try:
@@ -87,15 +87,18 @@ async def create(user: Users):
                         "user_type": user.user_type.user_type.value or "",
                     },
                 )
-                create_stripe_user_information(
-                    User_Stripe_Information(
-                        user_id=user_id,
-                        stripe_user_id=customer.id
-                    )
-                )
             except Exception as se:
                 raise HTTPException(status_code=502, detail=f"Stripe create customer failed: {se}")
+            insert_stripe_query = '''
+                INSERT INTO user_stripe_information
+                    (user_id, stripe_user_id)
+                VALUES
+                    ({}, '{}')
+            '''.format(user_id, customer.id)
+            cursor.execute(insert_stripe_query)
         return user_id
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code = 400, detail = str(e))
     
