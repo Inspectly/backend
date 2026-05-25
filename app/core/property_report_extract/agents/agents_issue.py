@@ -2,6 +2,7 @@ from typing import Any
 
 from pydantic_ai import Agent
 
+from app.core.common.models.open_ai import OpenAIModels
 from app.core.property_report_extract.model_provider import ModelProvider
 from app.core.property_report_extract.types import (
     ReportIssues,
@@ -20,6 +21,7 @@ from app.core.property_report_extract.prompts.prompts import (
 class Agents:
     def __init__(self, **kwargs: Any):
         self.model_provider = ModelProvider(**kwargs)
+        self.issue_type_model_provider = ModelProvider(**{**kwargs, 'primary_model': OpenAIModels.gpt_5_4_mini})
 
         self.issues_extract_agent = Agent(
             self.model_provider.get_model(**kwargs),
@@ -46,9 +48,9 @@ class Agents:
         )
 
         self.issue_type_agent = Agent(
-            self.model_provider.get_model(**kwargs),
+            self.issue_type_model_provider.get_model(**kwargs),
             name = 'issue_type_agent',
-            model_settings = self.model_provider.get_model_settings(**kwargs),
+            model_settings = self.issue_type_model_provider.get_model_settings(**kwargs),
             system_prompt = ISSUE_TYPE_SYSTEM_PROMPT,
             output_type = str
         )
