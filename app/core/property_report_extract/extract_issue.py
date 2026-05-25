@@ -19,8 +19,8 @@ class ExtractIssues:
         self.report_id = parent.report_id
         self.logfire = parent.logfire
         self.agents = Agents(
-            primary_model = OpenAIModels.gpt_5_1,
-            high_effort = False
+            primary_model = OpenAIModels.gpt_5_5,
+            high_effort = True
         )
 
     async def extract_issues(self):

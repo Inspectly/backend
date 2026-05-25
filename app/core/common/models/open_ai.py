@@ -21,6 +21,16 @@ class OpenAIModels:
         )
     )
 
+    gpt_5_4_mini = Models(
+        model_name = 'gpt-5.4-mini',
+        provider = Provider.openai,
+        model_settings = Settings(
+            allow_temperature = False,
+            allow_reasoning_effort = True,
+            reasoning_effort = ReasoningEffort.medium,
+        )
+    )
+
     gpt_5_1 = Models(
         model_name = 'gpt-5.1',
         provider = Provider.openai,
