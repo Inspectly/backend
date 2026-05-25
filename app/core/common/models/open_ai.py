@@ -11,6 +11,16 @@ class OpenAIModels:
         )
     )
 
+    gpt_5_5 = Models(
+        model_name = 'gpt-5.5',
+        provider = Provider.openai,
+        model_settings = Settings(
+            allow_temperature = False,
+            allow_reasoning_effort = True,
+            reasoning_effort = ReasoningEffort.high,
+        )
+    )
+
     gpt_5_1 = Models(
         model_name = 'gpt-5.1',
         provider = Provider.openai,
