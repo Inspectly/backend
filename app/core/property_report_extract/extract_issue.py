@@ -19,8 +19,8 @@ class ExtractIssues:
         self.report_id = parent.report_id
         self.logfire = parent.logfire
         self.agents = Agents(
-            primary_model = OpenAIModels.gpt_5_1,
-            high_effort = False
+            primary_model = OpenAIModels.gpt_5_5,
+            high_effort = True
         )
 
     async def extract_issues(self):
@@ -39,16 +39,17 @@ class ExtractIssues:
             self.logfire.info(f'Verified {len(extracted_issues_verified.output.issues)} issue types')
             self.logfire.info(f'Verified issues: {extracted_issues_verified.output.issues}')
 
-            issue_validation_tasks = [
-                self.agents.issue_validator_agent.run([
-                    ISSUE_VALIDATION_USER_PROMPT.format(issue = issue),
-                    BinaryContent(data = self.pdf, media_type = 'application/pdf')
-                ])
-                for issue in extracted_issues_verified.output.issues
-            ]
-            validated_issues_task = await asyncio.gather(*issue_validation_tasks)
-            validated_issues = [result.output for result in validated_issues_task]
-            self.logfire.info(f'Validated {len(validated_issues)} issues')
+            # issue_validation_tasks = [
+            #     self.agents.issue_validator_agent.run([
+            #         ISSUE_VALIDATION_USER_PROMPT.format(issue = issue),
+            #         BinaryContent(data = self.pdf, media_type = 'application/pdf')
+            #     ])
+            #     for issue in extracted_issues_verified.output.issues
+            # ]
+            # validated_issues_task = await asyncio.gather(*issue_validation_tasks)
+            # validated_issues = [result.output for result in validated_issues_task]
+            # self.logfire.info(f'Validated {len(validated_issues)} issues')
+            validated_issues = list(extracted_issues_verified.output.issues)
 
             issue_type_tasks = [
                 self.agents.issue_type_agent.run([
@@ -66,23 +67,23 @@ class ExtractIssues:
                 validated_issue.type = IssueTypes(issue_type_result.output.strip().upper())
                 self.logfire.info(f'Assigned type {issue_type_result.output} to issue: {validated_issue.name}')
 
-            issue_type_validation_tasks = [
-                self.agents.issue_type_validator_agent.run([
-                    ISSUE_TYPE_VALIDATION_USER_PROMPT.format(
-                        issue_name = validated_issue.name,
-                        issue_description = validated_issue.description,
-                        assigned_issue_type = validated_issue.type
-                    ),
-                    BinaryContent(data = self.pdf, media_type = 'application/pdf')
-                ])
-                for validated_issue in validated_issues
-            ]
-            validated_issue_types = await asyncio.gather(*issue_type_validation_tasks)
-            validated_issue_types = [result.output for result in validated_issue_types]
-            self.logfire.info(f'Validated types for {len(validated_issue_types)} issues')
-            for validated_issue, validated_type_result in zip(validated_issues, validated_issue_types):
-                validated_issue.type = IssueTypes(validated_type_result.upper())
-                self.logfire.info(f'Validated and assigned type {validated_type_result} to issue: {validated_issue.name}')
+            # issue_type_validation_tasks = [
+            #     self.agents.issue_type_validator_agent.run([
+            #         ISSUE_TYPE_VALIDATION_USER_PROMPT.format(
+            #             issue_name = validated_issue.name,
+            #             issue_description = validated_issue.description,
+            #             assigned_issue_type = validated_issue.type
+            #         ),
+            #         BinaryContent(data = self.pdf, media_type = 'application/pdf')
+            #     ])
+            #     for validated_issue in validated_issues
+            # ]
+            # validated_issue_types = await asyncio.gather(*issue_type_validation_tasks)
+            # validated_issue_types = [result.output for result in validated_issue_types]
+            # self.logfire.info(f'Validated types for {len(validated_issue_types)} issues')
+            # for validated_issue, validated_type_result in zip(validated_issues, validated_issue_types):
+            #     validated_issue.type = IssueTypes(validated_type_result.upper())
+            #     self.logfire.info(f'Validated and assigned type {validated_type_result} to issue: {validated_issue.name}')
 
             self.logfire.info(f'Validated {len(validated_issues)} issues')
             self.logfire.info(f'Validated issues: {validated_issues}')
