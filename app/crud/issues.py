@@ -8,6 +8,13 @@ def _attach_image_urls(issue_dict: dict) -> dict:
     issue_dict['image_urls'] = [img['url'] for img in images]
     return issue_dict
 
+def _attach_image_urls_batch(issue_dicts: list[dict]) -> list[dict]:
+    '''Attach image_urls to many issues using a single image query (avoids N+1).'''
+    images_by_issue = issue_images.get_images_for_issue_ids([i['id'] for i in issue_dicts])
+    for issue_dict in issue_dicts:
+        issue_dict['image_urls'] = images_by_issue.get(issue_dict['id'], [])
+    return issue_dicts
+
 def get_one(id: int):
     query = '''
                 SELECT *
@@ -35,7 +42,7 @@ def get_all(limit: int = 50, offset: int = 0):
         cursor.execute(query, (limit, offset))
         issues = cursor.fetchall()
         return {
-            'items': [_attach_image_urls(dict(issue)) for issue in issues],
+            'items': _attach_image_urls_batch([dict(issue) for issue in issues]),
             'total': total
         }
 
@@ -117,10 +124,10 @@ def get_all_filter(limit: int = 100, offset: int = 0, type = None, city = None, 
         cursor.execute(query, params + [limit, offset])
         issues = cursor.fetchall()
         return {
-            'items': [_attach_image_urls(dict(issue)) for issue in issues],
+            'items': _attach_image_urls_batch([dict(issue) for issue in issues]),
             'total': total
         }
-    
+
 def get_report_issues(report_id: int):
     query = '''
                 SELECT *
@@ -130,7 +137,7 @@ def get_report_issues(report_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [_attach_image_urls(dict(issue)) for issue in issues]
+        return _attach_image_urls_batch([dict(issue) for issue in issues])
 
 def get_listing_issues(listing_id: int):
     query = '''
@@ -141,7 +148,7 @@ def get_listing_issues(listing_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues_list = cursor.fetchall()
-        return [_attach_image_urls(dict(issue)) for issue in issues_list]
+        return _attach_image_urls_batch([dict(issue) for issue in issues_list])
 
 def get_vendor_issues(vendor_id: int):
     query = '''
@@ -152,7 +159,7 @@ def get_vendor_issues(vendor_id: int):
     with get_db_cursor() as cursor:
         cursor.execute(query)
         issues = cursor.fetchall()
-        return [_attach_image_urls(dict(issue)) for issue in issues]
+        return _attach_image_urls_batch([dict(issue) for issue in issues])
 
 def get_all_issue_addresses():
     query = '''

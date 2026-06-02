@@ -40,6 +40,23 @@ def get_issue_images(issue_id: int):
         issue_images = cursor.fetchall()
         return [dict(image) for image in issue_images]
 
+def get_images_for_issue_ids(issue_ids: list[int]) -> dict[int, list[str]]:
+    '''Fetch image urls for many issues in a single query, grouped by issue_id.'''
+    if not issue_ids:
+        return {}
+    query = '''
+                SELECT issue_id, url
+                FROM issue_images
+                WHERE issue_id = ANY(%s)
+            '''
+    with get_db_cursor() as cursor:
+        cursor.execute(query, (issue_ids,))
+        rows = cursor.fetchall()
+    grouped: dict[int, list[str]] = {}
+    for row in rows:
+        grouped.setdefault(row['issue_id'], []).append(row['url'])
+    return grouped
+
 def create(issue_image: Issue_Images):
     query = '''
                 INSERT INTO issue_images
