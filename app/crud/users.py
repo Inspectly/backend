@@ -96,7 +96,7 @@ async def create(user: Users):
                     ({}, '{}')
             '''.format(user_id, customer.id)
             cursor.execute(insert_stripe_query)
-        return user_id
+        return dict(result)
     except HTTPException:
         raise
     except Exception as e:
