@@ -64,15 +64,16 @@ def create(vendor: Vendors):
     
     query = '''
                 INSERT INTO vendors
-                    (vendor_user_id, vendor_type, vendor_types, code, name, email, phone, address, city, state, country, postal_code, rating, review, years_of_experience, service_area, response_time, insurance, warranty)
+                    (vendor_user_id, vendor_type, vendor_types, code, verified, name, email, phone, address, city, state, country, postal_code, rating, review, years_of_experience, service_area, response_time, insurance, warranty)
                 VALUES
-                    ({}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}', {}, '{}', '{}', '{}', '{}')
+                    ({}, '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}', {}, '{}', '{}', '{}', '{}')
                 RETURNING id, vendor_user_id, code, name, created_at
             '''.format(
                 vendor.vendor_user_id,
                 vendor.vendor_type.vendor_type.value,
                 vendor.vendor_types,
                 vendor.code,
+                vendor.verified,
                 vendor.name,
                 vendor.email,
                 vendor.phone,
