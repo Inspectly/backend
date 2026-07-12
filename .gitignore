@@ -138,6 +138,12 @@ ENV/
 env.bak/
 venv.bak/
 
+# Firebase Admin credentials
+fb_service_account.json
+*firebase*credentials*.json
+*service_account*.json
+*serviceAccount*.json
+
 # Spyder project settings
 .spyderproject
 .spyproject

@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -23,6 +24,10 @@ class Settings(BaseSettings):
 
     IMGBB_API_KEY: str
     IMGBB_API_URL: str
+
+    # Firebase Admin — service account JSON as a string
+    FIREBASE_CREDENTIALS_JSON: Optional[str] = None
+    FIREBASE_PROJECT_ID: Optional[str] = None
 
     class Config:
         env_file = '.env'

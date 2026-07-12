@@ -4,6 +4,7 @@ botocore
 Faker
 fastapi
 fastapi-pagination
+firebase-admin
 logfire
 openai
 psycopg2_binary
