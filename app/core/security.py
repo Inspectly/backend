@@ -18,6 +18,7 @@ AUTH_EXEMPT_PREFIXES = (
     '/stripe/checkout/webhook',
     '/status',
     '/user_types',
+    '/vendor_types',
     '/tasks',
 )
 
@@ -115,7 +116,7 @@ async def authenticate_user(
 ):
     '''
     Verify Firebase ID token and attach the DB user to request.state.user.
-    Exempt: health/status, stripe webhook, user_types, tasks.
+    Exempt: health/status, stripe webhook, user_types, vendor_types, tasks.
     User registration (POST /users): token required, DB user may not exist yet.
     '''
     if _is_auth_exempt(request):
