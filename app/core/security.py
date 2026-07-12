@@ -77,6 +77,17 @@ def _is_user_registration(request: Request) -> bool:
     path = request.url.path.rstrip('/')
     return request.method == 'POST' and path.endswith('/users')
 
+def _firebase_lookup_id(request: Request) -> Optional[str]:
+    '''Return firebase_id from GET /users/firebase/{firebase_id}, else None.'''
+    if request.method != 'GET':
+        return None
+    relative = _v0_relative_path(request.url.path.rstrip('/'))
+    prefix = '/users/firebase/'
+    if not relative.startswith(prefix):
+        return None
+    firebase_id = relative[len(prefix):].strip('/')
+    return firebase_id or None
+
 def _extract_bearer_token(authorization: Optional[str]) -> str:
     if not authorization:
         raise HTTPException(
@@ -117,7 +128,8 @@ async def authenticate_user(
     '''
     Verify Firebase ID token and attach the DB user to request.state.user.
     Exempt: health/status, stripe webhook, user_types, vendor_types, tasks.
-    User registration (POST /users): token required, DB user may not exist yet.
+    Signup paths (POST /users, GET /users/firebase/{uid}): token required,
+    DB user may not exist yet. Firebase lookup must match the token uid.
     '''
     if _is_auth_exempt(request):
         request.state.user = None
@@ -131,6 +143,24 @@ async def authenticate_user(
             status_code = HTTP_401_UNAUTHORIZED,
             detail = 'Invalid authentication token'
         )
+
+    lookup_firebase_id = _firebase_lookup_id(request)
+    if lookup_firebase_id is not None:
+        if lookup_firebase_id != firebase_id:
+            raise HTTPException(
+                status_code = HTTP_401_UNAUTHORIZED,
+                detail = 'Firebase ID does not match authenticated token'
+            )
+        from app.crud import users
+        try:
+            user = users.get_one_by_firebase_id(firebase_id)
+        except HTTPException as exc:
+            if exc.status_code == 404:
+                user = {'id': None, 'firebase_id': firebase_id, 'user_type': None}
+            else:
+                raise
+        request.state.user = user
+        return user
 
     if _is_user_registration(request):
         user = {'id': None, 'firebase_id': firebase_id, 'user_type': None}
