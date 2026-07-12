@@ -3,13 +3,14 @@ import os
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import Header, HTTPException, Request, Security
-from fastapi.security import APIKeyHeader
+from fastapi import HTTPException, Request, Security
+from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
 load_dotenv(override = True)
 
 api_key_header = APIKeyHeader(name = 'InspectlyAI-API-Key', auto_error = False)
+firebase_bearer = HTTPBearer(auto_error = False)
 
 _firebase_app = None
 
@@ -88,19 +89,18 @@ def _firebase_lookup_id(request: Request) -> Optional[str]:
     firebase_id = relative[len(prefix):].strip('/')
     return firebase_id or None
 
-def _extract_bearer_token(authorization: Optional[str]) -> str:
-    if not authorization:
+def _extract_bearer_token(credentials: Optional[HTTPAuthorizationCredentials]) -> str:
+    if credentials is None or not credentials.credentials or not credentials.credentials.strip():
         raise HTTPException(
             status_code = HTTP_401_UNAUTHORIZED,
             detail = 'Missing Authorization header'
         )
-    parts = authorization.split(' ', 1)
-    if len(parts) != 2 or parts[0].lower() != 'bearer' or not parts[1].strip():
+    if credentials.scheme.lower() != 'bearer':
         raise HTTPException(
             status_code = HTTP_401_UNAUTHORIZED,
             detail = 'Invalid Authorization header. Expected: Bearer <token>'
         )
-    return parts[1].strip()
+    return credentials.credentials.strip()
 
 def _verify_firebase_token(token: str) -> dict:
     _init_firebase()
@@ -123,7 +123,7 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 
 async def authenticate_user(
     request: Request,
-    authorization: Optional[str] = Header(default = None)
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(firebase_bearer),
 ):
     '''
     Verify Firebase ID token and attach the DB user to request.state.user.
@@ -135,7 +135,7 @@ async def authenticate_user(
         request.state.user = None
         return None
 
-    token = _extract_bearer_token(authorization)
+    token = _extract_bearer_token(credentials)
     decoded = _verify_firebase_token(token)
     firebase_id = decoded.get('uid')
     if not firebase_id:

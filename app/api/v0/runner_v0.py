@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Security
 
 from app.core.security import authenticate_user
 from app.api.v0.endpoints import (
@@ -12,7 +12,7 @@ from app.api.v0.endpoints import (
     image, issue_disputes, issue_dispute_messages, issue_dispute_attachments
 )
 
-api_router = APIRouter(dependencies = [Depends(authenticate_user)])
+api_router = APIRouter(dependencies = [Security(authenticate_user)])
 
 @api_router.get('/')
 def get_all():
