@@ -32,17 +32,21 @@ def _init_firebase():
         return _firebase_app
 
     creds_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
-    creds_path = os.getenv('FIREBASE_CREDENTIALS_PATH') or os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     project_id = os.getenv('FIREBASE_PROJECT_ID')
 
-    if creds_json:
-        cred = credentials.Certificate(json.loads(creds_json))
-    elif creds_path and os.path.isfile(creds_path):
-        cred = credentials.Certificate(creds_path)
-    else:
+    if not creds_json:
         raise HTTPException(
             status_code = HTTP_401_UNAUTHORIZED,
             detail = 'Firebase is not configured on the server'
+        )
+
+    try:
+        creds_payload = json.loads(creds_json.strip().strip("'").strip('"'))
+        cred = credentials.Certificate(creds_payload)
+    except Exception:
+        raise HTTPException(
+            status_code = HTTP_401_UNAUTHORIZED,
+            detail = 'Invalid FIREBASE_CREDENTIALS_JSON'
         )
 
     options = {'projectId': project_id} if project_id else None

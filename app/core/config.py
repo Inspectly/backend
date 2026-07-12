@@ -25,9 +25,8 @@ class Settings(BaseSettings):
     IMGBB_API_KEY: str
     IMGBB_API_URL: str
 
-    # Firebase Admin — set one of JSON string or file path
+    # Firebase Admin — service account JSON as a string
     FIREBASE_CREDENTIALS_JSON: Optional[str] = None
-    FIREBASE_CREDENTIALS_PATH: Optional[str] = None
     FIREBASE_PROJECT_ID: Optional[str] = None
 
     class Config:
