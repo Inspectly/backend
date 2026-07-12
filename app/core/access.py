@@ -16,6 +16,9 @@ def get_request_user(request: Request) -> dict:
         raise HTTPException(status_code = HTTP_403_FORBIDDEN, detail = 'Authentication required')
     return user
 
+def is_admin(user: dict) -> bool:
+    return user.get('user_type') == User_Type.ADMIN.value
+
 def _issue_exists(issue_id: int) -> bool:
     with get_db_cursor() as cursor:
         cursor.execute('SELECT 1 FROM issues WHERE id = %s LIMIT 1', (issue_id,))
@@ -23,8 +26,11 @@ def _issue_exists(issue_id: int) -> bool:
 
 def can_access_issue(user: dict, issue_id: int) -> bool:
     '''
-    Client who owns the listing/report, vendor who bid, or assigned vendor may access.
+    Client who owns the listing/report, vendor who bid, assigned vendor, or admin may access.
     '''
+    if is_admin(user):
+        return True
+
     user_id = user.get('id')
     if user_id is None:
         return False
@@ -64,8 +70,11 @@ def can_view_issue(user: dict, issue_id: int) -> bool:
 
 def can_access_issue_offer(user: dict, offer_id: int) -> bool:
     '''
-    Vendor who placed the bid, or client who owns the issue, may access the offer.
+    Vendor who placed the bid, client who owns the issue, or admin may access the offer.
     '''
+    if is_admin(user):
+        return True
+
     user_id = user.get('id')
     if user_id is None:
         return False
@@ -101,5 +110,7 @@ def require_issue_offer_access(user: dict, offer_id: int):
         _deny()
 
 def require_same_user(user: dict, requested_user_id: int):
+    if is_admin(user):
+        return
     if user.get('id') != requested_user_id:
         _deny()

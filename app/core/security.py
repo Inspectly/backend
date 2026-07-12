@@ -13,10 +13,12 @@ api_key_header = APIKeyHeader(name = 'InspectlyAI-API-Key', auto_error = False)
 
 _firebase_app = None
 
-# Paths under /api/v0 that do not require a logged-in user
-AUTH_EXEMPT_SUFFIXES = (
+# Paths under /api/v0 that do not require a logged-in user (prefix match)
+AUTH_EXEMPT_PREFIXES = (
     '/stripe/checkout/webhook',
     '/status',
+    '/user_types',
+    '/tasks',
 )
 
 def _init_firebase():
@@ -53,11 +55,22 @@ def _init_firebase():
     _firebase_app = firebase_admin.initialize_app(cred, options)
     return _firebase_app
 
+def _v0_relative_path(path: str) -> str:
+    marker = '/v0'
+    if marker in path:
+        relative = path.split(marker, 1)[1]
+        return relative if relative else '/'
+    return path
+
 def _is_auth_exempt(request: Request) -> bool:
     path = request.url.path.rstrip('/')
     if path.endswith('/v0') or path.endswith('/api'):
         return True
-    return any(path.endswith(suffix) for suffix in AUTH_EXEMPT_SUFFIXES)
+    relative = _v0_relative_path(path)
+    return any(
+        relative == prefix or relative.startswith(prefix + '/')
+        for prefix in AUTH_EXEMPT_PREFIXES
+    )
 
 def _is_user_registration(request: Request) -> bool:
     path = request.url.path.rstrip('/')
