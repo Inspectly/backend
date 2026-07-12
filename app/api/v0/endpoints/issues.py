@@ -1,10 +1,11 @@
 import math
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, Body, Request
 from fastapi_pagination import Page
 from fastapi_pagination.api import resolve_params
 
 from app.crud import issues
 from app.schema.properties import Issues
+from app.core.access import get_request_user, require_issue_access, require_issue_view, require_same_user
 
 router = APIRouter()
 
@@ -39,7 +40,9 @@ def get_all_filter(type = None, city = None, state = None, search = None, vendor
     )
 
 @router.get('/{id}')
-def get_one(id: int):
+def get_one(id: int, request: Request):
+    user = get_request_user(request)
+    require_issue_view(user, id)
     return issues.get_one(id)
 
 @router.get('/report/{report_id}')
@@ -51,7 +54,9 @@ def get_listing_issues(listing_id: int):
     return issues.get_listing_issues(listing_id)
 
 @router.get('/vendor/{vendor_id}')
-def get_vendor_issues(vendor_id: int):
+def get_vendor_issues(vendor_id: int, request: Request):
+    user = get_request_user(request)
+    require_same_user(user, vendor_id)
     return issues.get_vendor_issues(vendor_id)
 
 @router.get('/addresses/all')
@@ -63,7 +68,9 @@ def get_all_issue_addresses_issue_ids(issue_ids: list[int] = Body(..., embed = T
     return issues.get_all_issue_addresses_issue_ids(issue_ids)
 
 @router.get('/address/{id}')
-def get_issue_address(id: int):
+def get_issue_address(id: int, request: Request):
+    user = get_request_user(request)
+    require_issue_view(user, id)
     return issues.get_issue_address(id)
 
 @router.post('/')
@@ -71,9 +78,13 @@ async def create(issue: Issues):
     return await issues.create(issue)
 
 @router.put('/{id}')
-def update(id: int, issue: Issues):
+def update(id: int, issue: Issues, request: Request):
+    user = get_request_user(request)
+    require_issue_access(user, id)
     return issues.update(id, issue)
 
 @router.delete('/{id}')
-def delete(id: int):
+def delete(id: int, request: Request):
+    user = get_request_user(request)
+    require_issue_access(user, id)
     return issues.delete(id)
