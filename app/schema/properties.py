@@ -2,7 +2,7 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from app.schema.types import Assessment_Status, Bid_Status, Dispute_Status, Status, User_Type
+from app.schema.types import Assessment_Status, Bid_Status, Dispute_Status, Offer_Update_Status, Status, User_Type
 
 class Listings(BaseModel):
     user_id: int
@@ -80,6 +80,12 @@ class Issue_Offers(BaseModel):
     user_last_viewed: Optional[str] = None
     comment_vendor: Optional[str] = None
     comment_client: Optional[str] = None
+
+class Issue_Offer_Updates(BaseModel):
+    offer_id: int
+    amount: float
+    status: Offer_Update_Status = Offer_Update_Status.PENDING
+    reason: str
 
 class Issue_Assessments(BaseModel):
     issue_id: int

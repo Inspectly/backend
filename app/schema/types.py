@@ -45,6 +45,14 @@ class Bid_Status(str, Enum):
     RECEIVED = 'received'
     ACCEPTED = 'accepted'
     REJECTED = 'rejected'
+    PENDING = 'pending'
+
+class Offer_Update_Status(str, Enum):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    WITHDRAWN = 'withdrawn'
+    EXPIRED = 'expired'
 
 class Assessment_Status(str, Enum):
     RECEIVED = 'received'

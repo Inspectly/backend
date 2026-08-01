@@ -2,7 +2,7 @@ from fastapi import APIRouter, Security
 
 from app.core.security import authenticate_user
 from app.api.v0.endpoints import (
-    issue_offers, user_types, vendor_types,
+    issue_offers, issue_offer_updates, user_types, vendor_types,
     users, user_logins, user_sessions, clients, realtors, vendors,
     realtor_firms, vendor_employees,
     listings, reports, issues, issue_assessments, attachments, comments, notes,
@@ -45,6 +45,7 @@ api_router.include_router(reports.router, prefix = '/reports', tags = ['reports'
 api_router.include_router(issues.router, prefix = '/issues', tags = ['issues'])
 
 api_router.include_router(issue_offers.router, prefix = '/issue_offers', tags = ['issue_offers'])
+api_router.include_router(issue_offer_updates.router, prefix = '/issue_offer_updates', tags = ['issue_offer_updates'])
 api_router.include_router(issue_assessments.router, prefix = '/issue_assessments', tags = ['issue_assessments'])
 api_router.include_router(issue_assessment_comments.router, prefix = '/issue_assessment_comments', tags = ['issue_assessment_comments'])
 
