@@ -83,7 +83,7 @@ class Issue_Offers(BaseModel):
 
 class Issue_Offer_Updates(BaseModel):
     offer_id: int
-    amount: float
+    price: float
     status: Offer_Update_Status = Offer_Update_Status.PENDING
     reason: str
 

@@ -44,7 +44,7 @@ def get_all_by_issue_id(issue_id: int):
 
 def create(issue_offer_update: Issue_Offer_Updates):
     insert_query = '''
-        INSERT INTO issue_offer_updates (offer_id, amount, status, reason)
+        INSERT INTO issue_offer_updates (offer_id, price, status, reason)
         VALUES (%s, %s, %s, %s)
         RETURNING id, offer_id, created_at
     '''
@@ -59,7 +59,7 @@ def create(issue_offer_update: Issue_Offer_Updates):
             # into pending until the homeowner responds
             cursor.execute(insert_query, (
                 issue_offer_update.offer_id,
-                issue_offer_update.amount,
+                issue_offer_update.price,
                 Offer_Update_Status.PENDING,
                 issue_offer_update.reason
             ))
@@ -76,12 +76,12 @@ def update(id: int, issue_offer_update: Issue_Offer_Updates):
     update_query = '''
         UPDATE issue_offer_updates
         SET
-            amount = %s,
+            price = %s,
             status = %s,
             reason = %s,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = %s
-        RETURNING id, offer_id, amount, status, updated_at
+        RETURNING id, offer_id, price, status, updated_at
     '''
     offer_query = '''
         UPDATE issue_offers
@@ -91,7 +91,7 @@ def update(id: int, issue_offer_update: Issue_Offer_Updates):
     try:
         with get_db_cursor() as cursor:
             cursor.execute(update_query, (
-                issue_offer_update.amount,
+                issue_offer_update.price,
                 issue_offer_update.status,
                 issue_offer_update.reason,
                 id
@@ -100,11 +100,11 @@ def update(id: int, issue_offer_update: Issue_Offer_Updates):
             if not updated:
                 raise HTTPException(status_code = 404, detail = 'Issue offer update not found')
             updated = dict(updated)
-            # If the homeowner accepts, the new amount becomes the offer price
+            # If the homeowner accepts, the new price becomes the offer price
             # and both tables move to accepted
             if updated['status'] == Offer_Update_Status.ACCEPTED:
                 cursor.execute(offer_query, (
-                    updated['amount'],
+                    updated['price'],
                     Bid_Status.ACCEPTED,
                     updated['offer_id']
                 ))
